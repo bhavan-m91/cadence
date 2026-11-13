@@ -41,7 +41,8 @@ async def test_ac050_total_mismatch_reports_expected_actual_and_delta(client):
     r = await client.put(f"{API}/ideal/day", headers=p.headers, json=body)
     assert r.status_code == 422 and r.json()["error"]["code"] == "ALLOCATION_TOTAL_MISMATCH"
     assert r.json()["error"]["details"] == {"expected": 1440, "actual": 1380, "delta": -60}
-    over = day_body(p); over["allocations"][0]["minutes"] += 30
+    over = day_body(p)
+    over["allocations"][0]["minutes"] += 30
     assert (await client.put(f"{API}/ideal/day", headers=p.headers, json=over)).json()["error"]["details"]["delta"] == 30
     empty = await client.put(f"{API}/ideal/day", headers=p.headers, json={"effective_from": "2025-01-01", "allocations": []})
     assert empty.json()["error"]["details"] == {"expected": 1440, "actual": 0, "delta": -1440}
@@ -61,19 +62,25 @@ async def test_ac051_ancestor_and_descendant_cannot_both_be_allocated(client):
 async def test_input_validation_codes(client):
     p = await signup(client)
     for minutes in (0, -30, 7, 1445):
-        b = day_body(p); b["allocations"][0]["minutes"] = minutes
+        b = day_body(p)
+        b["allocations"][0]["minutes"] = minutes
         r = await client.put(f"{API}/ideal/day", headers=p.headers, json=b)
         assert r.json()["error"]["code"] == "INVALID_MINUTES", minutes
-    dup = day_body(p); dup["allocations"].append(dict(dup["allocations"][0]))
+    dup = day_body(p)
+    dup["allocations"].append(dict(dup["allocations"][0]))
     assert (await client.put(f"{API}/ideal/day", headers=p.headers, json=dup)).json()["error"]["code"] == "DUPLICATE_ALLOCATION"
     await client.patch(f"{API}/categories/{p.cats['Sales & clients']}", headers=p.headers, json={"archived": True})
-    arch = day_body(p, **{"Entertainment": 60}); arch["allocations"].append({"category_id": p.cats["Sales & clients"], "minutes": 60}); arch["allocations"][0]["minutes"] -= 60
+    arch = day_body(p, **{"Entertainment": 60})
+    arch["allocations"].append({"category_id": p.cats["Sales & clients"], "minutes": 60})
+    arch["allocations"][0]["minutes"] -= 60
     assert (await client.put(f"{API}/ideal/day", headers=p.headers, json=arch)).json()["error"]["code"] == "CATEGORY_ARCHIVED"
-    unknown = day_body(p); unknown["allocations"][0]["category_id"] = "00000000-0000-0000-0000-000000000000"
+    unknown = day_body(p)
+    unknown["allocations"][0]["category_id"] = "00000000-0000-0000-0000-000000000000"
     r = await client.put(f"{API}/ideal/day", headers=p.headers, json=unknown)
     assert r.status_code == 422 and r.json()["error"]["code"] == "VALIDATION_ERROR"
     other = await signup(client)  # someone else's category looks unknown
-    foreign = day_body(p); foreign["allocations"][0]["category_id"] = other.cats["Deep work"]
+    foreign = day_body(p)
+    foreign["allocations"][0]["category_id"] = other.cats["Deep work"]
     assert (await client.put(f"{API}/ideal/day", headers=p.headers, json=foreign)).status_code == 422
 
 
@@ -109,10 +116,12 @@ async def test_ac054_week_template_totals_168h_with_distribution_and_tag_goal_ou
     assert w["total_minutes"] == 10080 and w["unallocated_minutes"] == 0
     deep = next(a for a in w["allocations"] if a["name"] == "Deep work")
     assert deep["distribution"] == "weekdays" and deep["per_day_minutes"] == 240
-    bad = week_body(p); bad["allocations"][0]["minutes"] -= 60
+    bad = week_body(p)
+    bad["allocations"][0]["minutes"] -= 60
     r = await client.put(f"{API}/ideal/week", headers=p.headers, json=bad)
     assert r.json()["error"]["details"] == {"expected": 10080, "actual": 10020, "delta": -60}
-    day_forced = day_body(p); day_forced["allocations"][0]["distribution"] = "weekdays"
+    day_forced = day_body(p)
+    day_forced["allocations"][0]["distribution"] = "weekdays"
     saved = (await client.put(f"{API}/ideal/day", headers=p.headers, json=day_forced)).json()["data"]
     assert {a["distribution"] for a in saved["allocations"]} == {"all_days"}  # a day template is always all_days
 

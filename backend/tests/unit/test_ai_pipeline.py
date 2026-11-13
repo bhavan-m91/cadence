@@ -43,7 +43,7 @@ def prd_response():
     def act(i, title, quote, cat, ref, tags=(), conf=(0.9, 0.9, 0.9), flags=()):
         return {"temp_id": f"a{i}", "order": i, "title": title, "description": None, "source_quote": quote, "category_id": str(cat), "time_ref": ref,
                 "tags": [{"tag_id": str(t), "name": n, "reason": n, "confidence": 0.9} for t, n in tags], "task": None, "location_type": None,
-                "confidence": dict(zip(("overall", "time", "category"), conf)), "flags": list(flags)}
+                "confidence": dict(zip(("overall", "time", "category"), conf, strict=False)), "flags": list(flags)}
     return {"schema_version": "1", "entry_summary": "Research, Product A debugging, lunch, a meeting and Product B", "activities": [
         act(1, "Research new AI feature", "Started my day at around 9:30. Spent an hour researching how to implement the new AI feature", DEEP,
             {"kind": "range", "start": tod(9, 30), "duration_minutes": 60, "approximate": True, "quote": "around 9:30 ... an hour"}, [(T_RESEARCH, "research")], (0.9, 0.85, 0.8)),

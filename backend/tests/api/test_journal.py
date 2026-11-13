@@ -173,7 +173,7 @@ async def test_transient_errors_retry_with_backoff_then_fail_but_keep_the_text(c
     r = await client.post(f"{API}/journal-entries/{e['id']}/process", headers={**p.headers, **idem()}, json={})
     job_id = uuid.UUID(r.json()["data"]["job_id"])
     prov = Flaky(ProviderTransientError("429"))
-    for attempt, delay in ((1, 2), (2, 8)):
+    for attempt, _delay in ((1, 2), (2, 8)):
         await run_job(db, job_id, prov)
         row = (await db.execute(text("SELECT status::text, attempts, queued_at > now() FROM ai_processing_jobs WHERE id = :i"), {"i": job_id})).one()
         assert row[0] == "queued" and row[1] == attempt and row[2] is True                          # re-queued for later (2 s, then 8 s)
