@@ -991,6 +991,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/transcriptions": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Transcribe */
+        post: operations["transcribe_api_v1_transcriptions_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/users/me": {
         parameters: {
             query?: never;
@@ -1342,6 +1359,13 @@ export interface components {
             model: string;
             /** Provider */
             provider: string;
+            /**
+             * Stt Available
+             * @default false
+             */
+            stt_available: boolean;
+            /** Stt Provider */
+            stt_provider?: string | null;
             /** Used Today */
             used_today: number;
         };
@@ -1501,6 +1525,15 @@ export interface components {
              * @enum {string}
              */
             reason: "UNANSWERED_QUESTION" | "MISSING_DURATION" | "OVERLAP";
+        };
+        /** Body_transcribe_api_v1_transcriptions_post */
+        Body_transcribe_api_v1_transcriptions_post: {
+            /** Audio */
+            audio: string;
+            /** Duration S */
+            duration_s?: number | null;
+            /** Language */
+            language?: string | null;
         };
         /** BreakdownItem */
         BreakdownItem: {
@@ -2427,6 +2460,14 @@ export interface components {
         /** Envelope[TimelineOut] */
         Envelope_TimelineOut_: {
             data: components["schemas"]["TimelineOut"];
+            /** Meta */
+            meta?: {
+                [key: string]: unknown;
+            };
+        };
+        /** Envelope[TranscriptionOut] */
+        Envelope_TranscriptionOut_: {
+            data: components["schemas"]["TranscriptionOut"];
             /** Meta */
             meta?: {
                 [key: string]: unknown;
@@ -3819,6 +3860,15 @@ export interface components {
          * @enum {string}
          */
         TranscriptionMode: "auto" | "server_only" | "browser_only";
+        /** TranscriptionOut */
+        TranscriptionOut: {
+            /** Duration S */
+            duration_s: number | null;
+            /** Provider */
+            provider: string;
+            /** Text */
+            text: string;
+        };
         /** Transition */
         Transition: {
             /**
@@ -9121,6 +9171,75 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["Envelope_TimelineOut_"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Too Many Requests */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+        };
+    };
+    transcribe_api_v1_transcriptions_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "multipart/form-data": components["schemas"]["Body_transcribe_api_v1_transcriptions_post"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Envelope_TranscriptionOut_"];
                 };
             };
             /** @description Unauthorized */

@@ -48,3 +48,18 @@ class LLMProvider(Protocol):
     model: str
 
     async def generate_structured(self, request: StructuredRequest) -> StructuredResponse: ...
+
+
+@dataclass
+class TranscriptionResult:
+    text: str
+    model: str
+    provider: str
+    latency_ms: int
+
+
+class SpeechToTextProvider(Protocol):
+    name: str
+    model: str
+
+    async def transcribe(self, audio: bytes, filename: str, content_type: str, language: str | None, timeout_s: int) -> TranscriptionResult: ...

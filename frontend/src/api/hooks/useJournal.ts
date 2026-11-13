@@ -61,3 +61,15 @@ export function useJob(jobId: string | undefined) {
     refetchInterval: (q) => (q.state.data && TERMINAL.includes(q.state.data.status) ? false : navigator.onLine ? 1500 : false),
   })
 }
+
+/** Server-side transcription for browsers without live dictation (FR-016). The audio is sent once and not kept. */
+export const useTranscribe = () =>
+  useMutation({
+    mutationFn: ({ blob, seconds, language }: { blob: Blob; seconds: number; language?: string }) => {
+      const form = new FormData()
+      form.append('audio', blob, `recording.${blob.type.includes('mp4') ? 'm4a' : blob.type.includes('ogg') ? 'ogg' : 'webm'}`)
+      form.append('duration_s', String(seconds))
+      if (language) form.append('language', language)
+      return api.post<{ text: string; duration_s: number | null; provider: string }>('/transcriptions', form)
+    },
+  })

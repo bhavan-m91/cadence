@@ -59,12 +59,12 @@ Layering is strict: routers hold no business rules; services own transactions; r
 |---|---|
 | 0 Foundation | Repo, CI, config, error envelope, request ids, health endpoints, migrations, theme, PWA, OpenAPI -> TypeScript. **Not done:** Railway/Cloudflare deploy pipeline, Sentry project wiring (the code path exists, guarded by `SENTRY_DSN`) - both need accounts. |
 | 1 Core data & manual logging | Done (E-01..E-19 except Apple, E-33..E-69, E-79/E-80). |
-| 2 AI journal | Done except server-side speech-to-text (skipped by decision: the browser's speech recognition and typing only). Journal composer (dictate/type, autosave + offline draft), background worker, extraction pipeline with deterministic time/tag/task resolution, review screen, all-or-nothing idempotent commit, history and entry pages. Needs `ANTHROPIC_API_KEY`; without one a built-in offline reader runs in a labelled demo mode. |
+| 2 AI journal | Done. Voice input works in every browser: live dictation where the browser has speech recognition (Chrome, Edge, Safari), otherwise a recording the server transcribes (needs `OPENAI_API_KEY`; audio is never stored). Journal composer (dictate/type, autosave + offline draft), background worker, extraction pipeline with deterministic time/tag/task resolution, review screen, all-or-nothing idempotent commit, history and entry pages. Needs `ANTHROPIC_API_KEY`; without one a built-in offline reader runs in a labelled demo mode. |
 | 3 Ideal Day & Week | Done. Day and week editors, 24h/168h validation, effective-dated versions, pace and status against the week so far (E-70..E-73). |
 | 4 / 4B Analytics | Done. Day, week, overview, breakdown and trends endpoints (E-74..E-78) with ETag/304, deterministic banners, adherence, sleep by wake date, focus and streaks. Overview dashboards for day and week: KPIs, actual vs Ideal, work vs personal, 24h coverage, sleep, focus, 8-week trend, 26-week focus heatmap, treemap, top tasks, tag limits, deadlines. Every chart has a table view. `make seed-demo` fills an account with half a year of data. |
 | 5 Hardening | Not started (RLS, backup drill, load test). The backup script and restore runbook are written but **never run**. |
 
-Tests: 205 backend (real Postgres: tenant isolation, DST fixtures, time resolver, extraction pipeline, review/commit, Ideal) and 36 frontend. The labelled extraction set (`python -m app.ai.eval.run_eval`) has 16 cases; the PRD asks for 40.
+Tests: 227 backend (real Postgres: tenant isolation, DST fixtures, time resolver, extraction pipeline, review/commit, Ideal) and 47 frontend. The labelled extraction set (`python -m app.ai.eval.run_eval`) has 16 cases; the PRD asks for 40.
 
 ### Known gaps in what exists
 

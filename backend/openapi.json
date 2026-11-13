@@ -996,6 +996,22 @@
             "title": "Provider",
             "type": "string"
           },
+          "stt_available": {
+            "default": false,
+            "title": "Stt Available",
+            "type": "boolean"
+          },
+          "stt_provider": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Stt Provider"
+          },
           "used_today": {
             "title": "Used Today",
             "type": "integer"
@@ -1409,6 +1425,45 @@
           "reason"
         ],
         "title": "Blocker",
+        "type": "object"
+      },
+      "Body_transcribe_api_v1_transcriptions_post": {
+        "properties": {
+          "audio": {
+            "contentMediaType": "application/octet-stream",
+            "title": "Audio",
+            "type": "string"
+          },
+          "duration_s": {
+            "anyOf": [
+              {
+                "maximum": 3600.0,
+                "minimum": 0.0,
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Duration S"
+          },
+          "language": {
+            "anyOf": [
+              {
+                "maxLength": 12,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Language"
+          }
+        },
+        "required": [
+          "audio"
+        ],
+        "title": "Body_transcribe_api_v1_transcriptions_post",
         "type": "object"
       },
       "BreakdownItem": {
@@ -3834,6 +3889,23 @@
           "data"
         ],
         "title": "Envelope[TimelineOut]",
+        "type": "object"
+      },
+      "Envelope_TranscriptionOut_": {
+        "properties": {
+          "data": {
+            "$ref": "#/components/schemas/TranscriptionOut"
+          },
+          "meta": {
+            "additionalProperties": true,
+            "title": "Meta",
+            "type": "object"
+          }
+        },
+        "required": [
+          "data"
+        ],
+        "title": "Envelope[TranscriptionOut]",
         "type": "object"
       },
       "Envelope_TrendsOut_": {
@@ -7636,6 +7708,36 @@
         ],
         "title": "TranscriptionMode",
         "type": "string"
+      },
+      "TranscriptionOut": {
+        "properties": {
+          "duration_s": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Duration S"
+          },
+          "provider": {
+            "title": "Provider",
+            "type": "string"
+          },
+          "text": {
+            "title": "Text",
+            "type": "string"
+          }
+        },
+        "required": [
+          "text",
+          "duration_s",
+          "provider"
+        ],
+        "title": "TranscriptionOut",
+        "type": "object"
       },
       "Transition": {
         "properties": {
@@ -15764,6 +15866,92 @@
         "summary": "Timeline",
         "tags": [
           "timeline"
+        ]
+      }
+    },
+    "/api/v1/transcriptions": {
+      "post": {
+        "operationId": "transcribe_api_v1_transcriptions_post",
+        "requestBody": {
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "$ref": "#/components/schemas/Body_transcribe_api_v1_transcriptions_post"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Envelope_TranscriptionOut_"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Unauthorized"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Conflict"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Validation Error"
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Too Many Requests"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Transcribe",
+        "tags": [
+          "transcriptions"
         ]
       }
     },

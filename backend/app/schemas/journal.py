@@ -126,3 +126,11 @@ class AiStatusOut(BaseModel):
     enabled: bool
     daily_limit: int
     used_today: int
+    stt_available: bool = False
+    stt_provider: str | None = None
+
+
+class TranscriptionOut(BaseModel):
+    text: str
+    duration_s: int | None
+    provider: str

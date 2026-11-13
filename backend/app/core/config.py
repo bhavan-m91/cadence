@@ -39,6 +39,13 @@ class Settings(BaseSettings):
     llm_timeout_seconds: int = 45
     llm_max_tokens: int = 4096
     llm_enabled: bool = True  # kill switch (PRD Phase 5)
+    # Speech-to-text fallback (FR-016): used where the browser has no working Web Speech API (Firefox, Brave, app shells)
+    openai_api_key: str = ""
+    stt_provider: str = "auto"  # auto (OpenAI when a key is set, otherwise unavailable) | openai | fake (tests only)
+    stt_model: str = "gpt-4o-mini-transcribe"
+    stt_timeout_seconds: int = 30
+    stt_max_bytes: int = 10 * 1024 * 1024
+    stt_per_hour: int = 20
     ai_daily_job_limit: int = 30
     ai_regenerations_per_day: int = 5
     embedded_worker: bool = True  # run the job worker inside the API process; set false when running a separate worker

@@ -4,6 +4,7 @@ from app.ai.providers.base import (
     ProviderOutputError,
     ProviderPermanentError,
     ProviderTransientError,
+    SpeechToTextProvider,
     StructuredRequest,
     StructuredResponse,
 )
@@ -50,3 +51,32 @@ def provider_status() -> dict:
 
 __all__ = ["LLMProvider", "ProviderError", "ProviderOutputError", "ProviderPermanentError", "ProviderTransientError", "StructuredRequest",
            "StructuredResponse", "get_llm_provider", "provider_status", "set_provider"]
+
+
+# ---- speech-to-text (FR-016). Unlike the LLM there is no offline stand-in: invented text from a "demo" transcriber would look real.
+_stt_override: SpeechToTextProvider | None = None
+
+
+def set_stt_provider(p: SpeechToTextProvider | None) -> None:
+    global _stt_override
+    _stt_override = p
+
+
+def get_stt_provider() -> SpeechToTextProvider | None:
+    if _stt_override is not None:
+        return _stt_override
+    s = get_settings()
+    if s.stt_provider == "fake" and not s.is_production:
+        from app.ai.providers.stt_fake import FakeTranscriber
+
+        return FakeTranscriber()
+    if s.stt_provider in ("auto", "openai") and s.openai_api_key:
+        from app.ai.providers.stt_openai import OpenAITranscriber
+
+        return OpenAITranscriber(s.openai_api_key, s.stt_model)
+    return None
+
+
+def stt_status() -> dict:
+    p = get_stt_provider()
+    return {"stt_available": p is not None, "stt_provider": p.name if p else None}

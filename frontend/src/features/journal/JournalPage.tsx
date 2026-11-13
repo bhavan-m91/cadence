@@ -4,7 +4,8 @@ import { useNavigate } from 'react-router-dom'
 import { ApiError, request } from '@/api/client'
 import { errorMessage } from '@/api/errors'
 import { useTimeline } from '@/api/hooks/useActivities'
-import { useAiStatus, useCreateEntry, useJournalStats, usePatchEntry, useProcessEntry, useRecentEntries } from '@/api/hooks/useJournal'
+import { useAiStatus, useCreateEntry, useJournalStats, usePatchEntry, useProcessEntry, useRecentEntries, useTranscribe } from '@/api/hooks/useJournal'
+import { usePreferences } from '@/api/hooks/useSettings'
 import { useTags } from '@/api/hooks/useTaxonomy'
 import { useRules } from '@/api/hooks/useTaxonomy'
 import type { EntryOut, EntrySummary } from '@/api/types'
@@ -17,6 +18,7 @@ import { Skeleton } from '@/components/ui/Feedback'
 import { Icon, type IconName } from '@/components/ui/Icon'
 import { usePrefersReducedMotion } from '@/lib/a11y'
 import { BLOCKED_MESSAGES, checkMicrophone, createDictation, DICTATION_MESSAGES, dictationBlockedReason, dictationSupported, type Dictation, type DictationError } from '@/lib/dictation'
+import { createRecorder, recorderSupported, RecorderError, type Recorder } from '@/lib/recorder'
 import { approxActivities, phraseIn, wordCount } from '@/lib/heuristics'
 import { idbDelete, idbGet, idbSet } from '@/lib/idb'
 import { dayAndMonth, formatClock, hm, isoToLocal, minutesBetween, todayIn, weekdayShort } from '@/lib/time'
@@ -65,10 +67,19 @@ export function JournalPage() {
   const { data: rules } = useRules()
   const { data: tags } = useTags()
   const create = useCreateEntry(), patch = usePatchEntry(), process = useProcessEntry()
+  const { data: prefs } = usePreferences()
+  const transcribe = useTranscribe()
   const supported = dictationSupported()
   const blockedWhy = dictationBlockedReason()
+  // Two ways to turn speech into text: the browser's live recogniser, or a recording the server transcribes (FR-016).
+  // Which one runs follows the person's setting; `auto` prefers live text and falls back to the recording.
+  const recordOk = !!ai?.stt_available && recorderSupported()
+  const pref = prefs?.transcription_mode ?? 'auto'
+  const route: 'web' | 'rec' | null = pref === 'server_only' ? (recordOk ? 'rec' : supported ? 'web' : null)
+    : pref === 'browser_only' ? (supported ? 'web' : null) : supported ? 'web' : recordOk ? 'rec' : null
+  const canDictate = route !== null
 
-  const [mode, setMode] = useState<Mode>(supported ? 'dictate' : 'type')
+  const [mode, setMode] = useState<Mode>('dictate')
   const [text, setText] = useState('')
   const [interim, setInterim] = useState('')
   const [recording, setRecording] = useState(false)
@@ -76,6 +87,10 @@ export function JournalPage() {
   const [dictated, setDictated] = useState(false)
   const [micError, setMicError] = useState<DictationError>()
   const [micRaw, setMicRaw] = useState<string>()
+  const [micText, setMicText] = useState<string>()
+  const [notice, setNotice] = useState<string>()
+  const [capture, setCapture] = useState<'web' | 'rec' | null>(null)
+  const [transcribing, setTranscribing] = useState(false)
   const [preset, setPreset] = useState<Preset>('today')
   const [covers, setCovers] = useState<RangeValue>({ date: today, start: '00:00', end: nowTime })
   const [entryId, setEntryId] = useState<string>()
@@ -87,6 +102,7 @@ export function JournalPage() {
   const [restored, setRestored] = useState(false)
   const dict = useRef<Dictation | null>(null)
   const cancelStart = useRef(false)
+  const recorder = useRef<Recorder | null>(null)
   const keys = useRef(new Map<string, string>())
   const textRef = useRef(text)
   textRef.current = text
@@ -122,13 +138,13 @@ export function JournalPage() {
         }
       }
       if (!live) return
-      setText(d.text); setCovers(d.covers); setPreset(d.preset); setMode(d.mode === 'dictate' && !supported ? 'type' : d.mode)
+      setText(d.text); setCovers(d.covers); setPreset(d.preset); setMode(d.mode)
       setSeconds(d.seconds); setDictated(d.dictated); setEntryId(d.entryId); setVersion(d.version)
       setRestored(true)
       if (d.text.trim()) toast.success('Restored your unsaved draft.')
     })()
     return () => { live = false }
-  }, [user.id, supported])
+  }, [user.id])
 
   useEffect(() => {
     if (!restored) return
@@ -205,24 +221,81 @@ export function JournalPage() {
     const t = setInterval(() => setSeconds((s) => s + 1), 1000)
     return () => clearInterval(t)
   }, [recording])
-  useEffect(() => () => dict.current?.abort(), [])
+  useEffect(() => () => { dict.current?.abort(); recorder.current?.cancel() }, [])
+  const settledMode = useRef(false) // once, when the server's answer arrives: start on Type where nothing can dictate
+  useEffect(() => { if (ai && !settledMode.current) { settledMode.current = true; if (!canDictate) setMode('type') } }, [ai, canDictate])
+
+  const appendSpoken = (t: string) => {
+    if (!t.trim()) return
+    setText((p) => (p && !/\s$/.test(p) ? `${p} ` : p) + t.trim())
+    setDirty(true); setDictated(true)
+  }
+
+  const startWeb = () => {
+    setCapture('web')
+    dict.current = createDictation({
+      onFinal: appendSpoken,
+      onInterim: setInterim,
+      onError: (e, raw) => {
+        setInterim('')
+        // Live recognition that cannot work here (no speech service, odd failure) hands over to a recording when the server can transcribe one.
+        if ((e === 'network' || e === 'unknown' || e === 'unsupported') && recordOk && pref !== 'browser_only') {
+          setNotice('Live dictation is not available in this browser, so your voice is recorded and the text appears when you stop.')
+          void startRecorder()
+          return
+        }
+        setMicError(e); setMicRaw(raw); setRecording(false); setCapture(null)
+      },
+      onEnd: () => { setRecording(false); setInterim(''); setCapture(null) },
+    })
+    dict.current.start()
+  }
+
+  const startRecorder = async () => {
+    const r = createRecorder({ onLimit: () => { void finishRecorder() } })
+    recorder.current = r
+    try {
+      await r.start()
+      if (cancelStart.current) { r.cancel(); recorder.current = null; return }
+      setCapture('rec'); setRecording(true)
+    } catch (e) {
+      recorder.current = null
+      setRecording(false); setCapture(null)
+      setMicError(e instanceof RecorderError ? e.code : 'unknown')
+    }
+  }
+
+  const finishRecorder = async () => {
+    const r = recorder.current
+    if (!r) return
+    recorder.current = null
+    setRecording(false); setCapture(null); setTranscribing(true)
+    try {
+      const rec = await r.stop()
+      if (rec.seconds < 1 || rec.blob.size < 1024) { setMicError('no-speech'); return }
+      const out = await transcribe.mutateAsync({ blob: rec.blob, seconds: rec.seconds, language: navigator.language?.split('-')[0] })
+      if (out.text.trim()) appendSpoken(out.text)
+      else setMicError('no-speech')
+    } catch (e) {
+      setMicText(`${errorMessage(e)} Your recording was not kept, so tap the mic to try again, or type.`)
+    } finally { setTranscribing(false) }
+  }
 
   const startRec = async () => {
-    setMicError(undefined); setMicRaw(undefined)
+    setMicError(undefined); setMicRaw(undefined); setMicText(undefined); setNotice(undefined)
     cancelStart.current = false
     setRecording(true) // show the listening state at once; the permission prompt can take a moment
     const blocked = await checkMicrophone()
     if (cancelStart.current) return // stopped while the permission prompt was open
     if (blocked) { setMicError(blocked); setRecording(false); return }
-    dict.current = createDictation({
-      onFinal: (t) => { if (t) { setText((p) => (p && !/\s$/.test(p) ? `${p} ` : p) + t); setDirty(true); setDictated(true) } },
-      onInterim: setInterim,
-      onError: (e, raw) => { setMicError(e); setMicRaw(raw); setRecording(false); setInterim('') },
-      onEnd: () => { setRecording(false); setInterim('') },
-    })
-    dict.current.start()
+    if (route === 'rec') await startRecorder()
+    else startWeb()
   }
-  const stopRec = () => { cancelStart.current = true; dict.current?.stop(); setRecording(false); setInterim('') }
+  const stopRec = () => {
+    cancelStart.current = true
+    if (recorder.current) { void finishRecorder(); return }
+    dict.current?.stop(); setRecording(false); setInterim('')
+  }
 
   // ---- derived UI
   const words = wordCount(text)
@@ -244,7 +317,7 @@ export function JournalPage() {
     { id: 'since', label: 'Since my last entry', off: !lastEnd }, { id: 'custom', label: 'Custom' },
   ]
   const fullScreen = recording
-  const canSubmit = !submitting && !!text.trim() && !winError
+  const canSubmit = !submitting && !!text.trim() && !winError && !transcribing && capture !== 'rec'
 
   const dictateBox = (
     <div className={clsx(fullScreen && 'max-md:flex max-md:min-h-0 max-md:flex-1 max-md:flex-col')}>
@@ -254,20 +327,23 @@ export function JournalPage() {
             <i aria-hidden className="absolute inset-0 rounded-full bg-bad/15 motion-safe:animate-[ring_1.8s_ease-out_infinite]" />
             <i aria-hidden className="absolute inset-0 rounded-full bg-bad/10 motion-safe:animate-[ring_1.8s_ease-out_.6s_infinite]" />
           </>}
-          <button type="button" onClick={recording ? stopRec : startRec} aria-label={recording ? 'Stop dictation' : 'Start dictation'} aria-pressed={recording}
+          <button type="button" disabled={transcribing} onClick={recording ? stopRec : startRec} aria-label={recording ? 'Stop dictation' : 'Start dictation'} aria-pressed={recording}
             className={clsx('relative flex size-[76px] items-center justify-center rounded-full text-white shadow-lg transition', recording ? 'bg-bad' : 'bg-accent hover:brightness-95')}>
             <Icon name={recording ? 'stop' : 'journal'} size={30} strokeWidth={2} />
           </button>
         </div>
         <div className="text-[13px] font-medium text-muted" aria-live="polite">
-          {recording ? <span className="inline-flex items-center gap-2"><i className="size-2 rounded-full bg-bad motion-safe:animate-pulse" />Listening <b className="num font-semibold text-ink">{fmtTimer(seconds)}</b></span> : text ? 'Tap the mic to keep talking' : 'Tap the mic and tell me about your day'}
+          {transcribing ? <span className="inline-flex items-center gap-2"><span className="size-3.5 animate-spin rounded-full border-2 border-accent border-t-transparent" aria-hidden />Writing down what you said…</span>
+            : recording ? <span className="inline-flex flex-col items-center gap-0.5"><span className="inline-flex items-center gap-2"><i className="size-2 rounded-full bg-bad motion-safe:animate-pulse" />{capture === 'rec' ? 'Recording' : 'Listening'} <b className="num font-semibold text-ink">{fmtTimer(seconds)}</b></span>{capture === 'rec' && <small className="text-[11.5px] font-normal text-faint">The text appears when you stop</small>}</span>
+            : text ? 'Tap the mic to keep talking' : 'Tap the mic and tell me about your day'}
         </div>
         <Waveform active={recording} />
       </div>
-      {micError && <p role="alert" className="mb-3 rounded-[10px] border border-warn/40 bg-warn/10 px-3 py-2 text-[12.5px] text-ink">{DICTATION_MESSAGES[micError]}{micRaw && <span className="mt-1 block text-[11px] text-faint">Browser said: {micRaw}</span>}</p>}
+      {notice && <p role="status" className="mb-3 rounded-[10px] bg-tint px-3 py-2 text-[12.5px] text-muted">{notice}</p>}
+      {(micError || micText) && <p role="alert" className="mb-3 rounded-[10px] border border-warn/40 bg-warn/10 px-3 py-2 text-[12.5px] text-ink">{micText ?? DICTATION_MESSAGES[micError!]}{micRaw && <span className="mt-1 block text-[11px] text-faint">Browser said: {micRaw}</span>}</p>}
       {recording ? (
         <div className="min-h-[150px] flex-1 overflow-y-auto rounded-xl bg-line2 p-3.5 text-sm leading-[1.6] max-md:min-h-0" aria-label="Live transcript">
-          {text}{interim && <span className="text-faint"> {interim}</span>}<span aria-hidden className="ml-0.5 inline-block h-[1.1em] w-0.5 translate-y-[3px] bg-accent motion-safe:animate-pulse" />
+          {text}{interim && <span className="text-faint"> {interim}</span>}{capture === 'rec' ? <span className="text-faint">{text ? ' ' : ''}…</span> : <span aria-hidden className="ml-0.5 inline-block h-[1.1em] w-0.5 translate-y-[3px] bg-accent motion-safe:animate-pulse" />}
         </div>
       ) : (
         <textarea aria-label="Transcript" value={text} maxLength={MAX_CHARS} placeholder="Your words appear here as you speak. You can edit them before continuing."
@@ -290,7 +366,7 @@ export function JournalPage() {
             <div className="mb-3.5 flex flex-wrap items-center justify-between gap-3">
               <h2 id="composer" className="m-0 font-display text-xl font-semibold tracking-tight">How did your day go?</h2>
               <Segmented label="Input method" value={mode} onChange={(m) => { if (recording) stopRec(); setMode(m) }}
-                options={[{ value: 'dictate', label: supported ? 'Dictate' : 'Dictate (unavailable)' }, { value: 'type', label: 'Type' }]} />
+                options={[{ value: 'dictate', label: canDictate || !ai ? 'Dictate' : 'Dictate (unavailable)' }, { value: 'type', label: 'Type' }]} />
             </div>
 
             {ai?.demo && <p className="mb-3 flex items-start gap-2 rounded-[10px] bg-tint px-3 py-2 text-[12.5px] leading-snug text-muted"><Icon name="info" size={15} className="mt-px flex-none text-accent-ink" /><span><b className="font-semibold text-ink">Demo mode.</b> No AI key is set on this server, so a simple offline reader handles your text. Expect rougher results.</span></p>}
@@ -309,9 +385,9 @@ export function JournalPage() {
                 : <p className={clsx('mt-2 text-xs', winError ? 'text-bad' : 'text-faint')}>{winError ?? (win && <>{dayAndMonth(covers.date)} · {formatClock(win.start_at, tz, '12h')} – {formatClock(win.end_at, tz, '12h')} · {hm(winMinutes)}</>)}</p>}
             </div>
 
-            {mode === 'dictate' && supported ? dictateBox : (
+            {mode === 'dictate' && canDictate ? dictateBox : (
               <>
-                {mode === 'dictate' && <p role="status" className="mb-3 rounded-[10px] border border-warn/40 bg-warn/10 px-3 py-2 text-[12.5px]">{blockedWhy ? BLOCKED_MESSAGES[blockedWhy] : DICTATION_MESSAGES.unsupported}</p>}
+                {mode === 'dictate' && ai && <p role="status" className="mb-3 rounded-[10px] border border-warn/40 bg-warn/10 px-3 py-2 text-[12.5px]">{blockedWhy ? BLOCKED_MESSAGES[blockedWhy] : DICTATION_MESSAGES.unsupported} Server transcription is not set up, so ask whoever runs this server to add an OPENAI_API_KEY.</p>}
                 <textarea aria-label="Your entry" value={text} maxLength={MAX_CHARS} placeholder="Worked on the proposal from 9 to 11, then standup until 11:30. Lunch for half an hour…"
                   onChange={(e) => { setText(e.target.value); setDirty(true) }}
                   className="block min-h-[290px] w-full resize-y rounded-xl border border-line bg-card p-3.5 text-sm leading-[1.6] outline-none placeholder:text-faint focus:border-accent focus:shadow-[0_0_0_3px_color-mix(in_srgb,var(--accent)_18%,transparent)]" />

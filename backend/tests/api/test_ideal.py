@@ -1,3 +1,6 @@
+from datetime import datetime
+from zoneinfo import ZoneInfo
+
 import pytest
 from sqlalchemy import text
 
@@ -94,12 +97,13 @@ async def test_dry_run_validates_without_saving(client, db):
 
 async def test_saving_creates_versions_and_the_same_date_replaces(client):
     p = await signup(client)
+    onboarded = datetime.now(ZoneInfo("Asia/Kolkata")).date().isoformat()  # the seeded Ideal Day starts on the day of onboarding
     assert (await client.put(f"{API}/ideal/day", headers=p.headers, json=day_body(p, "2025-01-01"))).status_code == 200
     assert (await client.put(f"{API}/ideal/day", headers=p.headers, json=day_body(p, "2025-06-02", **{"Deep work": 540}))).status_code == 200
     again = await client.put(f"{API}/ideal/day", headers=p.headers, json=day_body(p, "2025-06-02", **{"Deep work": 600}))
     assert again.status_code == 200
     d = (await client.get(f"{API}/ideal/day?on=2025-07-01", headers=p.headers)).json()["data"]
-    assert [v["effective_from"] for v in d["versions"]] == ["2026-11-13", "2025-06-02", "2025-01-01"]  # newest first, two saves on 06-02 collapsed to one
+    assert [v["effective_from"] for v in d["versions"]] == [onboarded, "2025-06-02", "2025-01-01"]  # newest first, two saves on 06-02 collapsed to one
     deep = next(a for a in d["current"]["allocations"] if a["name"] == "Deep work")
     assert d["current"]["effective_from"] == "2025-06-02" and deep["minutes"] == 600
     early = (await client.get(f"{API}/ideal/day?on=2025-03-01", headers=p.headers)).json()["data"]["current"]

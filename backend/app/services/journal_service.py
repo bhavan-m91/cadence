@@ -9,7 +9,7 @@ from sqlalchemy import delete, select, update
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.ai.context_builder import PROMPT_ID
-from app.ai.providers import get_llm_provider
+from app.ai.providers import get_llm_provider, stt_status
 from app.core.config import get_settings
 from app.core.database import rolls_back_on_error
 from app.core.errors import AppError, Conflict, NotFound, RateLimited, ValidationFailed
@@ -219,7 +219,7 @@ class JournalService:
         prefs = await UsersRepository(self.session).preferences(self.user.id)
         p = get_llm_provider()
         return AiStatusOut(provider=p.name, model=p.model, demo=p.name in ("fake", "fixture"), enabled=s.llm_enabled and prefs.ai_enabled,
-                           daily_limit=s.ai_daily_job_limit, used_today=await self.used_today())
+                           daily_limit=s.ai_daily_job_limit, used_today=await self.used_today(), **stt_status())
 
     async def process(self, id: uuid.UUID, regenerate: bool, hint: str | None) -> AIProcessingJob:
         s = get_settings()

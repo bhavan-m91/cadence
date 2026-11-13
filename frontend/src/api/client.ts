@@ -64,11 +64,12 @@ interface Options {
 async function send(path: string, o: Options): Promise<Response> {
   const token = useAuthStore.getState().accessToken
   const headers: Record<string, string> = { Accept: 'application/json', ...o.headers }
-  if (o.body !== undefined) headers['Content-Type'] = 'application/json'
+  const isForm = typeof FormData !== 'undefined' && o.body instanceof FormData // the browser sets the multipart boundary itself
+  if (o.body !== undefined && !isForm) headers['Content-Type'] = 'application/json'
   if (o.auth !== false && token) headers.Authorization = `Bearer ${token}`
   return fetch(`${PREFIX}${path}${qs(o.query)}`, {
     method: o.method ?? 'GET', headers, credentials: 'include', signal: o.signal,
-    body: o.body !== undefined ? JSON.stringify(o.body) : undefined,
+    body: o.body === undefined ? undefined : isForm ? (o.body as FormData) : JSON.stringify(o.body),
   })
 }
 
