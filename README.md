@@ -2,7 +2,7 @@
 
 A personal time tracker and life-analytics app. Log what happened in a day, see it on a 24-hour calendar, and (in later phases) compare it with your Ideal Day and Week.
 
-This repository implements the **Cadence PRD V1.0**. **Phases 0 and 1 are built** (foundation + core data and manual logging). Journal/AI, Ideal editors, analytics and hardening are the next phases. See [Status](#status).
+This repository implements the **Cadence PRD V1.0**. **Phases 0 to 3 are built** (foundation, core data and manual logging, the AI journal, Ideal Day & Week). Analytics, deploy and hardening are next. See [Status](#status).
 
 | | |
 |---|---|
@@ -59,19 +59,20 @@ Layering is strict: routers hold no business rules; services own transactions; r
 |---|---|
 | 0 Foundation | Repo, CI, config, error envelope, request ids, health endpoints, migrations, theme, PWA, OpenAPI -> TypeScript. **Not done:** Railway/Cloudflare deploy pipeline, Sentry project wiring (the code path exists, guarded by `SENTRY_DSN`) - both need accounts. |
 | 1 Core data & manual logging | Done (E-01..E-19 except Apple, E-33..E-69, E-79/E-80). |
-| 2 AI journal | Not started. Schema is in place (`journal_entries`, `ai_processing_jobs`, ...); the Journal screen is a placeholder. |
-| 3 Ideal Day & Week | Read side only (seeded day template, calendar overlay). Editors, validation, versioning endpoints (E-70..E-73) are next. |
+| 2 AI journal | Done except server-side speech-to-text (skipped by decision: the browser's speech recognition and typing only). Journal composer (dictate/type, autosave + offline draft), background worker, extraction pipeline with deterministic time/tag/task resolution, review screen, all-or-nothing idempotent commit, history and entry pages. Needs `ANTHROPIC_API_KEY`; without one a built-in offline reader runs in a labelled demo mode. |
+| 3 Ideal Day & Week | Done. Day and week editors, 24h/168h validation, effective-dated versions, pace and status against the week so far (E-70..E-73). |
 | 4 / 4B Analytics | Not started. Overview shows server-provided coverage numbers only. |
 | 5 Hardening | Not started (RLS, backup drill, load test). The backup script and restore runbook are written but **never run**. |
 
-Tests: 86 backend (real Postgres, covering AC-001..AC-006, AC-028..AC-049 where applicable to this phase, tenant isolation, DST fixtures) and 20 frontend.
+Tests: 180 backend (real Postgres: tenant isolation, DST fixtures, time resolver, extraction pipeline, review/commit, Ideal) and 27 frontend. The labelled extraction set (`python -m app.ai.eval.run_eval`) has 16 cases; the PRD asks for 40.
 
 ### Known gaps in what exists
 
 - `mypy` reports many errors (nullable `placed`/`unplaced` columns). CI runs it as advisory. Ruff, ESLint and `tsc` are clean and blocking.
 - Docker and the Dockerfile were not built here (no Docker on the dev machine); the backend wheel installs and imports.
 - Calendar side panels from the design (agenda, mini-month, tag totals) are not built. Dependencies and Team screens are out of V1.0 per the PRD.
-- Idempotency keys, ETag caching and the Procrastinate worker land with the phases that need them.
+- ETag caching is not implemented. The AI worker is a small Postgres queue (see DECISIONS), not Procrastinate.
+- The live Anthropic path has not been verified end to end (the key supplied during development was rejected with 401). The offline reader and recorded fixtures cover the code paths.
 - Rate limiting is in-process (fine for one API instance; use a shared store if scaled out).
 
 See [docs/DECISIONS.md](docs/DECISIONS.md) for the choices made where the PRD or design was silent or inconsistent.

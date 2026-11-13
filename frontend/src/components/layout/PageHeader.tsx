@@ -1,15 +1,17 @@
 import type { ReactNode } from 'react'
+import { IconButton } from '../ui/Button'
 import { ThemeToggle } from './ThemeToggle'
 
-export function PageHeader({ title, subtitle, children }: { title: string; subtitle?: ReactNode; children?: ReactNode }) {
+export function PageHeader({ title, subtitle, back, children }: { title: string; subtitle?: ReactNode; back?: () => void; children?: ReactNode }) {
   return (
-    <header className="flex flex-wrap items-center gap-3 border-b border-line bg-card px-4 py-3.5 md:px-7 md:py-4">
-      <div className="mr-auto min-w-0">
+    <header className="flex flex-wrap items-center gap-x-3 gap-y-2.5 border-b border-line bg-card px-4 py-3.5 md:px-7 md:py-4">
+      {back && <IconButton icon="arrowLeft" label="Back" onClick={back} className="max-md:order-1" />}
+      <div className="mr-auto min-w-0 max-md:order-1 max-md:flex-1">
         <h1 className="m-0 text-xl font-bold tracking-tighter2">{title}</h1>
         {subtitle && <div className="text-[12.5px] text-muted">{subtitle}</div>}
       </div>
-      {children}
-      <ThemeToggle />
+      {children && <div className="flex flex-wrap items-center gap-2 max-md:order-3 max-md:w-full">{children}</div>}
+      <span className="max-md:order-2"><ThemeToggle /></span>
     </header>
   )
 }

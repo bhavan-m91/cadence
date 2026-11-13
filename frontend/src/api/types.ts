@@ -43,3 +43,25 @@ export interface Meta {
   next_cursor?: string | null
   [k: string]: unknown
 }
+
+// ---- Phase 2 / 3
+export type IdealOverview = components['schemas']['IdealOverviewOut']
+export type IdealTemplate = components['schemas']['IdealTemplateOut']
+export type IdealAllocation = components['schemas']['AllocationOut']
+export type IdealProgress = components['schemas']['ProgressOut']
+export type IdealProgressRow = components['schemas']['ProgressRow']
+export type EntryOut = components['schemas']['EntryOut']
+export type EntrySummary = components['schemas']['EntrySummary']
+export type EntryDetail = components['schemas']['EntryDetail']
+export type EntryRevision = components['schemas']['RevisionOut']
+export type JournalStats = components['schemas']['StatsOut']
+export type AiStatus = components['schemas']['AiStatusOut']
+export type JobOut = components['schemas']['JobOut']
+export type Review = components['schemas']['ReviewOut']
+export type ReviewDraft = components['schemas']['ReviewDraft']
+export type ReviewTag = components['schemas']['ReviewTag']
+export type ReviewGap = components['schemas']['ReviewGap']
+export type ReviewConflict = components['schemas']['ReviewConflict']
+export type ReviewQuestion = components['schemas']['Question']
+export type CommitBody = components['schemas']['CommitIn']
+export type CommitResult = components['schemas']['CommitOut']

@@ -12,8 +12,11 @@ const CalendarPage = lazy(() => import('@/features/calendar/CalendarPage').then(
 const TasksPage = lazy(() => import('@/features/tasks/TasksPage').then((m) => ({ default: m.TasksPage })))
 const TagsPage = lazy(() => import('@/features/tags/TagsPage').then((m) => ({ default: m.TagsPage })))
 const SettingsPage = lazy(() => import('@/features/settings/SettingsPage').then((m) => ({ default: m.SettingsPage })))
-const JournalPage = lazy(() => import('@/features/placeholders/ComingSoon').then((m) => ({ default: m.JournalPage })))
-const IdealPage = lazy(() => import('@/features/placeholders/ComingSoon').then((m) => ({ default: m.IdealPage })))
+const JournalPage = lazy(() => import('@/features/journal/JournalPage').then((m) => ({ default: m.JournalPage })))
+const ReviewPage = lazy(() => import('@/features/review/ReviewPage').then((m) => ({ default: m.ReviewPage })))
+const JournalHistoryPage = lazy(() => import('@/features/journal/HistoryPage').then((m) => ({ default: m.HistoryPage })))
+const EntryPage = lazy(() => import('@/features/journal/EntryPage').then((m) => ({ default: m.EntryPage })))
+const IdealPage = lazy(() => import('@/features/ideal/IdealPage').then((m) => ({ default: m.IdealPage })))
 
 const page = (el: React.ReactNode) => <Suspense fallback={<Splash />}>{el}</Suspense>
 
@@ -32,6 +35,9 @@ export const router = createBrowserRouter([
       { path: '/', element: <Navigate to="/overview" replace /> },
       { path: '/overview', element: page(<OverviewPage />) },
       { path: '/journal', element: page(<JournalPage />) },
+      { path: '/journal/history', element: page(<JournalHistoryPage />) },
+      { path: '/journal/:entryId', element: page(<EntryPage />) },
+      { path: '/journal/:entryId/review', element: page(<ReviewPage />) },
       { path: '/calendar', element: page(<CalendarPage />) },
       { path: '/activities/:activityId', element: page(<CalendarPage />) },
       { path: '/tasks', element: page(<TasksPage />) },
