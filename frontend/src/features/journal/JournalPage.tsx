@@ -16,7 +16,7 @@ import { Button } from '@/components/ui/Button'
 import { Skeleton } from '@/components/ui/Feedback'
 import { Icon, type IconName } from '@/components/ui/Icon'
 import { usePrefersReducedMotion } from '@/lib/a11y'
-import { createDictation, DICTATION_MESSAGES, dictationSupported, type Dictation, type DictationError } from '@/lib/dictation'
+import { BLOCKED_MESSAGES, checkMicrophone, createDictation, DICTATION_MESSAGES, dictationBlockedReason, dictationSupported, type Dictation, type DictationError } from '@/lib/dictation'
 import { approxActivities, phraseIn, wordCount } from '@/lib/heuristics'
 import { idbDelete, idbGet, idbSet } from '@/lib/idb'
 import { dayAndMonth, formatClock, hm, isoToLocal, minutesBetween, todayIn, weekdayShort } from '@/lib/time'
@@ -66,6 +66,7 @@ export function JournalPage() {
   const { data: tags } = useTags()
   const create = useCreateEntry(), patch = usePatchEntry(), process = useProcessEntry()
   const supported = dictationSupported()
+  const blockedWhy = dictationBlockedReason()
 
   const [mode, setMode] = useState<Mode>(supported ? 'dictate' : 'type')
   const [text, setText] = useState('')
@@ -74,6 +75,7 @@ export function JournalPage() {
   const [seconds, setSeconds] = useState(0)
   const [dictated, setDictated] = useState(false)
   const [micError, setMicError] = useState<DictationError>()
+  const [micRaw, setMicRaw] = useState<string>()
   const [preset, setPreset] = useState<Preset>('today')
   const [covers, setCovers] = useState<RangeValue>({ date: today, start: '00:00', end: nowTime })
   const [entryId, setEntryId] = useState<string>()
@@ -84,6 +86,7 @@ export function JournalPage() {
   const [submitting, setSubmitting] = useState(false)
   const [restored, setRestored] = useState(false)
   const dict = useRef<Dictation | null>(null)
+  const cancelStart = useRef(false)
   const keys = useRef(new Map<string, string>())
   const textRef = useRef(text)
   textRef.current = text
@@ -204,18 +207,22 @@ export function JournalPage() {
   }, [recording])
   useEffect(() => () => dict.current?.abort(), [])
 
-  const startRec = () => {
-    setMicError(undefined)
+  const startRec = async () => {
+    setMicError(undefined); setMicRaw(undefined)
+    cancelStart.current = false
+    setRecording(true) // show the listening state at once; the permission prompt can take a moment
+    const blocked = await checkMicrophone()
+    if (cancelStart.current) return // stopped while the permission prompt was open
+    if (blocked) { setMicError(blocked); setRecording(false); return }
     dict.current = createDictation({
       onFinal: (t) => { if (t) { setText((p) => (p && !/\s$/.test(p) ? `${p} ` : p) + t); setDirty(true); setDictated(true) } },
       onInterim: setInterim,
-      onError: (e) => { setMicError(e); setRecording(false); setInterim('') },
+      onError: (e, raw) => { setMicError(e); setMicRaw(raw); setRecording(false); setInterim('') },
       onEnd: () => { setRecording(false); setInterim('') },
     })
     dict.current.start()
-    setRecording(true)
   }
-  const stopRec = () => { dict.current?.stop(); setRecording(false); setInterim('') }
+  const stopRec = () => { cancelStart.current = true; dict.current?.stop(); setRecording(false); setInterim('') }
 
   // ---- derived UI
   const words = wordCount(text)
@@ -257,7 +264,7 @@ export function JournalPage() {
         </div>
         <Waveform active={recording} />
       </div>
-      {micError && <p role="alert" className="mb-3 rounded-[10px] border border-warn/40 bg-warn/10 px-3 py-2 text-[12.5px] text-ink">{DICTATION_MESSAGES[micError]}</p>}
+      {micError && <p role="alert" className="mb-3 rounded-[10px] border border-warn/40 bg-warn/10 px-3 py-2 text-[12.5px] text-ink">{DICTATION_MESSAGES[micError]}{micRaw && <span className="mt-1 block text-[11px] text-faint">Browser said: {micRaw}</span>}</p>}
       {recording ? (
         <div className="min-h-[150px] flex-1 overflow-y-auto rounded-xl bg-line2 p-3.5 text-sm leading-[1.6] max-md:min-h-0" aria-label="Live transcript">
           {text}{interim && <span className="text-faint"> {interim}</span>}<span aria-hidden className="ml-0.5 inline-block h-[1.1em] w-0.5 translate-y-[3px] bg-accent motion-safe:animate-pulse" />
@@ -304,7 +311,7 @@ export function JournalPage() {
 
             {mode === 'dictate' && supported ? dictateBox : (
               <>
-                {mode === 'dictate' && <p role="status" className="mb-3 rounded-[10px] border border-warn/40 bg-warn/10 px-3 py-2 text-[12.5px]">{DICTATION_MESSAGES.unsupported}</p>}
+                {mode === 'dictate' && <p role="status" className="mb-3 rounded-[10px] border border-warn/40 bg-warn/10 px-3 py-2 text-[12.5px]">{blockedWhy ? BLOCKED_MESSAGES[blockedWhy] : DICTATION_MESSAGES.unsupported}</p>}
                 <textarea aria-label="Your entry" value={text} maxLength={MAX_CHARS} placeholder="Worked on the proposal from 9 to 11, then standup until 11:30. Lunch for half an hour…"
                   onChange={(e) => { setText(e.target.value); setDirty(true) }}
                   className="block min-h-[290px] w-full resize-y rounded-xl border border-line bg-card p-3.5 text-sm leading-[1.6] outline-none placeholder:text-faint focus:border-accent focus:shadow-[0_0_0_3px_color-mix(in_srgb,var(--accent)_18%,transparent)]" />
