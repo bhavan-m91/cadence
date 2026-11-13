@@ -29,4 +29,5 @@ jobs:
       - name: OpenAPI snapshot is current
         run: |
           PYTHONPATH=. python scripts/export_openapi.py /tmp/openapi.json
+          diff -u openapi.json /tmp/openapi.json | head -60 || true
           diff -q /tmp/openapi.json openapi.json || (echo "openapi.json is stale: run make gen-api" && exit 1)
