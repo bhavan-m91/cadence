@@ -65,3 +65,34 @@ export type ReviewConflict = components['schemas']['ReviewConflict']
 export type ReviewQuestion = components['schemas']['Question']
 export type CommitBody = components['schemas']['CommitIn']
 export type CommitResult = components['schemas']['CommitOut']
+
+// ---- Phase 4 analytics (the overview's `charts` bag is an open object in the schema, so it is typed here)
+type SS = components['schemas']
+export type IdealCompare = SS['IdealCompare']
+export type IdealCompareRow = SS['IdealCompareRow']
+export type SleepBlock = SS['SleepBlock']
+export type FocusBlock = SS['FocusBlock']
+export type DayColumn = SS['DayColumn']
+export type CategoryTotal = SS['CategoryTotal']
+export type TagTotal = SS['TagTotal']
+export type TaskTotal = SS['TaskTotal']
+export type WorkPersonal = SS['WorkPersonal']
+export type Banner = SS['BannerOut']
+export type Deadline = SS['DeadlineOut']
+export type BreakdownItem = SS['BreakdownItem']
+export type Breakdown = SS['BreakdownOut']
+export type TrendPoint = SS['TrendPoint']
+export type Trends = SS['TrendsOut']
+export type TrendMetric = 'adherence' | 'coverage' | 'sleep' | 'focus'
+export interface OverviewCharts {
+  actual_vs_ideal: IdealCompare | null
+  work_vs_personal: WorkPersonal
+  coverage_by_day: DayColumn[]
+  sleep: SleepBlock
+  focus: FocusBlock
+  categories: CategoryTotal[]
+  top_tasks: TaskTotal[]
+  tag_goals: TagTotal[]
+  certainty: { recorded: number; estimated: number }
+}
+export type Overview = Omit<SS['OverviewOut'], 'charts'> & { charts: OverviewCharts }

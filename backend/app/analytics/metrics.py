@@ -45,4 +45,38 @@ def prorate(target: int, elapsed_minutes: int, day_minutes: int) -> int:
     return round(target * min(1.0, max(0.0, elapsed_minutes / day_minutes)))
 
 
-__all__ = ["row_status", "distribution_days", "per_day_minutes", "pace_expected", "prorate", "timedelta"]
+def coverage(logged: int, elapsed: int) -> float:
+    """Share of the elapsed time that is accounted for (a day that has not started is 100%, nothing is missing yet)."""
+    return round(min(1.0, logged / elapsed), 4) if elapsed > 0 else 1.0
+
+
+def adherence(pairs: list[tuple[int, int]]) -> float | None:
+    """FR-126 / AC-061: sum of min(actual, target) over the sum of targets. `None` when there is nothing to hold you to."""
+    total = sum(t for _, t in pairs)
+    if total <= 0:
+        return None
+    return round(sum(min(a, t) for a, t in pairs) / total, 4)
+
+
+def bedtime_minutes_after_18(hour: int, minute: int) -> int:
+    """Bedtime as minutes after 18:00 local, so 23:30 is 330 and 01:00 is 420 (a night is one continuous scale)."""
+    return (hour * 60 + minute - 18 * 60) % 1440
+
+
+def bedtime_drift(bedtimes: list[int]) -> int | None:
+    """Population standard deviation of bedtimes, in minutes. Needs at least two nights."""
+    if len(bedtimes) < 2:
+        return None
+    mean = sum(bedtimes) / len(bedtimes)
+    return round((sum((b - mean) ** 2 for b in bedtimes) / len(bedtimes)) ** 0.5)
+
+
+def pct_change(current: float | None, previous: float | None) -> float | None:
+    """Difference in percentage points (0.05 is +5 points); `None` when either side is missing."""
+    if current is None or previous is None:
+        return None
+    return round(current - previous, 4)
+
+
+__all__ = ["row_status", "distribution_days", "per_day_minutes", "pace_expected", "prorate", "timedelta", "coverage", "adherence",
+           "bedtime_minutes_after_18", "bedtime_drift", "pct_change"]

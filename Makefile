@@ -3,7 +3,7 @@ PGBIN ?= $(shell brew --prefix postgresql@16 2>/dev/null)/bin
 PGPORT ?= 54329
 API := backend/.venv/bin
 
-.PHONY: help setup db-start db-stop dev api web test test-api test-web lint typecheck migrate gen-api seed-check
+.PHONY: help setup db-start db-stop dev api web test test-api test-web lint typecheck migrate gen-api seed-check seed-demo
 
 help:            ## list targets
 	@grep -E '^[a-z-]+:.*##' $(MAKEFILE_LIST) | awk -F':.*## ' '{printf "  %-12s %s\n", $$1, $$2}'
@@ -49,6 +49,9 @@ lint:            ## ruff + eslint
 typecheck:       ## tsc (blocking) and mypy (advisory, see README)
 	cd frontend && npm run typecheck
 	-cd backend && .venv/bin/mypy app
+
+seed-demo:       ## fill an account with half a year of believable data: make seed-demo EMAIL=you@example.com PASSWORD=secret [BASE=http://localhost:8000]
+	cd backend && .venv/bin/python scripts/seed_demo.py --email "$(EMAIL)" --password "$(PASSWORD)" --base "$(or $(BASE),http://localhost:8000)"
 
 gen-api:         ## regenerate the OpenAPI snapshot and the frontend TypeScript types
 	cd backend && PYTHONPATH=. .venv/bin/python scripts/export_openapi.py openapi.json

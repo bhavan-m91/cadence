@@ -18,7 +18,7 @@ function useWriteMutation<V, R>(fn: (v: V) => Promise<R>) {
   return useMutation({
     mutationFn: fn,
     onSuccess: () => {
-      for (const key of ['tasks', 'task', 'projects', 'activity', 'activities']) qc.invalidateQueries({ queryKey: [key] })
+      for (const key of ['tasks', 'task', 'projects', 'activity', 'activities', 'analytics']) qc.invalidateQueries({ queryKey: [key] })
     },
   })
 }

@@ -19,7 +19,7 @@ export function useSaveIdeal() {
   return useMutation({
     mutationFn: ({ kind, ...body }: SaveIdealBody) => api.put<IdealTemplate>(`/ideal/${kind}`, body),
     onSuccess: () => {
-      for (const key of ['ideal', 'timeline', 'review']) qc.invalidateQueries({ queryKey: [key] })
+      for (const key of ['ideal', 'timeline', 'review', 'analytics']) qc.invalidateQueries({ queryKey: [key] })
     },
   })
 }

@@ -17,4 +17,4 @@ export const qk = {
 }
 
 /** Everything derived from activities must refresh after a write (slices change coverage, tag totals, task rollups). */
-export const ACTIVITY_DEPENDENTS = ['activities', 'activity', 'events', 'timeline', 'tags', 'tag', 'tasks', 'task', 'projects'] as const
+export const ACTIVITY_DEPENDENTS = ['analytics', 'activities', 'activity', 'events', 'timeline', 'tags', 'tag', 'tasks', 'task', 'projects'] as const

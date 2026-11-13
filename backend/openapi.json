@@ -938,6 +938,42 @@
         "title": "ActivityTagOut",
         "type": "object"
       },
+      "AdherenceOut": {
+        "properties": {
+          "provisional": {
+            "title": "Provisional",
+            "type": "boolean"
+          },
+          "value": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Value"
+          },
+          "vs_prev": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Vs Prev"
+          }
+        },
+        "required": [
+          "value",
+          "provisional"
+        ],
+        "title": "AdherenceOut",
+        "type": "object"
+      },
       "AiStatusOut": {
         "properties": {
           "daily_limit": {
@@ -1220,6 +1256,42 @@
         "title": "AuthOut",
         "type": "object"
       },
+      "BannerOut": {
+        "properties": {
+          "action": {
+            "additionalProperties": {
+              "type": "string"
+            },
+            "title": "Action",
+            "type": "object"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "kind": {
+            "title": "Kind",
+            "type": "string"
+          },
+          "severity": {
+            "title": "Severity",
+            "type": "string"
+          },
+          "text": {
+            "title": "Text",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "kind",
+          "severity",
+          "text",
+          "action"
+        ],
+        "title": "BannerOut",
+        "type": "object"
+      },
       "Block": {
         "properties": {
           "category": {
@@ -1337,6 +1409,142 @@
           "reason"
         ],
         "title": "Blocker",
+        "type": "object"
+      },
+      "BreakdownItem": {
+        "properties": {
+          "color": {
+            "title": "Color",
+            "type": "string"
+          },
+          "depth": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Depth"
+          },
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "minutes": {
+            "title": "Minutes",
+            "type": "integer"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "parent_id": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Parent Id"
+          },
+          "path_names": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Path Names"
+          },
+          "rollup_minutes": {
+            "title": "Rollup Minutes",
+            "type": "integer"
+          },
+          "root_kind": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Root Kind"
+          },
+          "share": {
+            "title": "Share",
+            "type": "number"
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "color",
+          "minutes",
+          "rollup_minutes",
+          "share"
+        ],
+        "title": "BreakdownItem",
+        "type": "object"
+      },
+      "BreakdownOut": {
+        "properties": {
+          "by": {
+            "title": "By",
+            "type": "string"
+          },
+          "from_date": {
+            "format": "date",
+            "title": "From Date",
+            "type": "string"
+          },
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/BreakdownItem"
+            },
+            "title": "Items",
+            "type": "array"
+          },
+          "series_kind": {
+            "enum": [
+              "partition",
+              "overlay"
+            ],
+            "title": "Series Kind",
+            "type": "string"
+          },
+          "to_date": {
+            "format": "date",
+            "title": "To Date",
+            "type": "string"
+          },
+          "total_minutes": {
+            "title": "Total Minutes",
+            "type": "integer"
+          },
+          "waking_minutes": {
+            "title": "Waking Minutes",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "series_kind",
+          "by",
+          "from_date",
+          "to_date",
+          "items",
+          "total_minutes",
+          "waking_minutes"
+        ],
+        "title": "BreakdownOut",
         "type": "object"
       },
       "BulkIn": {
@@ -1796,6 +2004,68 @@
         "title": "CategoryPatch",
         "type": "object"
       },
+      "CategoryTotal": {
+        "properties": {
+          "category_id": {
+            "format": "uuid",
+            "title": "Category Id",
+            "type": "string"
+          },
+          "color": {
+            "title": "Color",
+            "type": "string"
+          },
+          "minutes": {
+            "title": "Minutes",
+            "type": "integer"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "path_names": {
+            "title": "Path Names",
+            "type": "string"
+          },
+          "root_kind": {
+            "title": "Root Kind",
+            "type": "string"
+          },
+          "share": {
+            "title": "Share",
+            "type": "number"
+          }
+        },
+        "required": [
+          "category_id",
+          "name",
+          "path_names",
+          "color",
+          "root_kind",
+          "minutes",
+          "share"
+        ],
+        "title": "CategoryTotal",
+        "type": "object"
+      },
+      "CertaintyOut": {
+        "properties": {
+          "estimated": {
+            "title": "Estimated",
+            "type": "integer"
+          },
+          "recorded": {
+            "title": "Recorded",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "recorded",
+          "estimated"
+        ],
+        "title": "CertaintyOut",
+        "type": "object"
+      },
       "ChangePasswordIn": {
         "properties": {
           "current_password": {
@@ -2181,6 +2451,49 @@
         "title": "Coverage",
         "type": "object"
       },
+      "CoverageOut": {
+        "properties": {
+          "complete": {
+            "title": "Complete",
+            "type": "boolean"
+          },
+          "elapsed": {
+            "title": "Elapsed",
+            "type": "integer"
+          },
+          "logged": {
+            "title": "Logged",
+            "type": "integer"
+          },
+          "pct": {
+            "title": "Pct",
+            "type": "number"
+          },
+          "placed": {
+            "title": "Placed",
+            "type": "integer"
+          },
+          "unlogged": {
+            "title": "Unlogged",
+            "type": "integer"
+          },
+          "unplaced": {
+            "title": "Unplaced",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "placed",
+          "unplaced",
+          "logged",
+          "elapsed",
+          "unlogged",
+          "pct",
+          "complete"
+        ],
+        "title": "CoverageOut",
+        "type": "object"
+      },
       "CoveragePreset": {
         "enum": [
           "whole_day",
@@ -2190,6 +2503,142 @@
         ],
         "title": "CoveragePreset",
         "type": "string"
+      },
+      "DayAnalytics": {
+        "properties": {
+          "by_category": {
+            "items": {
+              "$ref": "#/components/schemas/CategoryTotal"
+            },
+            "title": "By Category",
+            "type": "array"
+          },
+          "by_project": {
+            "items": {
+              "$ref": "#/components/schemas/ProjectTotal"
+            },
+            "title": "By Project",
+            "type": "array"
+          },
+          "by_tag": {
+            "items": {
+              "$ref": "#/components/schemas/TagTotal"
+            },
+            "title": "By Tag",
+            "type": "array"
+          },
+          "by_task": {
+            "items": {
+              "$ref": "#/components/schemas/TaskTotal"
+            },
+            "title": "By Task",
+            "type": "array"
+          },
+          "certainty": {
+            "$ref": "#/components/schemas/CertaintyOut"
+          },
+          "coverage": {
+            "$ref": "#/components/schemas/CoverageOut"
+          },
+          "date": {
+            "format": "date",
+            "title": "Date",
+            "type": "string"
+          },
+          "focus": {
+            "$ref": "#/components/schemas/FocusBlock"
+          },
+          "ideal": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/IdealCompare"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "ideal_setup_needed": {
+            "title": "Ideal Setup Needed",
+            "type": "boolean"
+          },
+          "sleep": {
+            "$ref": "#/components/schemas/SleepBlock"
+          },
+          "work_vs_personal": {
+            "$ref": "#/components/schemas/WorkPersonal"
+          }
+        },
+        "required": [
+          "date",
+          "coverage",
+          "certainty",
+          "by_category",
+          "by_tag",
+          "by_task",
+          "by_project",
+          "work_vs_personal",
+          "sleep",
+          "focus",
+          "ideal",
+          "ideal_setup_needed"
+        ],
+        "title": "DayAnalytics",
+        "type": "object"
+      },
+      "DayColumn": {
+        "properties": {
+          "complete": {
+            "title": "Complete",
+            "type": "boolean"
+          },
+          "date": {
+            "format": "date",
+            "title": "Date",
+            "type": "string"
+          },
+          "elapsed": {
+            "title": "Elapsed",
+            "type": "integer"
+          },
+          "focus": {
+            "title": "Focus",
+            "type": "integer"
+          },
+          "logged": {
+            "title": "Logged",
+            "type": "integer"
+          },
+          "placed": {
+            "title": "Placed",
+            "type": "integer"
+          },
+          "sleep": {
+            "title": "Sleep",
+            "type": "integer"
+          },
+          "unlogged": {
+            "title": "Unlogged",
+            "type": "integer"
+          },
+          "unplaced": {
+            "title": "Unplaced",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "date",
+          "placed",
+          "unplaced",
+          "logged",
+          "elapsed",
+          "unlogged",
+          "complete",
+          "focus",
+          "sleep"
+        ],
+        "title": "DayColumn",
+        "type": "object"
       },
       "DayTimeline": {
         "properties": {
@@ -2265,6 +2714,53 @@
           "coverage"
         ],
         "title": "DayTimeline",
+        "type": "object"
+      },
+      "DeadlineOut": {
+        "properties": {
+          "days_left": {
+            "title": "Days Left",
+            "type": "integer"
+          },
+          "due_date": {
+            "format": "date",
+            "title": "Due Date",
+            "type": "string"
+          },
+          "overdue": {
+            "title": "Overdue",
+            "type": "boolean"
+          },
+          "priority": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Priority"
+          },
+          "task_id": {
+            "format": "uuid",
+            "title": "Task Id",
+            "type": "string"
+          },
+          "title": {
+            "title": "Title",
+            "type": "string"
+          }
+        },
+        "required": [
+          "task_id",
+          "title",
+          "due_date",
+          "days_left",
+          "overdue",
+          "priority"
+        ],
+        "title": "DeadlineOut",
         "type": "object"
       },
       "DeleteAccountIn": {
@@ -2864,6 +3360,23 @@
         "title": "Envelope[AuthOut]",
         "type": "object"
       },
+      "Envelope_BreakdownOut_": {
+        "properties": {
+          "data": {
+            "$ref": "#/components/schemas/BreakdownOut"
+          },
+          "meta": {
+            "additionalProperties": true,
+            "title": "Meta",
+            "type": "object"
+          }
+        },
+        "required": [
+          "data"
+        ],
+        "title": "Envelope[BreakdownOut]",
+        "type": "object"
+      },
       "Envelope_BulkOut_": {
         "properties": {
           "data": {
@@ -2930,6 +3443,23 @@
           "data"
         ],
         "title": "Envelope[CommitOut]",
+        "type": "object"
+      },
+      "Envelope_DayAnalytics_": {
+        "properties": {
+          "data": {
+            "$ref": "#/components/schemas/DayAnalytics"
+          },
+          "meta": {
+            "additionalProperties": true,
+            "title": "Meta",
+            "type": "object"
+          }
+        },
+        "required": [
+          "data"
+        ],
+        "title": "Envelope[DayAnalytics]",
         "type": "object"
       },
       "Envelope_EntryDetail_": {
@@ -3083,6 +3613,23 @@
           "data"
         ],
         "title": "Envelope[OnboardingOut]",
+        "type": "object"
+      },
+      "Envelope_OverviewOut_": {
+        "properties": {
+          "data": {
+            "$ref": "#/components/schemas/OverviewOut"
+          },
+          "meta": {
+            "additionalProperties": true,
+            "title": "Meta",
+            "type": "object"
+          }
+        },
+        "required": [
+          "data"
+        ],
+        "title": "Envelope[OverviewOut]",
         "type": "object"
       },
       "Envelope_PreferencesOut_": {
@@ -3289,6 +3836,23 @@
         "title": "Envelope[TimelineOut]",
         "type": "object"
       },
+      "Envelope_TrendsOut_": {
+        "properties": {
+          "data": {
+            "$ref": "#/components/schemas/TrendsOut"
+          },
+          "meta": {
+            "additionalProperties": true,
+            "title": "Meta",
+            "type": "object"
+          }
+        },
+        "required": [
+          "data"
+        ],
+        "title": "Envelope[TrendsOut]",
+        "type": "object"
+      },
       "Envelope_UserOut_": {
         "properties": {
           "data": {
@@ -3304,6 +3868,23 @@
           "data"
         ],
         "title": "Envelope[UserOut]",
+        "type": "object"
+      },
+      "Envelope_WeekAnalytics_": {
+        "properties": {
+          "data": {
+            "$ref": "#/components/schemas/WeekAnalytics"
+          },
+          "meta": {
+            "additionalProperties": true,
+            "title": "Meta",
+            "type": "object"
+          }
+        },
+        "required": [
+          "data"
+        ],
+        "title": "Envelope[WeekAnalytics]",
         "type": "object"
       },
       "Envelope_list_ActivityOut__": {
@@ -3685,6 +4266,58 @@
         "title": "ExportStatus",
         "type": "string"
       },
+      "FocusBlock": {
+        "properties": {
+          "days": {
+            "items": {
+              "$ref": "#/components/schemas/FocusDay"
+            },
+            "title": "Days",
+            "type": "array"
+          },
+          "minutes": {
+            "title": "Minutes",
+            "type": "integer"
+          },
+          "target": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Target"
+          }
+        },
+        "required": [
+          "days",
+          "minutes",
+          "target"
+        ],
+        "title": "FocusBlock",
+        "type": "object"
+      },
+      "FocusDay": {
+        "properties": {
+          "date": {
+            "format": "date",
+            "title": "Date",
+            "type": "string"
+          },
+          "minutes": {
+            "title": "Minutes",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "date",
+          "minutes"
+        ],
+        "title": "FocusDay",
+        "type": "object"
+      },
       "ForgotIn": {
         "properties": {
           "email": {
@@ -3732,6 +4365,128 @@
         ],
         "title": "GoalKind",
         "type": "string"
+      },
+      "IdealCompare": {
+        "properties": {
+          "adherence": {
+            "$ref": "#/components/schemas/AdherenceOut"
+          },
+          "effective_from": {
+            "anyOf": [
+              {
+                "format": "date",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Effective From"
+          },
+          "kind": {
+            "enum": [
+              "day",
+              "week"
+            ],
+            "title": "Kind",
+            "type": "string"
+          },
+          "rows": {
+            "items": {
+              "$ref": "#/components/schemas/IdealCompareRow"
+            },
+            "title": "Rows",
+            "type": "array"
+          },
+          "unallocated_actual": {
+            "title": "Unallocated Actual",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "kind",
+          "effective_from",
+          "rows",
+          "unallocated_actual",
+          "adherence"
+        ],
+        "title": "IdealCompare",
+        "type": "object"
+      },
+      "IdealCompareRow": {
+        "properties": {
+          "actual": {
+            "title": "Actual",
+            "type": "integer"
+          },
+          "category_id": {
+            "format": "uuid",
+            "title": "Category Id",
+            "type": "string"
+          },
+          "color": {
+            "title": "Color",
+            "type": "string"
+          },
+          "delta": {
+            "title": "Delta",
+            "type": "integer"
+          },
+          "distribution": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/IdealDistribution"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "expected": {
+            "title": "Expected",
+            "type": "integer"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "path_names": {
+            "title": "Path Names",
+            "type": "string"
+          },
+          "root_kind": {
+            "title": "Root Kind",
+            "type": "string"
+          },
+          "status": {
+            "enum": [
+              "on_target",
+              "under",
+              "over"
+            ],
+            "title": "Status",
+            "type": "string"
+          },
+          "target": {
+            "title": "Target",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "category_id",
+          "name",
+          "path_names",
+          "color",
+          "root_kind",
+          "distribution",
+          "target",
+          "expected",
+          "actual",
+          "delta",
+          "status"
+        ],
+        "title": "IdealCompareRow",
+        "type": "object"
       },
       "IdealDistribution": {
         "enum": [
@@ -4134,6 +4889,86 @@
         "title": "KeywordTarget",
         "type": "string"
       },
+      "Kpis": {
+        "properties": {
+          "adherence": {
+            "$ref": "#/components/schemas/AdherenceOut"
+          },
+          "coverage_pct": {
+            "title": "Coverage Pct",
+            "type": "number"
+          },
+          "elapsed_minutes": {
+            "title": "Elapsed Minutes",
+            "type": "integer"
+          },
+          "focus": {
+            "additionalProperties": {
+              "anyOf": [
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "title": "Focus",
+            "type": "object"
+          },
+          "logged_minutes": {
+            "title": "Logged Minutes",
+            "type": "integer"
+          },
+          "sleep": {
+            "additionalProperties": {
+              "anyOf": [
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "title": "Sleep",
+            "type": "object"
+          },
+          "unlogged_minutes": {
+            "title": "Unlogged Minutes",
+            "type": "integer"
+          },
+          "vs_prev": {
+            "additionalProperties": {
+              "anyOf": [
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "title": "Vs Prev",
+            "type": "object"
+          }
+        },
+        "required": [
+          "coverage_pct",
+          "unlogged_minutes",
+          "logged_minutes",
+          "elapsed_minutes",
+          "adherence",
+          "focus",
+          "sleep",
+          "vs_prev"
+        ],
+        "title": "Kpis",
+        "type": "object"
+      },
       "LocationType": {
         "enum": [
           "office",
@@ -4295,6 +5130,78 @@
           "tags_created"
         ],
         "title": "OnboardingOut",
+        "type": "object"
+      },
+      "OverviewOut": {
+        "properties": {
+          "banners": {
+            "items": {
+              "$ref": "#/components/schemas/BannerOut"
+            },
+            "title": "Banners",
+            "type": "array"
+          },
+          "charts": {
+            "additionalProperties": true,
+            "title": "Charts",
+            "type": "object"
+          },
+          "deadlines": {
+            "items": {
+              "$ref": "#/components/schemas/DeadlineOut"
+            },
+            "title": "Deadlines",
+            "type": "array"
+          },
+          "ideal_setup_needed": {
+            "title": "Ideal Setup Needed",
+            "type": "boolean"
+          },
+          "kpis": {
+            "$ref": "#/components/schemas/Kpis"
+          },
+          "range": {
+            "additionalProperties": {
+              "format": "date",
+              "type": "string"
+            },
+            "title": "Range",
+            "type": "object"
+          },
+          "rhythm": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/DayTimeline"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "scope": {
+            "enum": [
+              "day",
+              "week"
+            ],
+            "title": "Scope",
+            "type": "string"
+          },
+          "streaks": {
+            "$ref": "#/components/schemas/Streaks"
+          }
+        },
+        "required": [
+          "scope",
+          "range",
+          "kpis",
+          "banners",
+          "charts",
+          "deadlines",
+          "streaks",
+          "rhythm",
+          "ideal_setup_needed"
+        ],
+        "title": "OverviewOut",
         "type": "object"
       },
       "Placement": {
@@ -4835,6 +5742,30 @@
           }
         },
         "title": "ProjectPatch",
+        "type": "object"
+      },
+      "ProjectTotal": {
+        "properties": {
+          "minutes": {
+            "title": "Minutes",
+            "type": "integer"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "project_id": {
+            "format": "uuid",
+            "title": "Project Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "project_id",
+          "name",
+          "minutes"
+        ],
+        "title": "ProjectTotal",
         "type": "object"
       },
       "Question": {
@@ -5681,6 +6612,137 @@
         "title": "RootKind",
         "type": "string"
       },
+      "SleepBlock": {
+        "properties": {
+          "avg_minutes": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Avg Minutes"
+          },
+          "drift_minutes": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Drift Minutes"
+          },
+          "longest": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Longest"
+          },
+          "nights": {
+            "items": {
+              "$ref": "#/components/schemas/SleepNight"
+            },
+            "title": "Nights",
+            "type": "array"
+          },
+          "short_nights": {
+            "title": "Short Nights",
+            "type": "integer"
+          },
+          "shortest": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Shortest"
+          },
+          "target": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Target"
+          }
+        },
+        "required": [
+          "nights",
+          "avg_minutes",
+          "target",
+          "drift_minutes",
+          "shortest",
+          "longest",
+          "short_nights"
+        ],
+        "title": "SleepBlock",
+        "type": "object"
+      },
+      "SleepNight": {
+        "properties": {
+          "bed_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Bed At"
+          },
+          "date": {
+            "format": "date",
+            "title": "Date",
+            "type": "string"
+          },
+          "minutes": {
+            "title": "Minutes",
+            "type": "integer"
+          },
+          "short": {
+            "title": "Short",
+            "type": "boolean"
+          },
+          "wake_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Wake At"
+          }
+        },
+        "required": [
+          "date",
+          "minutes",
+          "bed_at",
+          "wake_at",
+          "short"
+        ],
+        "title": "SleepNight",
+        "type": "object"
+      },
       "SourceContext": {
         "properties": {
           "context_after": {
@@ -5804,6 +6866,24 @@
           "yesterday_gap"
         ],
         "title": "StatsOut",
+        "type": "object"
+      },
+      "Streaks": {
+        "properties": {
+          "focus": {
+            "title": "Focus",
+            "type": "integer"
+          },
+          "journal": {
+            "title": "Journal",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "journal",
+          "focus"
+        ],
+        "title": "Streaks",
         "type": "object"
       },
       "TagCreate": {
@@ -6055,6 +7135,62 @@
           }
         },
         "title": "TagPatch",
+        "type": "object"
+      },
+      "TagTotal": {
+        "properties": {
+          "color": {
+            "title": "Color",
+            "type": "string"
+          },
+          "goal_kind": {
+            "title": "Goal Kind",
+            "type": "string"
+          },
+          "goal_status": {
+            "title": "Goal Status",
+            "type": "string"
+          },
+          "goal_weekly_minutes": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Goal Weekly Minutes"
+          },
+          "minutes": {
+            "title": "Minutes",
+            "type": "integer"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "share": {
+            "title": "Share",
+            "type": "number"
+          },
+          "tag_id": {
+            "format": "uuid",
+            "title": "Tag Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "tag_id",
+          "name",
+          "color",
+          "minutes",
+          "share",
+          "goal_kind",
+          "goal_weekly_minutes",
+          "goal_status"
+        ],
+        "title": "TagTotal",
         "type": "object"
       },
       "TagsPut": {
@@ -6393,6 +7529,43 @@
         "title": "TaskStatus",
         "type": "string"
       },
+      "TaskTotal": {
+        "properties": {
+          "minutes": {
+            "title": "Minutes",
+            "type": "integer"
+          },
+          "project_id": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Project Id"
+          },
+          "task_id": {
+            "format": "uuid",
+            "title": "Task Id",
+            "type": "string"
+          },
+          "title": {
+            "title": "Title",
+            "type": "string"
+          }
+        },
+        "required": [
+          "task_id",
+          "title",
+          "project_id",
+          "minutes"
+        ],
+        "title": "TaskTotal",
+        "type": "object"
+      },
       "Theme": {
         "enum": [
           "system",
@@ -6482,6 +7655,69 @@
           "end_at"
         ],
         "title": "Transition",
+        "type": "object"
+      },
+      "TrendPoint": {
+        "properties": {
+          "period_start": {
+            "format": "date",
+            "title": "Period Start",
+            "type": "string"
+          },
+          "target": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Target"
+          },
+          "value": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Value"
+          }
+        },
+        "required": [
+          "period_start",
+          "value"
+        ],
+        "title": "TrendPoint",
+        "type": "object"
+      },
+      "TrendsOut": {
+        "properties": {
+          "granularity": {
+            "title": "Granularity",
+            "type": "string"
+          },
+          "metric": {
+            "title": "Metric",
+            "type": "string"
+          },
+          "points": {
+            "items": {
+              "$ref": "#/components/schemas/TrendPoint"
+            },
+            "title": "Points",
+            "type": "array"
+          }
+        },
+        "required": [
+          "metric",
+          "granularity",
+          "points"
+        ],
+        "title": "TrendsOut",
         "type": "object"
       },
       "UnplacedItem": {
@@ -6596,6 +7832,148 @@
           "has_password"
         ],
         "title": "UserOut",
+        "type": "object"
+      },
+      "WeekAnalytics": {
+        "properties": {
+          "by_category": {
+            "items": {
+              "$ref": "#/components/schemas/CategoryTotal"
+            },
+            "title": "By Category",
+            "type": "array"
+          },
+          "by_project": {
+            "items": {
+              "$ref": "#/components/schemas/ProjectTotal"
+            },
+            "title": "By Project",
+            "type": "array"
+          },
+          "by_tag": {
+            "items": {
+              "$ref": "#/components/schemas/TagTotal"
+            },
+            "title": "By Tag",
+            "type": "array"
+          },
+          "by_task": {
+            "items": {
+              "$ref": "#/components/schemas/TaskTotal"
+            },
+            "title": "By Task",
+            "type": "array"
+          },
+          "certainty": {
+            "$ref": "#/components/schemas/CertaintyOut"
+          },
+          "coverage": {
+            "$ref": "#/components/schemas/CoverageOut"
+          },
+          "days": {
+            "items": {
+              "$ref": "#/components/schemas/DayColumn"
+            },
+            "title": "Days",
+            "type": "array"
+          },
+          "focus": {
+            "$ref": "#/components/schemas/FocusBlock"
+          },
+          "from_date": {
+            "format": "date",
+            "title": "From Date",
+            "type": "string"
+          },
+          "ideal": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/IdealCompare"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "ideal_setup_needed": {
+            "title": "Ideal Setup Needed",
+            "type": "boolean"
+          },
+          "prev": {
+            "additionalProperties": {
+              "anyOf": [
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "title": "Prev",
+            "type": "object"
+          },
+          "sleep": {
+            "$ref": "#/components/schemas/SleepBlock"
+          },
+          "to_date": {
+            "format": "date",
+            "title": "To Date",
+            "type": "string"
+          },
+          "work_vs_personal": {
+            "$ref": "#/components/schemas/WorkPersonal"
+          }
+        },
+        "required": [
+          "from_date",
+          "to_date",
+          "coverage",
+          "certainty",
+          "by_category",
+          "by_tag",
+          "by_task",
+          "by_project",
+          "work_vs_personal",
+          "days",
+          "sleep",
+          "focus",
+          "ideal",
+          "ideal_setup_needed",
+          "prev"
+        ],
+        "title": "WeekAnalytics",
+        "type": "object"
+      },
+      "WorkPersonal": {
+        "properties": {
+          "personal": {
+            "title": "Personal",
+            "type": "integer"
+          },
+          "personal_in_office_hours": {
+            "title": "Personal In Office Hours",
+            "type": "integer"
+          },
+          "work": {
+            "title": "Work",
+            "type": "integer"
+          },
+          "work_outside_office": {
+            "title": "Work Outside Office",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "work",
+          "personal",
+          "work_outside_office",
+          "personal_in_office_hours"
+        ],
+        "title": "WorkPersonal",
         "type": "object"
       },
       "YesterdayGap": {
@@ -8272,6 +9650,685 @@
         "summary": "Ai Status",
         "tags": [
           "journal"
+        ]
+      }
+    },
+    "/api/v1/analytics/breakdown": {
+      "get": {
+        "operationId": "breakdown_api_v1_analytics_breakdown_get",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "from",
+            "required": true,
+            "schema": {
+              "format": "date",
+              "title": "From",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "to",
+            "required": true,
+            "schema": {
+              "format": "date",
+              "title": "To",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "by",
+            "required": false,
+            "schema": {
+              "default": "category",
+              "enum": [
+                "category",
+                "tag",
+                "task",
+                "project"
+              ],
+              "title": "By",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "q",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "maxLength": 100,
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Q"
+            }
+          },
+          {
+            "in": "query",
+            "name": "category_id",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "format": "uuid",
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Category Id"
+            }
+          },
+          {
+            "in": "query",
+            "name": "tag_ids",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "items": {
+                    "format": "uuid",
+                    "type": "string"
+                  },
+                  "type": "array"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Tag Ids"
+            }
+          },
+          {
+            "in": "query",
+            "name": "tag_mode",
+            "required": false,
+            "schema": {
+              "default": "any",
+              "pattern": "^(any|all)$",
+              "title": "Tag Mode",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "task_id",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "format": "uuid",
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Task Id"
+            }
+          },
+          {
+            "in": "query",
+            "name": "project_id",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "format": "uuid",
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Project Id"
+            }
+          },
+          {
+            "in": "query",
+            "name": "status",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "$ref": "#/components/schemas/ActivityStatus"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Status"
+            }
+          },
+          {
+            "in": "query",
+            "name": "kind",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "$ref": "#/components/schemas/ActivityKind"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Kind"
+            }
+          },
+          {
+            "in": "query",
+            "name": "certainty",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "$ref": "#/components/schemas/TimeCertainty"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Certainty"
+            }
+          },
+          {
+            "in": "query",
+            "name": "needs_review",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "boolean"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Needs Review"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Envelope_BreakdownOut_"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Unauthorized"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Conflict"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Validation Error"
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Too Many Requests"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Breakdown",
+        "tags": [
+          "analytics"
+        ]
+      }
+    },
+    "/api/v1/analytics/day/{day}": {
+      "get": {
+        "operationId": "day_api_v1_analytics_day__day__get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "day",
+            "required": true,
+            "schema": {
+              "format": "date",
+              "title": "Day",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Envelope_DayAnalytics_"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Unauthorized"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Conflict"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Validation Error"
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Too Many Requests"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Day",
+        "tags": [
+          "analytics"
+        ]
+      }
+    },
+    "/api/v1/analytics/overview": {
+      "get": {
+        "operationId": "overview_api_v1_analytics_overview_get",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "scope",
+            "required": false,
+            "schema": {
+              "default": "week",
+              "enum": [
+                "day",
+                "week"
+              ],
+              "title": "Scope",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "anchor",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "format": "date",
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Anchor"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Envelope_OverviewOut_"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Unauthorized"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Conflict"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Validation Error"
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Too Many Requests"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Overview",
+        "tags": [
+          "analytics"
+        ]
+      }
+    },
+    "/api/v1/analytics/trends": {
+      "get": {
+        "operationId": "trends_api_v1_analytics_trends_get",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "metric",
+            "required": true,
+            "schema": {
+              "enum": [
+                "adherence",
+                "coverage",
+                "sleep",
+                "focus"
+              ],
+              "title": "Metric",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "granularity",
+            "required": false,
+            "schema": {
+              "default": "week",
+              "enum": [
+                "day",
+                "week"
+              ],
+              "title": "Granularity",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "periods",
+            "required": false,
+            "schema": {
+              "default": 8,
+              "title": "Periods",
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Envelope_TrendsOut_"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Unauthorized"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Conflict"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Validation Error"
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Too Many Requests"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Trends",
+        "tags": [
+          "analytics"
+        ]
+      }
+    },
+    "/api/v1/analytics/week/{week_start}": {
+      "get": {
+        "operationId": "week_api_v1_analytics_week__week_start__get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "week_start",
+            "required": true,
+            "schema": {
+              "format": "date",
+              "title": "Week Start",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Envelope_WeekAnalytics_"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Unauthorized"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Conflict"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Validation Error"
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Too Many Requests"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Week",
+        "tags": [
+          "analytics"
         ]
       }
     },

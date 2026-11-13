@@ -211,6 +211,91 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/analytics/breakdown": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Breakdown */
+        get: operations["breakdown_api_v1_analytics_breakdown_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/analytics/day/{day}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Day */
+        get: operations["day_api_v1_analytics_day__day__get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/analytics/overview": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Overview */
+        get: operations["overview_api_v1_analytics_overview_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/analytics/trends": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Trends */
+        get: operations["trends_api_v1_analytics_trends_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/analytics/week/{week_start}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Week */
+        get: operations["week_api_v1_analytics_week__week_start__get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/auth/google/callback": {
         parameters: {
             query?: never;
@@ -1236,6 +1321,15 @@ export interface components {
              */
             tag_id: string;
         };
+        /** AdherenceOut */
+        AdherenceOut: {
+            /** Provisional */
+            provisional: boolean;
+            /** Value */
+            value: number | null;
+            /** Vs Prev */
+            vs_prev?: number | null;
+        };
         /** AiStatusOut */
         AiStatusOut: {
             /** Daily Limit */
@@ -1342,6 +1436,21 @@ export interface components {
             expires_in: number;
             user: components["schemas"]["UserOut"];
         };
+        /** BannerOut */
+        BannerOut: {
+            /** Action */
+            action: {
+                [key: string]: string;
+            };
+            /** Id */
+            id: string;
+            /** Kind */
+            kind: string;
+            /** Severity */
+            severity: string;
+            /** Text */
+            text: string;
+        };
         /** Block */
         Block: {
             category: components["schemas"]["CategoryChip"];
@@ -1392,6 +1501,58 @@ export interface components {
              * @enum {string}
              */
             reason: "UNANSWERED_QUESTION" | "MISSING_DURATION" | "OVERLAP";
+        };
+        /** BreakdownItem */
+        BreakdownItem: {
+            /** Color */
+            color: string;
+            /** Depth */
+            depth?: number | null;
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Minutes */
+            minutes: number;
+            /** Name */
+            name: string;
+            /** Parent Id */
+            parent_id?: string | null;
+            /** Path Names */
+            path_names?: string | null;
+            /** Rollup Minutes */
+            rollup_minutes: number;
+            /** Root Kind */
+            root_kind?: string | null;
+            /** Share */
+            share: number;
+        };
+        /** BreakdownOut */
+        BreakdownOut: {
+            /** By */
+            by: string;
+            /**
+             * From Date
+             * Format: date
+             */
+            from_date: string;
+            /** Items */
+            items: components["schemas"]["BreakdownItem"][];
+            /**
+             * Series Kind
+             * @enum {string}
+             */
+            series_kind: "partition" | "overlay";
+            /**
+             * To Date
+             * Format: date
+             */
+            to_date: string;
+            /** Total Minutes */
+            total_minutes: number;
+            /** Waking Minutes */
+            waking_minutes: number;
         };
         /** BulkIn */
         BulkIn: {
@@ -1547,6 +1708,33 @@ export interface components {
             /** Sort Order */
             sort_order?: number | null;
         };
+        /** CategoryTotal */
+        CategoryTotal: {
+            /**
+             * Category Id
+             * Format: uuid
+             */
+            category_id: string;
+            /** Color */
+            color: string;
+            /** Minutes */
+            minutes: number;
+            /** Name */
+            name: string;
+            /** Path Names */
+            path_names: string;
+            /** Root Kind */
+            root_kind: string;
+            /** Share */
+            share: number;
+        };
+        /** CertaintyOut */
+        CertaintyOut: {
+            /** Estimated */
+            estimated: number;
+            /** Recorded */
+            recorded: number;
+        };
         /** ChangePasswordIn */
         ChangePasswordIn: {
             /** Current Password */
@@ -1663,11 +1851,76 @@ export interface components {
             /** Unlogged */
             unlogged: number;
         };
+        /** CoverageOut */
+        CoverageOut: {
+            /** Complete */
+            complete: boolean;
+            /** Elapsed */
+            elapsed: number;
+            /** Logged */
+            logged: number;
+            /** Pct */
+            pct: number;
+            /** Placed */
+            placed: number;
+            /** Unlogged */
+            unlogged: number;
+            /** Unplaced */
+            unplaced: number;
+        };
         /**
          * CoveragePreset
          * @enum {string}
          */
         CoveragePreset: "whole_day" | "last_hours" | "since_last" | "custom";
+        /** DayAnalytics */
+        DayAnalytics: {
+            /** By Category */
+            by_category: components["schemas"]["CategoryTotal"][];
+            /** By Project */
+            by_project: components["schemas"]["ProjectTotal"][];
+            /** By Tag */
+            by_tag: components["schemas"]["TagTotal"][];
+            /** By Task */
+            by_task: components["schemas"]["TaskTotal"][];
+            certainty: components["schemas"]["CertaintyOut"];
+            coverage: components["schemas"]["CoverageOut"];
+            /**
+             * Date
+             * Format: date
+             */
+            date: string;
+            focus: components["schemas"]["FocusBlock"];
+            ideal: components["schemas"]["IdealCompare"] | null;
+            /** Ideal Setup Needed */
+            ideal_setup_needed: boolean;
+            sleep: components["schemas"]["SleepBlock"];
+            work_vs_personal: components["schemas"]["WorkPersonal"];
+        };
+        /** DayColumn */
+        DayColumn: {
+            /** Complete */
+            complete: boolean;
+            /**
+             * Date
+             * Format: date
+             */
+            date: string;
+            /** Elapsed */
+            elapsed: number;
+            /** Focus */
+            focus: number;
+            /** Logged */
+            logged: number;
+            /** Placed */
+            placed: number;
+            /** Sleep */
+            sleep: number;
+            /** Unlogged */
+            unlogged: number;
+            /** Unplaced */
+            unplaced: number;
+        };
         /** DayTimeline */
         DayTimeline: {
             /** Blocks */
@@ -1696,6 +1949,27 @@ export interface components {
             planned: components["schemas"]["Block"][];
             /** Unplaced */
             unplaced: components["schemas"]["UnplacedItem"][];
+        };
+        /** DeadlineOut */
+        DeadlineOut: {
+            /** Days Left */
+            days_left: number;
+            /**
+             * Due Date
+             * Format: date
+             */
+            due_date: string;
+            /** Overdue */
+            overdue: boolean;
+            /** Priority */
+            priority: number | null;
+            /**
+             * Task Id
+             * Format: uuid
+             */
+            task_id: string;
+            /** Title */
+            title: string;
         };
         /** DeleteAccountIn */
         DeleteAccountIn: {
@@ -1934,6 +2208,14 @@ export interface components {
                 [key: string]: unknown;
             };
         };
+        /** Envelope[BreakdownOut] */
+        Envelope_BreakdownOut_: {
+            data: components["schemas"]["BreakdownOut"];
+            /** Meta */
+            meta?: {
+                [key: string]: unknown;
+            };
+        };
         /** Envelope[BulkOut] */
         Envelope_BulkOut_: {
             data: components["schemas"]["BulkOut"];
@@ -1961,6 +2243,14 @@ export interface components {
         /** Envelope[CommitOut] */
         Envelope_CommitOut_: {
             data: components["schemas"]["CommitOut"];
+            /** Meta */
+            meta?: {
+                [key: string]: unknown;
+            };
+        };
+        /** Envelope[DayAnalytics] */
+        Envelope_DayAnalytics_: {
+            data: components["schemas"]["DayAnalytics"];
             /** Meta */
             meta?: {
                 [key: string]: unknown;
@@ -2033,6 +2323,14 @@ export interface components {
         /** Envelope[OnboardingOut] */
         Envelope_OnboardingOut_: {
             data: components["schemas"]["OnboardingOut"];
+            /** Meta */
+            meta?: {
+                [key: string]: unknown;
+            };
+        };
+        /** Envelope[OverviewOut] */
+        Envelope_OverviewOut_: {
+            data: components["schemas"]["OverviewOut"];
             /** Meta */
             meta?: {
                 [key: string]: unknown;
@@ -2134,9 +2432,25 @@ export interface components {
                 [key: string]: unknown;
             };
         };
+        /** Envelope[TrendsOut] */
+        Envelope_TrendsOut_: {
+            data: components["schemas"]["TrendsOut"];
+            /** Meta */
+            meta?: {
+                [key: string]: unknown;
+            };
+        };
         /** Envelope[UserOut] */
         Envelope_UserOut_: {
             data: components["schemas"]["UserOut"];
+            /** Meta */
+            meta?: {
+                [key: string]: unknown;
+            };
+        };
+        /** Envelope[WeekAnalytics] */
+        Envelope_WeekAnalytics_: {
+            data: components["schemas"]["WeekAnalytics"];
             /** Meta */
             meta?: {
                 [key: string]: unknown;
@@ -2300,6 +2614,25 @@ export interface components {
          * @enum {string}
          */
         ExportStatus: "queued" | "running" | "succeeded" | "failed" | "expired";
+        /** FocusBlock */
+        FocusBlock: {
+            /** Days */
+            days: components["schemas"]["FocusDay"][];
+            /** Minutes */
+            minutes: number;
+            /** Target */
+            target: number | null;
+        };
+        /** FocusDay */
+        FocusDay: {
+            /**
+             * Date
+             * Format: date
+             */
+            date: string;
+            /** Minutes */
+            minutes: number;
+        };
         /** ForgotIn */
         ForgotIn: {
             /**
@@ -2328,6 +2661,51 @@ export interface components {
          * @enum {string}
          */
         GoalKind: "tracked" | "min" | "max";
+        /** IdealCompare */
+        IdealCompare: {
+            adherence: components["schemas"]["AdherenceOut"];
+            /** Effective From */
+            effective_from: string | null;
+            /**
+             * Kind
+             * @enum {string}
+             */
+            kind: "day" | "week";
+            /** Rows */
+            rows: components["schemas"]["IdealCompareRow"][];
+            /** Unallocated Actual */
+            unallocated_actual: number;
+        };
+        /** IdealCompareRow */
+        IdealCompareRow: {
+            /** Actual */
+            actual: number;
+            /**
+             * Category Id
+             * Format: uuid
+             */
+            category_id: string;
+            /** Color */
+            color: string;
+            /** Delta */
+            delta: number;
+            distribution: components["schemas"]["IdealDistribution"] | null;
+            /** Expected */
+            expected: number;
+            /** Name */
+            name: string;
+            /** Path Names */
+            path_names: string;
+            /** Root Kind */
+            root_kind: string;
+            /**
+             * Status
+             * @enum {string}
+             */
+            status: "on_target" | "under" | "over";
+            /** Target */
+            target: number;
+        };
         /**
          * IdealDistribution
          * @enum {string}
@@ -2502,6 +2880,30 @@ export interface components {
          * @enum {string}
          */
         KeywordTarget: "tag" | "category";
+        /** Kpis */
+        Kpis: {
+            adherence: components["schemas"]["AdherenceOut"];
+            /** Coverage Pct */
+            coverage_pct: number;
+            /** Elapsed Minutes */
+            elapsed_minutes: number;
+            /** Focus */
+            focus: {
+                [key: string]: number | null;
+            };
+            /** Logged Minutes */
+            logged_minutes: number;
+            /** Sleep */
+            sleep: {
+                [key: string]: number | null;
+            };
+            /** Unlogged Minutes */
+            unlogged_minutes: number;
+            /** Vs Prev */
+            vs_prev: {
+                [key: string]: number | null;
+            };
+        };
         /**
          * LocationType
          * @enum {string}
@@ -2583,6 +2985,31 @@ export interface components {
             categories_created: number;
             /** Tags Created */
             tags_created: number;
+        };
+        /** OverviewOut */
+        OverviewOut: {
+            /** Banners */
+            banners: components["schemas"]["BannerOut"][];
+            /** Charts */
+            charts: {
+                [key: string]: unknown;
+            };
+            /** Deadlines */
+            deadlines: components["schemas"]["DeadlineOut"][];
+            /** Ideal Setup Needed */
+            ideal_setup_needed: boolean;
+            kpis: components["schemas"]["Kpis"];
+            /** Range */
+            range: {
+                [key: string]: string;
+            };
+            rhythm: components["schemas"]["DayTimeline"] | null;
+            /**
+             * Scope
+             * @enum {string}
+             */
+            scope: "day" | "week";
+            streaks: components["schemas"]["Streaks"];
         };
         /**
          * Placement
@@ -2765,6 +3192,18 @@ export interface components {
             color?: string | null;
             /** Name */
             name?: string | null;
+        };
+        /** ProjectTotal */
+        ProjectTotal: {
+            /** Minutes */
+            minutes: number;
+            /** Name */
+            name: string;
+            /**
+             * Project Id
+             * Format: uuid
+             */
+            project_id: string;
         };
         /** Question */
         Question: {
@@ -3071,6 +3510,39 @@ export interface components {
          * @enum {string}
          */
         RootKind: "work" | "personal" | "sleep";
+        /** SleepBlock */
+        SleepBlock: {
+            /** Avg Minutes */
+            avg_minutes: number | null;
+            /** Drift Minutes */
+            drift_minutes: number | null;
+            /** Longest */
+            longest: number | null;
+            /** Nights */
+            nights: components["schemas"]["SleepNight"][];
+            /** Short Nights */
+            short_nights: number;
+            /** Shortest */
+            shortest: number | null;
+            /** Target */
+            target: number | null;
+        };
+        /** SleepNight */
+        SleepNight: {
+            /** Bed At */
+            bed_at: string | null;
+            /**
+             * Date
+             * Format: date
+             */
+            date: string;
+            /** Minutes */
+            minutes: number;
+            /** Short */
+            short: boolean;
+            /** Wake At */
+            wake_at: string | null;
+        };
         /** SourceContext */
         SourceContext: {
             /** Context After */
@@ -3104,6 +3576,13 @@ export interface components {
             /** Streak Days */
             streak_days: number;
             yesterday_gap: components["schemas"]["YesterdayGap"] | null;
+        };
+        /** Streaks */
+        Streaks: {
+            /** Focus */
+            focus: number;
+            /** Journal */
+            journal: number;
         };
         /** TagCreate */
         TagCreate: {
@@ -3186,6 +3665,28 @@ export interface components {
             keep_old_name_as_alias: boolean;
             /** Name */
             name?: string | null;
+        };
+        /** TagTotal */
+        TagTotal: {
+            /** Color */
+            color: string;
+            /** Goal Kind */
+            goal_kind: string;
+            /** Goal Status */
+            goal_status: string;
+            /** Goal Weekly Minutes */
+            goal_weekly_minutes: number | null;
+            /** Minutes */
+            minutes: number;
+            /** Name */
+            name: string;
+            /** Share */
+            share: number;
+            /**
+             * Tag Id
+             * Format: uuid
+             */
+            tag_id: string;
         };
         /** TagsPut */
         TagsPut: {
@@ -3272,6 +3773,20 @@ export interface components {
          * @enum {string}
          */
         TaskStatus: "open" | "done" | "dropped";
+        /** TaskTotal */
+        TaskTotal: {
+            /** Minutes */
+            minutes: number;
+            /** Project Id */
+            project_id: string | null;
+            /**
+             * Task Id
+             * Format: uuid
+             */
+            task_id: string;
+            /** Title */
+            title: string;
+        };
         /**
          * Theme
          * @enum {string}
@@ -3317,6 +3832,27 @@ export interface components {
              */
             start_at: string;
         };
+        /** TrendPoint */
+        TrendPoint: {
+            /**
+             * Period Start
+             * Format: date
+             */
+            period_start: string;
+            /** Target */
+            target?: number | null;
+            /** Value */
+            value: number | null;
+        };
+        /** TrendsOut */
+        TrendsOut: {
+            /** Granularity */
+            granularity: string;
+            /** Metric */
+            metric: string;
+            /** Points */
+            points: components["schemas"]["TrendPoint"][];
+        };
         /** UnplacedItem */
         UnplacedItem: {
             category: components["schemas"]["CategoryChip"];
@@ -3356,6 +3892,52 @@ export interface components {
             theme: components["schemas"]["Theme"];
             /** Timezone */
             timezone: string;
+        };
+        /** WeekAnalytics */
+        WeekAnalytics: {
+            /** By Category */
+            by_category: components["schemas"]["CategoryTotal"][];
+            /** By Project */
+            by_project: components["schemas"]["ProjectTotal"][];
+            /** By Tag */
+            by_tag: components["schemas"]["TagTotal"][];
+            /** By Task */
+            by_task: components["schemas"]["TaskTotal"][];
+            certainty: components["schemas"]["CertaintyOut"];
+            coverage: components["schemas"]["CoverageOut"];
+            /** Days */
+            days: components["schemas"]["DayColumn"][];
+            focus: components["schemas"]["FocusBlock"];
+            /**
+             * From Date
+             * Format: date
+             */
+            from_date: string;
+            ideal: components["schemas"]["IdealCompare"] | null;
+            /** Ideal Setup Needed */
+            ideal_setup_needed: boolean;
+            /** Prev */
+            prev: {
+                [key: string]: number | null;
+            };
+            sleep: components["schemas"]["SleepBlock"];
+            /**
+             * To Date
+             * Format: date
+             */
+            to_date: string;
+            work_vs_personal: components["schemas"]["WorkPersonal"];
+        };
+        /** WorkPersonal */
+        WorkPersonal: {
+            /** Personal */
+            personal: number;
+            /** Personal In Office Hours */
+            personal_in_office_hours: number;
+            /** Work */
+            work: number;
+            /** Work Outside Office */
+            work_outside_office: number;
         };
         /** YesterdayGap */
         YesterdayGap: {
@@ -4399,6 +4981,356 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["Envelope_AiStatusOut_"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Too Many Requests */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+        };
+    };
+    breakdown_api_v1_analytics_breakdown_get: {
+        parameters: {
+            query: {
+                from: string;
+                to: string;
+                by?: "category" | "tag" | "task" | "project";
+                q?: string | null;
+                category_id?: string | null;
+                tag_ids?: string[] | null;
+                tag_mode?: string;
+                task_id?: string | null;
+                project_id?: string | null;
+                status?: components["schemas"]["ActivityStatus"] | null;
+                kind?: components["schemas"]["ActivityKind"] | null;
+                certainty?: components["schemas"]["TimeCertainty"] | null;
+                needs_review?: boolean | null;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Envelope_BreakdownOut_"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Too Many Requests */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+        };
+    };
+    day_api_v1_analytics_day__day__get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                day: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Envelope_DayAnalytics_"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Too Many Requests */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+        };
+    };
+    overview_api_v1_analytics_overview_get: {
+        parameters: {
+            query?: {
+                scope?: "day" | "week";
+                anchor?: string | null;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Envelope_OverviewOut_"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Too Many Requests */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+        };
+    };
+    trends_api_v1_analytics_trends_get: {
+        parameters: {
+            query: {
+                metric: "adherence" | "coverage" | "sleep" | "focus";
+                granularity?: "day" | "week";
+                periods?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Envelope_TrendsOut_"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Too Many Requests */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+        };
+    };
+    week_api_v1_analytics_week__week_start__get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                week_start: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Envelope_WeekAnalytics_"];
                 };
             };
             /** @description Unauthorized */

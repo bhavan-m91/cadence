@@ -90,3 +90,8 @@ def compute_slices(start: datetime, end: datetime, tz: ZoneInfo) -> list[DaySlic
             out.append(DaySlice(d, minutes, s, e))
         d += timedelta(days=1)
     return out
+
+
+def ymd_label(d: date) -> str:
+    """'Wed 11 Nov' for banner text (no leading zero, locale independent)."""
+    return f"{d.strftime('%a')} {d.day} {d.strftime('%b')}"

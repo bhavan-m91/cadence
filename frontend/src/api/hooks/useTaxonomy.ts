@@ -39,7 +39,7 @@ function useTaxonomyMutation<V, R>(fn: (v: V) => Promise<R>) {
   return useMutation({
     mutationFn: fn,
     onSuccess: () => {
-      for (const key of ['categories', 'tags', 'tag', 'rules', 'activities', 'activity', 'timeline', 'tasks']) qc.invalidateQueries({ queryKey: [key] })
+      for (const key of ['categories', 'tags', 'tag', 'rules', 'activities', 'activity', 'timeline', 'tasks', 'analytics']) qc.invalidateQueries({ queryKey: [key] })
     },
   })
 }

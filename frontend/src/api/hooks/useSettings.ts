@@ -14,7 +14,7 @@ export function useUpdatePreferences() {
     mutationFn: (b: Partial<Preferences>) => api.patch<Preferences>('/users/me/preferences', b),
     onSuccess: (p) => {
       qc.setQueryData(qk.preferences, p)
-      qc.invalidateQueries({ queryKey: ['timeline'] })
+      qc.invalidateQueries({ queryKey: ['timeline'] }); qc.invalidateQueries({ queryKey: ['analytics'] })
     },
   })
 }
@@ -25,7 +25,7 @@ export function useUpdateProfile() {
     mutationFn: (b: Partial<Pick<User, 'display_name' | 'role_title' | 'timezone' | 'theme'>>) => api.patch<User>('/users/me', b),
     onSuccess: (user) => {
       useAuthStore.getState().setUser(user)
-      qc.invalidateQueries({ queryKey: ['timeline'] })
+      qc.invalidateQueries({ queryKey: ['timeline'] }); qc.invalidateQueries({ queryKey: ['analytics'] })
     },
   })
 }
