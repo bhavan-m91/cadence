@@ -1,0 +1,32 @@
+name: backend
+on:
+  push: { branches: [main], paths: ["backend/**", ".github/workflows/ci-backend.yml"] }
+  pull_request: { paths: ["backend/**", ".github/workflows/ci-backend.yml"] }
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    defaults: { run: { working-directory: backend } }
+    services:
+      postgres:
+        image: postgres:16
+        env: { POSTGRES_USER: cadence, POSTGRES_HOST_AUTH_METHOD: trust, POSTGRES_DB: cadence_test }
+        ports: ["5432:5432"]
+        options: >-
+          --health-cmd "pg_isready -U cadence" --health-interval 5s --health-timeout 5s --health-retries 10
+    env:
+      TEST_DATABASE_URL: postgresql+asyncpg://cadence@localhost:5432/cadence_test
+      DATABASE_URL: postgresql+asyncpg://cadence@localhost:5432/cadence_test
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: "3.12", cache: pip, cache-dependency-path: backend/pyproject.toml }
+      - run: pip install -e ".[dev]"
+      - run: ruff check app tests scripts
+      - name: Type check (advisory until the nullable-column typing is cleaned up)
+        run: mypy app
+        continue-on-error: true
+      - run: python -m pytest -q
+      - name: OpenAPI snapshot is current
+        run: |
+          PYTHONPATH=. python scripts/export_openapi.py /tmp/openapi.json
+          diff -q /tmp/openapi.json openapi.json || (echo "openapi.json is stale: run make gen-api" && exit 1)

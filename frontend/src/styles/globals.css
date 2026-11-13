@@ -1,0 +1,23 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  * { @apply box-border; }
+  html, body, #root { min-height: 100%; }
+  body { @apply bg-paper text-ink font-sans antialiased tracking-tightish; margin: 0; }
+  a { color: inherit; text-decoration: none; }
+  button, input, select, textarea { font: inherit; letter-spacing: inherit; }
+  :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+  @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; } }
+}
+
+@layer components {
+  .num { font-family: 'Space Grotesk', sans-serif; font-variant-numeric: tabular-nums; }
+  .card { @apply bg-card border border-line rounded-2xl shadow-card; }
+  .hatch-bad {
+    background: repeating-linear-gradient(135deg, color-mix(in srgb, var(--bad) 22%, transparent) 0 3px, transparent 3px 7px);
+  }
+}
+
+@keyframes fade { from { opacity: 0 } to { opacity: 1 } }

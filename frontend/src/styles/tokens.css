@@ -1,0 +1,22 @@
+/* Design tokens lifted from the Cadence design file (light and dark). Components never hard-code colours. */
+:root,
+:root[data-theme='light'] {
+  --ink: #17181c; --muted: #5b6068; --faint: #6f747c; --line: #ecece6; --line2: #f4f4ef; --card: #ffffff; --paper: #f6f6f2;
+  --ghost: #efefe9; --ghostline: #c4c4ba; --tipbg: #17181c; --tipink: #ffffff; --tipmuted: #a7acb4;
+  --h0: #ebedf0; --h1: #9be9a8; --h2: #40c463; --h3: #30a14e; --h4: #216e39;
+  --sleep: #5e6582; --violet: #8a6ce6; --teal: #1c9c8d; --sky: #3e86d4; --rose: #db5e86; --good: #2e9e6b; --warn: #c27c22; --bad: #d4564f;
+  --accent: #4c63e6; --accentInk: var(--accent);
+  --tintA: color-mix(in srgb, var(--accent) 9%, var(--card)); --tintA2: color-mix(in srgb, var(--accent) 18%, var(--card));
+  --shadow: 0 1px 2px rgba(20, 20, 20, 0.04);
+  --panel: #17181c; --panelInk: #f3f4f6; --panelMuted: #a7acb4;
+  color-scheme: light;
+}
+:root[data-theme='dark'] {
+  --ink: #eceef0; --muted: #b2b7be; --faint: #8f959d; --line: #272a30; --line2: #1e2025; --card: #16181c; --paper: #0e0f12;
+  --ghost: #1f2126; --ghostline: #4a4e57; --tipbg: #2a2d34; --tipink: #f3f4f6; --tipmuted: #a3a8b0;
+  --h0: #1c2027; --h1: #0e4429; --h2: #006d32; --h3: #26a641; --h4: #39d353;
+  --sleep: #8d95b8; --violet: #a48bf0; --teal: #2db8a7; --sky: #5fa6e8; --rose: #ec7fa6; --good: #3dbb7e; --warn: #e3a043; --bad: #ee7570;
+  --accentInk: color-mix(in srgb, var(--accent) 60%, #fff);
+  --shadow: none; --panel: #1a1c21;
+  color-scheme: dark;
+}
