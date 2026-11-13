@@ -116,6 +116,12 @@ def _pick(ctx: _Ctx, t: Spoken, lo: datetime, day_offset: int, label: str | None
     cands = candidates(t, ctx.dates(day_offset), ctx.tz)
     inside = [c for c in cands if lo <= c <= hi]
     flags: list[str] = []
+    if not inside and has_prev:
+        # A narrative moves forward. After an earlier activity, a time that fits nowhere inside the window is later than the window
+        # (a plan for the rest of the day), not an earlier moment on the previous day.
+        later = sorted(c for c in cands if c > hi and c <= hi + timedelta(hours=24))
+        if later:
+            return later[0], ["after_window"], False
     if not inside:  # carried over from before the window (sleep) or before the cursor
         loose = [c for c in cands if ctx.w0 - CARRY_OVER <= c <= hi]
         if not loose:

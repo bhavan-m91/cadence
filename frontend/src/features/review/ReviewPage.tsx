@@ -19,7 +19,7 @@ import { Icon } from '@/components/ui/Icon'
 import { dayAndMonth, formatClock, formatRange, hm, isoToLocal, weekdayShort, type TimeFormat } from '@/lib/time'
 import { useAuthStore } from '@/stores/authStore'
 import { toast, useToastStore } from '@/stores/toastStore'
-import { DraftCard, DraftEditDialog, GapRow, initialEdit, type DraftEdit, type DraftView, type ResolutionAction } from './DraftParts'
+import { DraftCard, DraftEditDialog, GapRow, initialEdit, isLater, type DraftEdit, type DraftView, type ResolutionAction } from './DraftParts'
 
 type Edits = NonNullable<NonNullable<CommitBody['activities']>[number]['edits']>
 
@@ -110,7 +110,7 @@ function ReviewBoard({ entryId, jobId, review, stale, onRerun, rerunning }: { en
   const answer = useAnswer(entryId), commit = useCommit(entryId)
   const { entry, drafts } = review
 
-  const [include, setInclude] = useState<Record<string, boolean>>(() => Object.fromEntries(drafts.map((d) => [d.id, d.include])))
+  const [include, setInclude] = useState<Record<string, boolean>>(() => Object.fromEntries(drafts.map((d) => [d.id, d.include && !isLater(d, entry.covers_end_at)])))
   const [edits, setEdits] = useState<Record<string, DraftEdit>>({})
   const [resolutions, setResolutions] = useState<Record<string, { action: ResolutionAction; existing: string }>>({})
   const [transitions, setTransitions] = useState<string[]>([])
@@ -125,7 +125,7 @@ function ReviewBoard({ entryId, jobId, review, stale, onRerun, rerunning }: { en
   const keys = useRef(new Map<string, string>())
 
   // New drafts after an answer re-resolve the times: keep what the person already decided, default the rest.
-  useEffect(() => setInclude((p) => Object.fromEntries(drafts.map((d) => [d.id, p[d.id] ?? d.include]))), [drafts])
+  useEffect(() => setInclude((p) => Object.fromEntries(drafts.map((d) => [d.id, p[d.id] ?? (d.include && !isLater(d, entry.covers_end_at))]))), [drafts, entry.covers_end_at])
 
   const getEdit = (d: Review['drafts'][number]) => edits[d.id] ?? initialEdit(d, tz)
   const isIn = (id: string) => include[id] !== false
@@ -148,6 +148,17 @@ function ReviewBoard({ entryId, jobId, review, stale, onRerun, rerunning }: { en
 
   const blockersOf = (id: string) => review.blocking.filter((b) => b.draft_id === id && (b.reason !== 'OVERLAP' || !resolutions[id])).map((b) => b.reason as string)
   const blocked = included.filter((d) => blockersOf(d.id).length > 0)
+  // A question about something you unticked cannot hold up saving the rest.
+  const includedTemp = new Set(included.map((d) => d.temp_id))
+  const openQuestions = review.questions.filter((q) => includedTemp.has(q.activity_temp_id))
+  const later = drafts.filter((d) => isLater(d, entry.covers_end_at))
+  // Plain words for why Save is greyed out, so nobody has to hover a disabled button to find out.
+  const reasons: { text: string; to: string }[] = [
+    ...(openQuestions.length ? [{ text: `Answer ${openQuestions.length === 1 ? 'the question' : `${openQuestions.length} questions`} below`, to: 'questions' }] : []),
+    ...blocked.flatMap((d) => blockersOf(d.id).filter((r) => r !== 'UNANSWERED_QUESTION').map((r) => ({
+      text: r === 'MISSING_DURATION' ? `Add a duration to “${views.get(d.id)?.title}”` : `Choose how to fix the overlap on “${views.get(d.id)?.title}”`, to: `draft-${d.id}` }))),
+    ...(included.length === 0 ? [{ text: 'Tick at least one activity', to: '' }] : []),
+  ]
 
   // ---- timeline summary
   const w0 = Date.parse(entry.covers_start_at), w1 = Date.parse(entry.covers_end_at), span = Math.max(1, w1 - w0)
@@ -232,12 +243,25 @@ function ReviewBoard({ entryId, jobId, review, stale, onRerun, rerunning }: { en
         subtitle={<>From your {sourceLabel} entry · {weekdayShort(isoToLocal(entry.covers_start_at, tz).date)} {dayAndMonth(isoToLocal(entry.covers_start_at, tz).date)} · {formatClock(entry.covers_start_at, tz, fmt)} – {formatClock(entry.covers_end_at, tz, fmt)}</>}>
         <Button variant="subtle" icon="refresh" aria-label="Regenerate" onClick={() => setRegenOpen(true)}><span className="max-xl:sr-only">Regenerate</span></Button>
         <Button onClick={() => setDiscardOpen(true)}>Discard</Button>
-        <Button variant="primary" icon="check" disabled={count === 0 || blocked.length > 0 || review.questions.length > 0 || commit.isPending} loading={commit.isPending} onClick={save}
-          title={blocked.length ? 'Resolve the items marked in red first' : review.questions.length ? 'Answer the questions first' : undefined}>Save {count} {count === 1 ? 'activity' : 'activities'}</Button>
+        <Button variant="primary" icon="check" disabled={reasons.length > 0 || commit.isPending} loading={commit.isPending} onClick={save}
+          title={reasons.length ? `To save: ${reasons.map((r) => r.text).join('; ')}` : undefined}>Save {count} {count === 1 ? 'activity' : 'activities'}</Button>
       </PageHeader>
 
       <div className="flex flex-col gap-4 p-4 md:px-7 md:py-[22px] md:pb-10">
         {stale && <p role="status" className="m-0 flex flex-wrap items-center gap-3 rounded-xl border border-warn/40 bg-warn/10 px-3.5 py-2.5 text-[13px]"><Icon name="alert" size={15} className="text-warn" /><span className="mr-auto">You edited the entry after this was read. These results may be out of date.</span><Button size="sm" loading={rerunning} onClick={() => onRerun(false)}>Read again</Button></p>}
+        {later.length > 0 && (
+          <p role="status" className="m-0 flex flex-wrap items-start gap-3 rounded-xl border border-accent/30 bg-tint px-3.5 py-2.5 text-[13px]">
+            <Icon name="clock" size={15} className="mt-0.5 flex-none text-accent-ink" />
+            <span className="min-w-0 flex-1"><b className="font-semibold">{later.length} later {later.length === 1 ? 'activity is' : 'activities are'} unticked.</b> {later.length === 1 ? 'It starts' : 'They start'} after this entry's window ends ({formatClock(entry.covers_end_at, tz, fmt)}), so {later.length === 1 ? 'it has' : 'they have'} not happened yet: {later.map((d) => views.get(d.id)?.title).slice(0, 4).join(', ')}{later.length > 4 ? '…' : ''}. Tick one here if it already happened.</span>
+            <Button size="sm" onClick={() => setInclude((p) => ({ ...p, ...Object.fromEntries(later.map((d) => [d.id, true])) }))}>Tick them anyway</Button>
+          </p>
+        )}
+        {reasons.length > 0 && (
+          <div role="status" className="flex flex-wrap items-center gap-x-4 gap-y-2 rounded-xl border border-warn/40 bg-warn/10 px-3.5 py-2.5 text-[13px]">
+            <b className="font-semibold">To save:</b>
+            {reasons.map((r) => <button key={r.text} type="button" className="font-medium text-accent-ink underline underline-offset-2" onClick={() => (r.to ? document.getElementById(r.to)?.scrollIntoView({ behavior: 'smooth', block: 'center' }) : undefined)}>{r.text}</button>)}
+          </div>
+        )}
         {review.warnings.map((w) => <p key={w} className="m-0 flex items-start gap-2 rounded-xl bg-tint px-3.5 py-2.5 text-[12.5px] text-muted"><Icon name="info" size={15} className="mt-px flex-none text-accent-ink" />{w}</p>)}
 
         {err && <p role="alert" className="m-0 flex items-start gap-2 rounded-xl border border-bad/40 bg-bad/10 px-3.5 py-2.5 text-[13px] font-medium"><Icon name="alert" size={15} className="mt-px flex-none text-bad" />{err}</p>}
@@ -256,12 +280,12 @@ function ReviewBoard({ entryId, jobId, review, stale, onRerun, rerunning }: { en
           <div className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-muted"><span className="flex items-center gap-1.5"><i className="size-2.5 rounded-[3px] bg-accent" />Logged by this entry</span><span className="flex items-center gap-1.5"><i className="hatch-bad size-2.5 rounded-[3px] border border-dashed border-bad" />Not mentioned</span>{unplacedMin > 0 && <span>{hm(unplacedMin)} has no fixed time</span>}</div>
         </section>
 
-        {review.questions.length > 0 && (
-          <section className="card border-accent/40 p-[18px]" aria-label="Questions" aria-live="polite">
-            <h2 className="m-0 mb-1 flex items-center gap-2 text-sm font-semibold"><Icon name="sparkle" size={15} className="text-accent-ink" />A quick question{review.questions.length > 1 ? 's' : ''} before saving</h2>
+        {openQuestions.length > 0 && (
+          <section id="questions" className="card border-accent/40 p-[18px]" aria-label="Questions" aria-live="polite">
+            <h2 className="m-0 mb-1 flex items-center gap-2 text-sm font-semibold"><Icon name="sparkle" size={15} className="text-accent-ink" />A quick question{openQuestions.length > 1 ? 's' : ''} before saving</h2>
             <p className="m-0 mb-3 text-xs text-muted">Cadence will not guess these. Your answer places the activity.</p>
             <ul className="m-0 flex list-none flex-col gap-3.5 p-0">
-              {review.questions.map((q) => (
+              {openQuestions.map((q) => (
                 <li key={q.id}><p className="m-0 mb-2 text-[13px] font-semibold">{q.prompt}</p>
                   <div className="flex flex-wrap gap-2">{q.options.map((o) => <Button key={o.value} size="sm" disabled={answer.isPending} onClick={() => answer.mutate({ job_id: jobId, question_id: q.id, value: o.value }, { onError: (e) => toast.error(errorMessage(e)) })}>{o.label}</Button>)}</div></li>
               ))}

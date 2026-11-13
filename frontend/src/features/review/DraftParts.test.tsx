@@ -2,7 +2,7 @@ import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { describe, expect, it, vi } from 'vitest'
 import type { ReviewDraft } from '@/api/types'
-import { DraftCard, flagText, initialEdit, type DraftView } from './DraftParts'
+import { DraftCard, flagText, initialEdit, isLater, type DraftView } from './DraftParts'
 
 const draft = {
   id: 'd1', temp_id: 'a1', order: 0, title: 'Standup', description: null, placement: 'placed',
@@ -25,6 +25,13 @@ describe('review drafts', () => {
     const e = initialEdit(draft, 'Asia/Kolkata')
     expect(e.range).toEqual({ date: '2026-11-13', start: '10:00', end: '10:30' })
     expect(e.tag_ids).toEqual(['t1'])
+  })
+
+  it('treats an activity that starts after the entry window as a plan, not something to log', () => {
+    const end = '2026-11-13T21:42:00Z' // 3:12am IST
+    expect(isLater({ ...draft, start_at: '2026-11-14T04:30:00Z' } as ReviewDraft, end)).toBe(true) // 10am
+    expect(isLater({ ...draft, start_at: '2026-11-13T20:30:00Z' } as ReviewDraft, end)).toBe(false) // 2am, runs past the end but began inside it
+    expect(isLater({ ...draft, placement: 'unplaced', start_at: null, window_start_at: '2026-11-14T04:30:00Z' } as ReviewDraft, end)).toBe(true)
   })
 
   it('lets the person untick, edit and remove a tag from a card', async () => {

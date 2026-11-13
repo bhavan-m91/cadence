@@ -159,3 +159,30 @@ def test_answers_for_the_same_input_are_deterministic():
 
 
 __all__ = ["datetime", "timezone"]
+
+
+def test_a_late_night_entry_that_plans_the_rest_of_the_day_puts_later_times_later_not_on_yesterday():
+    """Dictated at 3:12am about what comes next: sleep until 10, a 10-11 routine, then lunch 12-1. Nothing may land on the previous day."""
+    d = date(2026, 11, 14)
+    w0, w1 = at(0, 0, d), at(3, 12, d)
+    items = [
+        ItemIn("friends", "range", start=Spoken(12, 0, "am"), end=Spoken(2, 0, "am")),
+        ItemIn("build", "range", start_anchor="previous_end", end=Spoken(4, 0, "am")),
+        ItemIn("sleep", "range", start_anchor="previous_end", end=Spoken(10, 0, "am"), duration=360),
+        ItemIn("routine", "range", start=Spoken(10, 0, "am"), end=Spoken(11, 0, "am"), approximate=True),
+        ItemIn("youtube", "duration", start_anchor="previous_end", duration=60),
+        ItemIn("lunch", "range", start=Spoken(12), end=Spoken(1)),
+    ]
+    r = {x.key: x for x in resolve_day(items, w0, w1, IST)}
+    assert (local(r["friends"].start), local(r["friends"].end)) == ("00:00", "02:00")
+    assert (r["routine"].placement, local(r["routine"].start), local(r["routine"].end)) == ("placed", "10:00", "11:00") and "after_window" in r["routine"].flags
+    assert (local(r["youtube"].start), local(r["youtube"].end)) == ("11:00", "12:00")
+    lunch = r["lunch"]
+    assert lunch.start.astimezone(IST).date() == d and (local(lunch.start), local(lunch.end)) == ("12:00", "13:00") and "after_window" in lunch.flags
+    assert all(x.start is None or x.start.astimezone(IST).date() == d for x in r.values())
+
+
+def test_the_first_thing_said_can_still_reach_back_before_the_window_for_last_nights_sleep():
+    d = date(2026, 11, 14)
+    r = resolve_day([ItemIn("sleep", "range", start=Spoken(11, 0, "pm"), end=Spoken(6, 30, "am"))], at(5, 0, d), at(12, 0, d), IST)[0]
+    assert r.placement == "placed" and r.start.astimezone(IST).date() == date(2026, 11, 13)

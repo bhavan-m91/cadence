@@ -22,12 +22,19 @@ export const initialEdit = (d: ReviewDraft, tz: string): DraftEdit => ({
   duration: d.duration_minutes, task_id: d.task.task_id ?? '', new_task_title: d.task.new_task_title ?? '',
 })
 
+/** Starts at or after the end of the entry's window: it has not happened yet, so it is a plan rather than something to log. */
+export function isLater(d: ReviewDraft, windowEndIso: string): boolean {
+  const at = d.placement === 'placed' ? d.start_at : d.window_start_at
+  return !!at && Date.parse(at) >= Date.parse(windowEndIso)
+}
+
 export type ResolutionAction = 'trim_new' | 'trim_existing' | 'replace_existing' | 'keep_unplaced'
 
 const FLAG_TEXT: Record<string, string> = {
   start_unknown: 'No start time was given.', unplaced: 'No fixed time. It is kept as “some time” in the window.', duration_estimated: 'The duration was estimated.',
   estimated: 'The time was inferred from your wording.', inferred: 'The time was inferred from your wording.', boundary_inferred: 'The start or end was inferred from the neighbouring activity.',
   meridiem_ambiguous: 'am or pm was unclear.', meridiem_inferred: 'am or pm was inferred.', outside_window: 'Falls outside the window you set.', extends_past_window: 'Runs past the end of the window.',
+  after_window: 'Later than this entry\'s window, so it has not happened yet.',
   possible_duplicate: 'Might repeat something already logged.', quote_unverified: 'Could not match this to your words.', category_unresolved: 'The category is a best guess.',
   time_unsupported: 'The time is not clearly in your words.', missing_duration: 'No duration was given.',
 }
