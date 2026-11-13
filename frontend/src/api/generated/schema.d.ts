@@ -177,6 +177,40 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/ai-jobs/{job_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get Job */
+        get: operations["get_job_api_v1_ai_jobs__job_id__get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/ai/status": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Ai Status */
+        get: operations["ai_status_api_v1_ai_status_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/auth/google/callback": {
         parameters: {
             query?: never;
@@ -460,6 +494,198 @@ export interface paths {
         };
         /** Healthz */
         get: operations["healthz_api_v1_healthz_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/ideal/day": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get Day */
+        get: operations["get_day_api_v1_ideal_day_get"];
+        /** Put Day */
+        put: operations["put_day_api_v1_ideal_day_put"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/ideal/progress": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Progress */
+        get: operations["progress_api_v1_ideal_progress_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/ideal/week": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get Week */
+        get: operations["get_week_api_v1_ideal_week_get"];
+        /** Put Week */
+        put: operations["put_week_api_v1_ideal_week_put"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/journal-entries": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List Entries */
+        get: operations["list_entries_api_v1_journal_entries_get"];
+        put?: never;
+        /** Create Entry */
+        post: operations["create_entry_api_v1_journal_entries_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/journal-entries/stats": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Stats */
+        get: operations["stats_api_v1_journal_entries_stats_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/journal-entries/{entry_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get Entry */
+        get: operations["get_entry_api_v1_journal_entries__entry_id__get"];
+        put?: never;
+        post?: never;
+        /** Delete Entry */
+        delete: operations["delete_entry_api_v1_journal_entries__entry_id__delete"];
+        options?: never;
+        head?: never;
+        /** Patch Entry */
+        patch: operations["patch_entry_api_v1_journal_entries__entry_id__patch"];
+        trace?: never;
+    };
+    "/api/v1/journal-entries/{entry_id}/process": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Process */
+        post: operations["process_api_v1_journal_entries__entry_id__process_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/journal-entries/{entry_id}/review": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Review */
+        get: operations["review_api_v1_journal_entries__entry_id__review_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/journal-entries/{entry_id}/review/answers": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Answer */
+        post: operations["answer_api_v1_journal_entries__entry_id__review_answers_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/journal-entries/{entry_id}/review/commit": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Commit */
+        post: operations["commit_api_v1_journal_entries__entry_id__review_commit_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/journal-entries/{entry_id}/revisions": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Revisions */
+        get: operations["revisions_api_v1_journal_entries__entry_id__revisions_get"];
         put?: never;
         post?: never;
         delete?: never;
@@ -1010,10 +1236,57 @@ export interface components {
              */
             tag_id: string;
         };
+        /** AiStatusOut */
+        AiStatusOut: {
+            /** Daily Limit */
+            daily_limit: number;
+            /** Demo */
+            demo: boolean;
+            /** Enabled */
+            enabled: boolean;
+            /** Model */
+            model: string;
+            /** Provider */
+            provider: string;
+            /** Used Today */
+            used_today: number;
+        };
         /** AliasesIn */
         AliasesIn: {
             /** Aliases */
             aliases: string[];
+        };
+        /** AllocationIn */
+        AllocationIn: {
+            /**
+             * Category Id
+             * Format: uuid
+             */
+            category_id: string;
+            /** @default all_days */
+            distribution: components["schemas"]["IdealDistribution"];
+            /** Minutes */
+            minutes: number;
+        };
+        /** AllocationOut */
+        AllocationOut: {
+            /**
+             * Category Id
+             * Format: uuid
+             */
+            category_id: string;
+            /** Color */
+            color: string;
+            distribution: components["schemas"]["IdealDistribution"];
+            /** Minutes */
+            minutes: number;
+            /** Name */
+            name: string;
+            /** Path Names */
+            path_names: string;
+            /** Per Day Minutes */
+            per_day_minutes?: number | null;
+            root_kind: components["schemas"]["RootKind"];
         };
         /** AlsoTagged */
         AlsoTagged: {
@@ -1028,6 +1301,18 @@ export interface components {
             start_at: string | null;
             /** Title */
             title: string;
+        };
+        /** AnswerIn */
+        AnswerIn: {
+            /**
+             * Job Id
+             * Format: uuid
+             */
+            job_id: string;
+            /** Question Id */
+            question_id: string;
+            /** Value */
+            value: string;
         };
         /** AuthEventOut */
         AuthEventOut: {
@@ -1094,6 +1379,19 @@ export interface components {
             title: string;
             /** Version */
             version: number;
+        };
+        /** Blocker */
+        Blocker: {
+            /**
+             * Draft Id
+             * Format: uuid
+             */
+            draft_id: string;
+            /**
+             * Reason
+             * @enum {string}
+             */
+            reason: "UNANSWERED_QUESTION" | "MISSING_DURATION" | "OVERLAP";
         };
         /** BulkIn */
         BulkIn: {
@@ -1256,6 +1554,100 @@ export interface components {
             /** New Password */
             new_password: string;
         };
+        /** CommitActivity */
+        CommitActivity: {
+            /**
+             * Draft Id
+             * Format: uuid
+             */
+            draft_id: string;
+            edits?: components["schemas"]["CommitEdit"] | null;
+            /**
+             * Include
+             * @default true
+             */
+            include: boolean;
+        };
+        /** CommitEdit */
+        CommitEdit: {
+            /** Category Id */
+            category_id?: string | null;
+            /**
+             * Clear Task
+             * @default false
+             */
+            clear_task: boolean;
+            /** Description */
+            description?: string | null;
+            /** Duration Minutes */
+            duration_minutes?: number | null;
+            /** End At */
+            end_at?: string | null;
+            location_type?: components["schemas"]["LocationType"] | null;
+            /** New Task Title */
+            new_task_title?: string | null;
+            /** Start At */
+            start_at?: string | null;
+            /** Tag Ids */
+            tag_ids?: string[] | null;
+            /** Task Id */
+            task_id?: string | null;
+            /** Title */
+            title?: string | null;
+            /** Window End At */
+            window_end_at?: string | null;
+            /** Window Start At */
+            window_start_at?: string | null;
+        };
+        /** CommitIn */
+        CommitIn: {
+            /** Activities */
+            activities?: components["schemas"]["CommitActivity"][];
+            /** Conflict Resolutions */
+            conflict_resolutions?: components["schemas"]["ConflictResolution"][];
+            /**
+             * Job Id
+             * Format: uuid
+             */
+            job_id: string;
+            /** New Tags */
+            new_tags?: components["schemas"]["NewTagChoice"][];
+            /**
+             * Replace Previous
+             * @default false
+             */
+            replace_previous: boolean;
+            /** Transitions */
+            transitions?: components["schemas"]["Transition"][];
+        };
+        /** CommitOut */
+        CommitOut: {
+            /** Activities */
+            activities: components["schemas"]["ActivityOut"][];
+            /** Created Tags */
+            created_tags: string[];
+            /** Created Tasks */
+            created_tasks: string[];
+            /** Kept Edited */
+            kept_edited: string[];
+            /** Replaced */
+            replaced: string[];
+        };
+        /** ConflictResolution */
+        ConflictResolution: {
+            /**
+             * Action
+             * @enum {string}
+             */
+            action: "trim_new" | "trim_existing" | "replace_existing" | "keep_unplaced";
+            /**
+             * Draft Id
+             * Format: uuid
+             */
+            draft_id: string;
+            /** Existing Id */
+            existing_id?: string | null;
+        };
         /** Coverage */
         Coverage: {
             /** Complete */
@@ -1319,6 +1711,197 @@ export interface components {
             /** Start At */
             start_at?: string | null;
         };
+        /** DuplicateRef */
+        DuplicateRef: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Start At */
+            start_at: string | null;
+            /** Title */
+            title: string;
+        };
+        /** EntryCreate */
+        EntryCreate: {
+            /**
+             * Covers End At
+             * Format: date-time
+             */
+            covers_end_at: string;
+            /**
+             * Covers Start At
+             * Format: date-time
+             */
+            covers_start_at: string;
+            /** Dictation Seconds */
+            dictation_seconds?: number | null;
+            /** @default typed */
+            input_method: components["schemas"]["InputMethod"];
+            /** Raw Text */
+            raw_text: string;
+            /** Timezone */
+            timezone?: string | null;
+        };
+        /** EntryDetail */
+        EntryDetail: {
+            /** Activities */
+            activities: components["schemas"]["ActivityOut"][];
+            /**
+             * Covers End At
+             * Format: date-time
+             */
+            covers_end_at: string;
+            /**
+             * Covers Start At
+             * Format: date-time
+             */
+            covers_start_at: string;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+            /** Dictation Seconds */
+            dictation_seconds: number | null;
+            /**
+             * Entry Date
+             * Format: date
+             */
+            entry_date: string;
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            input_method: components["schemas"]["InputMethod"];
+            latest_job: components["schemas"]["JobBrief"] | null;
+            /** Latest Job Id */
+            latest_job_id: string | null;
+            /** Raw Text */
+            raw_text: string;
+            /** Revision */
+            revision: number;
+            status: components["schemas"]["EntryStatus"];
+            /** Timezone */
+            timezone: string;
+            /** Title */
+            title: string | null;
+            /**
+             * Updated At
+             * Format: date-time
+             */
+            updated_at: string;
+            /** Version */
+            version: number;
+        };
+        /** EntryOut */
+        EntryOut: {
+            /**
+             * Covers End At
+             * Format: date-time
+             */
+            covers_end_at: string;
+            /**
+             * Covers Start At
+             * Format: date-time
+             */
+            covers_start_at: string;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+            /** Dictation Seconds */
+            dictation_seconds: number | null;
+            /**
+             * Entry Date
+             * Format: date
+             */
+            entry_date: string;
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            input_method: components["schemas"]["InputMethod"];
+            /** Latest Job Id */
+            latest_job_id: string | null;
+            /** Raw Text */
+            raw_text: string;
+            /** Revision */
+            revision: number;
+            status: components["schemas"]["EntryStatus"];
+            /** Timezone */
+            timezone: string;
+            /** Title */
+            title: string | null;
+            /**
+             * Updated At
+             * Format: date-time
+             */
+            updated_at: string;
+            /** Version */
+            version: number;
+        };
+        /** EntryPatch */
+        EntryPatch: {
+            /** Covers End At */
+            covers_end_at?: string | null;
+            /** Covers Start At */
+            covers_start_at?: string | null;
+            /** Raw Text */
+            raw_text?: string | null;
+            /** Title */
+            title?: string | null;
+            /** Version */
+            version: number;
+        };
+        /**
+         * EntryStatus
+         * @enum {string}
+         */
+        EntryStatus: "draft" | "processing" | "review" | "confirmed" | "failed" | "manual";
+        /** EntrySummary */
+        EntrySummary: {
+            /** Activity Count */
+            activity_count: number;
+            /** Covered Minutes */
+            covered_minutes: number;
+            /**
+             * Covers End At
+             * Format: date-time
+             */
+            covers_end_at: string;
+            /**
+             * Covers Start At
+             * Format: date-time
+             */
+            covers_start_at: string;
+            /**
+             * Entry Date
+             * Format: date
+             */
+            entry_date: string;
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            input_method: components["schemas"]["InputMethod"];
+            status: components["schemas"]["EntryStatus"];
+            /** Tags */
+            tags: components["schemas"]["TagDot"][];
+            /** Timezone */
+            timezone: string;
+            /** Title */
+            title: string;
+            /** Window Minutes */
+            window_minutes: number;
+            /** Word Count */
+            word_count: number;
+        };
         /** Envelope[ActivityDetail] */
         Envelope_ActivityDetail_: {
             data: components["schemas"]["ActivityDetail"];
@@ -1330,6 +1913,14 @@ export interface components {
         /** Envelope[ActivityOut] */
         Envelope_ActivityOut_: {
             data: components["schemas"]["ActivityOut"];
+            /** Meta */
+            meta?: {
+                [key: string]: unknown;
+            };
+        };
+        /** Envelope[AiStatusOut] */
+        Envelope_AiStatusOut_: {
+            data: components["schemas"]["AiStatusOut"];
             /** Meta */
             meta?: {
                 [key: string]: unknown;
@@ -1367,9 +1958,57 @@ export interface components {
                 [key: string]: unknown;
             };
         };
+        /** Envelope[CommitOut] */
+        Envelope_CommitOut_: {
+            data: components["schemas"]["CommitOut"];
+            /** Meta */
+            meta?: {
+                [key: string]: unknown;
+            };
+        };
+        /** Envelope[EntryDetail] */
+        Envelope_EntryDetail_: {
+            data: components["schemas"]["EntryDetail"];
+            /** Meta */
+            meta?: {
+                [key: string]: unknown;
+            };
+        };
+        /** Envelope[EntryOut] */
+        Envelope_EntryOut_: {
+            data: components["schemas"]["EntryOut"];
+            /** Meta */
+            meta?: {
+                [key: string]: unknown;
+            };
+        };
         /** Envelope[ExportOut] */
         Envelope_ExportOut_: {
             data: components["schemas"]["ExportOut"];
+            /** Meta */
+            meta?: {
+                [key: string]: unknown;
+            };
+        };
+        /** Envelope[IdealOverviewOut] */
+        Envelope_IdealOverviewOut_: {
+            data: components["schemas"]["IdealOverviewOut"];
+            /** Meta */
+            meta?: {
+                [key: string]: unknown;
+            };
+        };
+        /** Envelope[IdealTemplateOut] */
+        Envelope_IdealTemplateOut_: {
+            data: components["schemas"]["IdealTemplateOut"];
+            /** Meta */
+            meta?: {
+                [key: string]: unknown;
+            };
+        };
+        /** Envelope[JobOut] */
+        Envelope_JobOut_: {
+            data: components["schemas"]["JobOut"];
             /** Meta */
             meta?: {
                 [key: string]: unknown;
@@ -1407,6 +2046,22 @@ export interface components {
                 [key: string]: unknown;
             };
         };
+        /** Envelope[ProcessOut] */
+        Envelope_ProcessOut_: {
+            data: components["schemas"]["ProcessOut"];
+            /** Meta */
+            meta?: {
+                [key: string]: unknown;
+            };
+        };
+        /** Envelope[ProgressOut] */
+        Envelope_ProgressOut_: {
+            data: components["schemas"]["ProgressOut"];
+            /** Meta */
+            meta?: {
+                [key: string]: unknown;
+            };
+        };
         /** Envelope[ProjectOut] */
         Envelope_ProjectOut_: {
             data: components["schemas"]["ProjectOut"];
@@ -1423,9 +2078,25 @@ export interface components {
                 [key: string]: unknown;
             };
         };
+        /** Envelope[ReviewOut] */
+        Envelope_ReviewOut_: {
+            data: components["schemas"]["ReviewOut"];
+            /** Meta */
+            meta?: {
+                [key: string]: unknown;
+            };
+        };
         /** Envelope[SplitOut] */
         Envelope_SplitOut_: {
             data: components["schemas"]["SplitOut"];
+            /** Meta */
+            meta?: {
+                [key: string]: unknown;
+            };
+        };
+        /** Envelope[StatsOut] */
+        Envelope_StatsOut_: {
+            data: components["schemas"]["StatsOut"];
             /** Meta */
             meta?: {
                 [key: string]: unknown;
@@ -1498,6 +2169,15 @@ export interface components {
                 [key: string]: unknown;
             };
         };
+        /** Envelope[list[EntrySummary]] */
+        Envelope_list_EntrySummary__: {
+            /** Data */
+            data: components["schemas"]["EntrySummary"][];
+            /** Meta */
+            meta?: {
+                [key: string]: unknown;
+            };
+        };
         /** Envelope[list[EventOut]] */
         Envelope_list_EventOut__: {
             /** Data */
@@ -1520,6 +2200,15 @@ export interface components {
         Envelope_list_ProjectOut__: {
             /** Data */
             data: components["schemas"]["ProjectOut"][];
+            /** Meta */
+            meta?: {
+                [key: string]: unknown;
+            };
+        };
+        /** Envelope[list[RevisionOut]] */
+        Envelope_list_RevisionOut__: {
+            /** Data */
+            data: components["schemas"]["RevisionOut"][];
             /** Meta */
             meta?: {
                 [key: string]: unknown;
@@ -1639,6 +2328,29 @@ export interface components {
          * @enum {string}
          */
         GoalKind: "tracked" | "min" | "max";
+        /**
+         * IdealDistribution
+         * @enum {string}
+         */
+        IdealDistribution: "all_days" | "weekdays" | "weekend";
+        /** IdealOverviewOut */
+        IdealOverviewOut: {
+            current: components["schemas"]["IdealTemplateOut"] | null;
+            /** Versions */
+            versions: components["schemas"]["IdealVersion"][];
+        };
+        /** IdealPreview */
+        IdealPreview: {
+            /**
+             * Date
+             * Format: date
+             */
+            date: string;
+            /** Other Actual */
+            other_actual: number;
+            /** Rows */
+            rows: components["schemas"]["IdealRowOut"][];
+        };
         /** IdealRow */
         IdealRow: {
             /**
@@ -1652,6 +2364,109 @@ export interface components {
             minutes: number;
             /** Name */
             name: string;
+        };
+        /** IdealRowOut */
+        IdealRowOut: {
+            /** Actual */
+            actual: number;
+            /**
+             * Category Id
+             * Format: uuid
+             */
+            category_id: string;
+            /** Color */
+            color: string;
+            /** Name */
+            name: string;
+            /** Target */
+            target: number;
+        };
+        /** IdealSaveIn */
+        IdealSaveIn: {
+            /** Allocations */
+            allocations: components["schemas"]["AllocationIn"][];
+            /**
+             * Effective From
+             * Format: date
+             */
+            effective_from: string;
+        };
+        /** IdealTemplateOut */
+        IdealTemplateOut: {
+            /** Allocations */
+            allocations: components["schemas"]["AllocationOut"][];
+            /** Effective From */
+            effective_from: string | null;
+            /** Expected Minutes */
+            expected_minutes: number;
+            /**
+             * Kind
+             * @enum {string}
+             */
+            kind: "day" | "week";
+            /** Total Minutes */
+            total_minutes: number;
+            /** Unallocated Minutes */
+            unallocated_minutes: number;
+        };
+        /** IdealVersion */
+        IdealVersion: {
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+            /**
+             * Effective From
+             * Format: date
+             */
+            effective_from: string;
+            /** Total Minutes */
+            total_minutes: number;
+        };
+        /**
+         * InputMethod
+         * @enum {string}
+         */
+        InputMethod: "typed" | "dictated";
+        /** JobBrief */
+        JobBrief: {
+            /** Error Code */
+            error_code: string | null;
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Is Stale */
+            is_stale: boolean;
+            /** Model */
+            model: string;
+            /** Provider */
+            provider: string;
+            /** Status */
+            status: string;
+        };
+        /** JobOut */
+        JobOut: {
+            /** Attempts */
+            attempts: number;
+            /**
+             * Entry Id
+             * Format: uuid
+             */
+            entry_id: string;
+            /** Error Code */
+            error_code: string | null;
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Is Stale */
+            is_stale: boolean;
+            /** Status */
+            status: string;
         };
         /** KeywordRuleCreate */
         KeywordRuleCreate: {
@@ -1721,6 +2536,21 @@ export interface components {
             end_at?: string | null;
             /** Start At */
             start_at?: string | null;
+        };
+        /** NewTagChoice */
+        NewTagChoice: {
+            /**
+             * Draft Id
+             * Format: uuid
+             */
+            draft_id: string;
+            /**
+             * Keep
+             * @default true
+             */
+            keep: boolean;
+            /** Name */
+            name: string;
         };
         /** OkOut */
         OkOut: {
@@ -1799,6 +2629,26 @@ export interface components {
             /** Week Start */
             week_start?: number | null;
         };
+        /** ProcessIn */
+        ProcessIn: {
+            /**
+             * Regenerate
+             * @default false
+             */
+            regenerate: boolean;
+            /** User Hint */
+            user_hint?: string | null;
+        };
+        /** ProcessOut */
+        ProcessOut: {
+            /**
+             * Job Id
+             * Format: uuid
+             */
+            job_id: string;
+            /** Status */
+            status: string;
+        };
         /** ProfilePatch */
         ProfilePatch: {
             /** Display Name */
@@ -1808,6 +2658,70 @@ export interface components {
             theme?: components["schemas"]["Theme"] | null;
             /** Timezone */
             timezone?: string | null;
+        };
+        /** ProgressOut */
+        ProgressOut: {
+            /**
+             * As Of
+             * Format: date
+             */
+            as_of: string;
+            /**
+             * From Date
+             * Format: date
+             */
+            from_date: string;
+            /** Other Actual */
+            other_actual: number;
+            /** Provisional */
+            provisional: boolean;
+            /** Rows */
+            rows: components["schemas"]["ProgressRow"][];
+            /**
+             * Scope
+             * @enum {string}
+             */
+            scope: "day" | "week";
+            /** Template Effective From */
+            template_effective_from: string | null;
+            /**
+             * To Date
+             * Format: date
+             */
+            to_date: string;
+            /** Total Actual */
+            total_actual: number;
+            /** Total Target */
+            total_target: number;
+        };
+        /** ProgressRow */
+        ProgressRow: {
+            /** Actual */
+            actual: number;
+            /**
+             * Category Id
+             * Format: uuid
+             */
+            category_id: string;
+            /** Color */
+            color: string;
+            /** Delta */
+            delta: number;
+            distribution: components["schemas"]["IdealDistribution"];
+            /** Expected To Date */
+            expected_to_date: number;
+            /** Name */
+            name: string;
+            /** Path Names */
+            path_names: string;
+            root_kind: components["schemas"]["RootKind"];
+            /**
+             * Status
+             * @enum {string}
+             */
+            status: "on_target" | "under" | "over";
+            /** Target */
+            target: number;
         };
         /** ProjectCreate */
         ProjectCreate: {
@@ -1852,6 +2766,21 @@ export interface components {
             /** Name */
             name?: string | null;
         };
+        /** Question */
+        Question: {
+            /** Activity Temp Id */
+            activity_temp_id: string;
+            /** Id */
+            id: string;
+            /** Options */
+            options: {
+                [key: string]: string;
+            }[];
+            /** Prompt */
+            prompt: string;
+            /** Type */
+            type: string;
+        };
         /** RefreshOut */
         RefreshOut: {
             /** Access Token */
@@ -1876,12 +2805,266 @@ export interface components {
              */
             timezone: string;
         };
+        /** ReplaceCandidate */
+        ReplaceCandidate: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Title */
+            title: string;
+            /** User Edited */
+            user_edited: boolean;
+        };
         /** ResetIn */
         ResetIn: {
             /** Password */
             password: string;
             /** Token */
             token: string;
+        };
+        /** ReviewCategory */
+        ReviewCategory: {
+            /** Color */
+            color: string;
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Name */
+            name: string;
+            /** Path Names */
+            path_names: string;
+            /** Root Kind */
+            root_kind: string;
+        };
+        /** ReviewConflict */
+        ReviewConflict: {
+            /**
+             * Draft Id
+             * Format: uuid
+             */
+            draft_id: string;
+            /**
+             * End At
+             * Format: date-time
+             */
+            end_at: string;
+            /**
+             * Other Id
+             * Format: uuid
+             */
+            other_id: string;
+            /** Other Is Draft */
+            other_is_draft: boolean;
+            /** Other Title */
+            other_title: string;
+            /** Overlap Minutes */
+            overlap_minutes: number;
+            /**
+             * Start At
+             * Format: date-time
+             */
+            start_at: string;
+        };
+        /** ReviewDraft */
+        ReviewDraft: {
+            /**
+             * Band
+             * @enum {string}
+             */
+            band: "high" | "medium" | "low";
+            category: components["schemas"]["ReviewCategory"];
+            /** Confidence */
+            confidence: number;
+            /** Description */
+            description: string | null;
+            duplicate_of: components["schemas"]["DuplicateRef"] | null;
+            /** Duration Minutes */
+            duration_minutes: number | null;
+            /** End At */
+            end_at: string | null;
+            /** Flags */
+            flags: string[];
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Ideal Row Id */
+            ideal_row_id: string | null;
+            /** Include */
+            include: boolean;
+            location_type: components["schemas"]["LocationType"] | null;
+            /** Order */
+            order: number;
+            /**
+             * Placement
+             * @enum {string}
+             */
+            placement: "placed" | "unplaced";
+            source: components["schemas"]["ReviewSource"];
+            /** Start At */
+            start_at: string | null;
+            /** Tags */
+            tags: components["schemas"]["ReviewTag"][];
+            task: components["schemas"]["ReviewTask"];
+            /** Temp Id */
+            temp_id: string;
+            /** Time Certainty */
+            time_certainty: string;
+            /** Title */
+            title: string;
+            /** Window End At */
+            window_end_at: string | null;
+            /** Window Start At */
+            window_start_at: string | null;
+        };
+        /** ReviewEntry */
+        ReviewEntry: {
+            /**
+             * Covers End At
+             * Format: date-time
+             */
+            covers_end_at: string;
+            /**
+             * Covers Start At
+             * Format: date-time
+             */
+            covers_start_at: string;
+            /** Dictation Seconds */
+            dictation_seconds: number | null;
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Input Method */
+            input_method: string;
+            /** Raw Text */
+            raw_text: string;
+            /** Revision */
+            revision: number;
+            /** Status */
+            status: string;
+            /** Timezone */
+            timezone: string;
+            /** Title */
+            title: string | null;
+        };
+        /** ReviewGap */
+        ReviewGap: {
+            /**
+             * End At
+             * Format: date-time
+             */
+            end_at: string;
+            /** Minutes */
+            minutes: number;
+            /**
+             * Start At
+             * Format: date-time
+             */
+            start_at: string;
+        };
+        /** ReviewOut */
+        ReviewOut: {
+            /** Blocking */
+            blocking: components["schemas"]["Blocker"][];
+            /** Conflicts */
+            conflicts: components["schemas"]["ReviewConflict"][];
+            /** Drafts */
+            drafts: components["schemas"]["ReviewDraft"][];
+            entry: components["schemas"]["ReviewEntry"];
+            /** Gaps */
+            gaps: components["schemas"]["ReviewGap"][];
+            ideal: components["schemas"]["IdealPreview"] | null;
+            job: components["schemas"]["JobBrief"];
+            /** Questions */
+            questions: components["schemas"]["Question"][];
+            /** Replace Candidates */
+            replace_candidates: components["schemas"]["ReplaceCandidate"][];
+            summary: components["schemas"]["ReviewSummary"];
+            /** Warnings */
+            warnings: string[];
+        };
+        /** ReviewSource */
+        ReviewSource: {
+            /** End */
+            end: number | null;
+            /** Quote */
+            quote: string | null;
+            /** Start */
+            start: number | null;
+        };
+        /** ReviewSummary */
+        ReviewSummary: {
+            /** Activity Count */
+            activity_count: number;
+            /** Covered Minutes */
+            covered_minutes: number;
+            /** Gap Count */
+            gap_count: number;
+            /** Not Mentioned Minutes */
+            not_mentioned_minutes: number;
+            /** Tags Applied */
+            tags_applied: number;
+            /** To Double Check */
+            to_double_check: number;
+        };
+        /** ReviewTag */
+        ReviewTag: {
+            /** Applied */
+            applied: boolean;
+            /** Color */
+            color: string;
+            /** Confidence */
+            confidence: number;
+            /** Name */
+            name: string;
+            /** New */
+            new: boolean;
+            /** Reason */
+            reason: string | null;
+            /** Source */
+            source: string;
+            /** Tag Id */
+            tag_id: string | null;
+        };
+        /** ReviewTask */
+        ReviewTask: {
+            /** Confidence */
+            confidence: number;
+            /** New Task Title */
+            new_task_title: string | null;
+            /** Task Id */
+            task_id: string | null;
+            /** Task Title */
+            task_title: string | null;
+        };
+        /** RevisionOut */
+        RevisionOut: {
+            /**
+             * Covers End At
+             * Format: date-time
+             */
+            covers_end_at: string;
+            /**
+             * Covers Start At
+             * Format: date-time
+             */
+            covers_start_at: string;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+            /** Raw Text */
+            raw_text: string;
+            /** Revision */
+            revision: number;
         };
         /**
          * RootKind
@@ -1912,6 +3095,16 @@ export interface components {
             created: components["schemas"]["ActivityOut"];
             original: components["schemas"]["ActivityOut"];
         };
+        /** StatsOut */
+        StatsOut: {
+            /** Entries Per Day 30D */
+            entries_per_day_30d: number;
+            /** Full Days Pct 30D */
+            full_days_pct_30d: number | null;
+            /** Streak Days */
+            streak_days: number;
+            yesterday_gap: components["schemas"]["YesterdayGap"] | null;
+        };
         /** TagCreate */
         TagCreate: {
             /** Color */
@@ -1922,6 +3115,13 @@ export interface components {
             goal_kind: components["schemas"]["GoalKind"];
             /** Goal Weekly Minutes */
             goal_weekly_minutes?: number | null;
+            /** Name */
+            name: string;
+        };
+        /** TagDot */
+        TagDot: {
+            /** Color */
+            color: string;
             /** Name */
             name: string;
         };
@@ -2104,6 +3304,19 @@ export interface components {
          * @enum {string}
          */
         TranscriptionMode: "auto" | "server_only" | "browser_only";
+        /** Transition */
+        Transition: {
+            /**
+             * End At
+             * Format: date-time
+             */
+            end_at: string;
+            /**
+             * Start At
+             * Format: date-time
+             */
+            start_at: string;
+        };
         /** UnplacedItem */
         UnplacedItem: {
             category: components["schemas"]["CategoryChip"];
@@ -2143,6 +3356,26 @@ export interface components {
             theme: components["schemas"]["Theme"];
             /** Timezone */
             timezone: string;
+        };
+        /** YesterdayGap */
+        YesterdayGap: {
+            /**
+             * Date
+             * Format: date
+             */
+            date: string;
+            /**
+             * End At
+             * Format: date-time
+             */
+            end_at: string;
+            /** Minutes */
+            minutes: number;
+            /**
+             * Start At
+             * Format: date-time
+             */
+            start_at: string;
         };
         /** MergeIn */
         app__schemas__activity__MergeIn: {
@@ -3034,6 +4267,138 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["Envelope_ActivityOut_"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Too Many Requests */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+        };
+    };
+    get_job_api_v1_ai_jobs__job_id__get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                job_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Envelope_JobOut_"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Too Many Requests */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+        };
+    };
+    ai_status_api_v1_ai_status_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Envelope_AiStatusOut_"];
                 };
             };
             /** @description Unauthorized */
@@ -4328,6 +5693,1116 @@ export interface operations {
                 };
                 content: {
                     "application/json": unknown;
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Too Many Requests */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+        };
+    };
+    get_day_api_v1_ideal_day_get: {
+        parameters: {
+            query?: {
+                on?: string | null;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Envelope_IdealOverviewOut_"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Too Many Requests */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+        };
+    };
+    put_day_api_v1_ideal_day_put: {
+        parameters: {
+            query?: {
+                dry_run?: boolean;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["IdealSaveIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Envelope_IdealTemplateOut_"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Too Many Requests */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+        };
+    };
+    progress_api_v1_ideal_progress_get: {
+        parameters: {
+            query?: {
+                on?: string | null;
+                scope?: "day" | "week";
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Envelope_ProgressOut_"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Too Many Requests */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+        };
+    };
+    get_week_api_v1_ideal_week_get: {
+        parameters: {
+            query?: {
+                on?: string | null;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Envelope_IdealOverviewOut_"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Too Many Requests */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+        };
+    };
+    put_week_api_v1_ideal_week_put: {
+        parameters: {
+            query?: {
+                dry_run?: boolean;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["IdealSaveIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Envelope_IdealTemplateOut_"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Too Many Requests */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+        };
+    };
+    list_entries_api_v1_journal_entries_get: {
+        parameters: {
+            query?: {
+                from?: string | null;
+                to?: string | null;
+                status?: components["schemas"]["EntryStatus"] | null;
+                q?: string | null;
+                limit?: number;
+                cursor?: string | null;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Envelope_list_EntrySummary__"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Too Many Requests */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+        };
+    };
+    create_entry_api_v1_journal_entries_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["EntryCreate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Envelope_EntryOut_"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Too Many Requests */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+        };
+    };
+    stats_api_v1_journal_entries_stats_get: {
+        parameters: {
+            query?: {
+                as_of_date?: string | null;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Envelope_StatsOut_"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Too Many Requests */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+        };
+    };
+    get_entry_api_v1_journal_entries__entry_id__get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                entry_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Envelope_EntryDetail_"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Too Many Requests */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+        };
+    };
+    delete_entry_api_v1_journal_entries__entry_id__delete: {
+        parameters: {
+            query?: {
+                activities?: string | null;
+            };
+            header?: never;
+            path: {
+                entry_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Too Many Requests */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+        };
+    };
+    patch_entry_api_v1_journal_entries__entry_id__patch: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                entry_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["EntryPatch"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Envelope_EntryOut_"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Too Many Requests */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+        };
+    };
+    process_api_v1_journal_entries__entry_id__process_post: {
+        parameters: {
+            query?: never;
+            header?: {
+                "Idempotency-Key"?: string | null;
+            };
+            path: {
+                entry_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "application/json": components["schemas"]["ProcessIn"] | null;
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            202: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Envelope_ProcessOut_"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Too Many Requests */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+        };
+    };
+    review_api_v1_journal_entries__entry_id__review_get: {
+        parameters: {
+            query?: {
+                job_id?: string | null;
+            };
+            header?: never;
+            path: {
+                entry_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Envelope_ReviewOut_"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Too Many Requests */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+        };
+    };
+    answer_api_v1_journal_entries__entry_id__review_answers_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                entry_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["AnswerIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Envelope_ReviewOut_"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Too Many Requests */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+        };
+    };
+    commit_api_v1_journal_entries__entry_id__review_commit_post: {
+        parameters: {
+            query?: never;
+            header?: {
+                "Idempotency-Key"?: string | null;
+            };
+            path: {
+                entry_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CommitIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Envelope_CommitOut_"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Too Many Requests */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+        };
+    };
+    revisions_api_v1_journal_entries__entry_id__revisions_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                entry_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Envelope_list_RevisionOut__"];
                 };
             };
             /** @description Unauthorized */

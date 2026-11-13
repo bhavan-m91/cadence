@@ -7,6 +7,8 @@ from pathlib import Path
 
 os.environ.setdefault("EMAIL_BACKEND", "memory")
 os.environ["APP_ENV"] = "test"
+os.environ["LLM_PROVIDER"] = "fake"  # tests never reach a real model, whatever is in .env
+os.environ["ANTHROPIC_API_KEY"] = ""
 
 import pytest  # noqa: E402
 import pytest_asyncio  # noqa: E402
@@ -62,6 +64,9 @@ async def db(engine):
 
 @pytest.fixture(autouse=True)
 def _reset_state():
+    from app.ai import providers
+
+    providers.set_provider(None)
     limiter.reset()
     email_service.OUTBOX.clear()
     yield

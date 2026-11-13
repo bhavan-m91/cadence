@@ -1,0 +1,33 @@
+Entry window (local time, {{ timezone }}): {{ window_start_local }} to {{ window_end_local }}
+Current local time: {{ now_local }}
+Entry date: {{ entry_date }}
+{% if hint %}
+Note from the person about this run: {{ hint }}
+{% endif %}
+
+## Categories (choose exactly one `category_id` per activity)
+{% for c in categories -%}
+- id={{ c.id }} | {{ c.path }}{% if c.description %} | {{ c.description }}{% endif %}{% if c.focus %} | focus time{% endif %}
+
+{% endfor %}
+## Tags (choose by id; propose a new one only when nothing fits)
+{% for t in tags -%}
+- id={{ t.id }} | {{ t.name }}{% if t.aliases %} | also: {{ t.aliases | join(', ') }}{% endif %}
+
+{% endfor %}
+{% if keyword_hits %}
+## Phrases already matched by the person's own rules (informational)
+{% for h in keyword_hits -%}
+- "{{ h.phrase }}" -> {{ h.target }}
+{% endfor %}
+{% endif %}
+{% if tasks %}
+## Open tasks (link by `task_id` only if the activity clearly is that work)
+{% for t in tasks -%}
+- id={{ t.id }} | {{ t.title }}{% if t.project %} | project: {{ t.project }}{% endif %}{% if t.priority is not none %} | P{{ t.priority }}{% endif %}
+
+{% endfor %}
+{% endif %}
+<journal_entry>
+{{ text }}
+</journal_entry>

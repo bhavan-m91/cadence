@@ -1,3 +1,4 @@
+import asyncio
 from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
@@ -28,7 +29,15 @@ def create_app() -> FastAPI:
 
     @asynccontextmanager
     async def lifespan(_: FastAPI):
+        stop, task = asyncio.Event(), None
+        if s.embedded_worker and s.app_env != "test":  # one process to run in development; split it out in production
+            from app.workers.runner import worker_loop
+
+            task = asyncio.create_task(worker_loop(stop))
         yield
+        stop.set()
+        if task:
+            await asyncio.wait_for(task, timeout=10)
         await dispose_engine()
 
     app = FastAPI(

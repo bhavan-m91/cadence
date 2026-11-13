@@ -938,6 +938,44 @@
         "title": "ActivityTagOut",
         "type": "object"
       },
+      "AiStatusOut": {
+        "properties": {
+          "daily_limit": {
+            "title": "Daily Limit",
+            "type": "integer"
+          },
+          "demo": {
+            "title": "Demo",
+            "type": "boolean"
+          },
+          "enabled": {
+            "title": "Enabled",
+            "type": "boolean"
+          },
+          "model": {
+            "title": "Model",
+            "type": "string"
+          },
+          "provider": {
+            "title": "Provider",
+            "type": "string"
+          },
+          "used_today": {
+            "title": "Used Today",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "provider",
+          "model",
+          "demo",
+          "enabled",
+          "daily_limit",
+          "used_today"
+        ],
+        "title": "AiStatusOut",
+        "type": "object"
+      },
       "AliasesIn": {
         "properties": {
           "aliases": {
@@ -953,6 +991,82 @@
           "aliases"
         ],
         "title": "AliasesIn",
+        "type": "object"
+      },
+      "AllocationIn": {
+        "properties": {
+          "category_id": {
+            "format": "uuid",
+            "title": "Category Id",
+            "type": "string"
+          },
+          "distribution": {
+            "$ref": "#/components/schemas/IdealDistribution",
+            "default": "all_days"
+          },
+          "minutes": {
+            "title": "Minutes",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "category_id",
+          "minutes"
+        ],
+        "title": "AllocationIn",
+        "type": "object"
+      },
+      "AllocationOut": {
+        "properties": {
+          "category_id": {
+            "format": "uuid",
+            "title": "Category Id",
+            "type": "string"
+          },
+          "color": {
+            "title": "Color",
+            "type": "string"
+          },
+          "distribution": {
+            "$ref": "#/components/schemas/IdealDistribution"
+          },
+          "minutes": {
+            "title": "Minutes",
+            "type": "integer"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "path_names": {
+            "title": "Path Names",
+            "type": "string"
+          },
+          "per_day_minutes": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Per Day Minutes"
+          },
+          "root_kind": {
+            "$ref": "#/components/schemas/RootKind"
+          }
+        },
+        "required": [
+          "category_id",
+          "name",
+          "path_names",
+          "color",
+          "root_kind",
+          "minutes",
+          "distribution"
+        ],
+        "title": "AllocationOut",
         "type": "object"
       },
       "AlsoTagged": {
@@ -997,6 +1111,31 @@
           "duration_minutes"
         ],
         "title": "AlsoTagged",
+        "type": "object"
+      },
+      "AnswerIn": {
+        "properties": {
+          "job_id": {
+            "format": "uuid",
+            "title": "Job Id",
+            "type": "string"
+          },
+          "question_id": {
+            "title": "Question Id",
+            "type": "string"
+          },
+          "value": {
+            "maxLength": 64,
+            "title": "Value",
+            "type": "string"
+          }
+        },
+        "required": [
+          "job_id",
+          "question_id",
+          "value"
+        ],
+        "title": "AnswerIn",
         "type": "object"
       },
       "AuthEventOut": {
@@ -1174,6 +1313,30 @@
           "location_type"
         ],
         "title": "Block",
+        "type": "object"
+      },
+      "Blocker": {
+        "properties": {
+          "draft_id": {
+            "format": "uuid",
+            "title": "Draft Id",
+            "type": "string"
+          },
+          "reason": {
+            "enum": [
+              "UNANSWERED_QUESTION",
+              "MISSING_DURATION",
+              "OVERLAP"
+            ],
+            "title": "Reason",
+            "type": "string"
+          }
+        },
+        "required": [
+          "draft_id",
+          "reason"
+        ],
+        "title": "Blocker",
         "type": "object"
       },
       "BulkIn": {
@@ -1653,6 +1816,333 @@
         "title": "ChangePasswordIn",
         "type": "object"
       },
+      "CommitActivity": {
+        "properties": {
+          "draft_id": {
+            "format": "uuid",
+            "title": "Draft Id",
+            "type": "string"
+          },
+          "edits": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/CommitEdit"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "include": {
+            "default": true,
+            "title": "Include",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "draft_id"
+        ],
+        "title": "CommitActivity",
+        "type": "object"
+      },
+      "CommitEdit": {
+        "properties": {
+          "category_id": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Category Id"
+          },
+          "clear_task": {
+            "default": false,
+            "title": "Clear Task",
+            "type": "boolean"
+          },
+          "description": {
+            "anyOf": [
+              {
+                "maxLength": 2000,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Description"
+          },
+          "duration_minutes": {
+            "anyOf": [
+              {
+                "maximum": 1440.0,
+                "minimum": 1.0,
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Duration Minutes"
+          },
+          "end_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "End At"
+          },
+          "location_type": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/LocationType"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "new_task_title": {
+            "anyOf": [
+              {
+                "maxLength": 160,
+                "minLength": 1,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "New Task Title"
+          },
+          "start_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Start At"
+          },
+          "tag_ids": {
+            "anyOf": [
+              {
+                "items": {
+                  "format": "uuid",
+                  "type": "string"
+                },
+                "maxItems": 30,
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Tag Ids"
+          },
+          "task_id": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Task Id"
+          },
+          "title": {
+            "anyOf": [
+              {
+                "maxLength": 120,
+                "minLength": 1,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Title"
+          },
+          "window_end_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Window End At"
+          },
+          "window_start_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Window Start At"
+          }
+        },
+        "title": "CommitEdit",
+        "type": "object"
+      },
+      "CommitIn": {
+        "properties": {
+          "activities": {
+            "items": {
+              "$ref": "#/components/schemas/CommitActivity"
+            },
+            "maxItems": 60,
+            "title": "Activities",
+            "type": "array"
+          },
+          "conflict_resolutions": {
+            "items": {
+              "$ref": "#/components/schemas/ConflictResolution"
+            },
+            "maxItems": 60,
+            "title": "Conflict Resolutions",
+            "type": "array"
+          },
+          "job_id": {
+            "format": "uuid",
+            "title": "Job Id",
+            "type": "string"
+          },
+          "new_tags": {
+            "items": {
+              "$ref": "#/components/schemas/NewTagChoice"
+            },
+            "maxItems": 60,
+            "title": "New Tags",
+            "type": "array"
+          },
+          "replace_previous": {
+            "default": false,
+            "title": "Replace Previous",
+            "type": "boolean"
+          },
+          "transitions": {
+            "items": {
+              "$ref": "#/components/schemas/Transition"
+            },
+            "maxItems": 30,
+            "title": "Transitions",
+            "type": "array"
+          }
+        },
+        "required": [
+          "job_id"
+        ],
+        "title": "CommitIn",
+        "type": "object"
+      },
+      "CommitOut": {
+        "properties": {
+          "activities": {
+            "items": {
+              "$ref": "#/components/schemas/ActivityOut"
+            },
+            "title": "Activities",
+            "type": "array"
+          },
+          "created_tags": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Created Tags",
+            "type": "array"
+          },
+          "created_tasks": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Created Tasks",
+            "type": "array"
+          },
+          "kept_edited": {
+            "items": {
+              "format": "uuid",
+              "type": "string"
+            },
+            "title": "Kept Edited",
+            "type": "array"
+          },
+          "replaced": {
+            "items": {
+              "format": "uuid",
+              "type": "string"
+            },
+            "title": "Replaced",
+            "type": "array"
+          }
+        },
+        "required": [
+          "activities",
+          "created_tags",
+          "created_tasks",
+          "replaced",
+          "kept_edited"
+        ],
+        "title": "CommitOut",
+        "type": "object"
+      },
+      "ConflictResolution": {
+        "properties": {
+          "action": {
+            "enum": [
+              "trim_new",
+              "trim_existing",
+              "replace_existing",
+              "keep_unplaced"
+            ],
+            "title": "Action",
+            "type": "string"
+          },
+          "draft_id": {
+            "format": "uuid",
+            "title": "Draft Id",
+            "type": "string"
+          },
+          "existing_id": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Existing Id"
+          }
+        },
+        "required": [
+          "draft_id",
+          "action"
+        ],
+        "title": "ConflictResolution",
+        "type": "object"
+      },
       "Coverage": {
         "properties": {
           "complete": {
@@ -1830,6 +2320,482 @@
         "title": "DuplicateIn",
         "type": "object"
       },
+      "DuplicateRef": {
+        "properties": {
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "start_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Start At"
+          },
+          "title": {
+            "title": "Title",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "title",
+          "start_at"
+        ],
+        "title": "DuplicateRef",
+        "type": "object"
+      },
+      "EntryCreate": {
+        "properties": {
+          "covers_end_at": {
+            "format": "date-time",
+            "title": "Covers End At",
+            "type": "string"
+          },
+          "covers_start_at": {
+            "format": "date-time",
+            "title": "Covers Start At",
+            "type": "string"
+          },
+          "dictation_seconds": {
+            "anyOf": [
+              {
+                "maximum": 36000.0,
+                "minimum": 0.0,
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Dictation Seconds"
+          },
+          "input_method": {
+            "$ref": "#/components/schemas/InputMethod",
+            "default": "typed"
+          },
+          "raw_text": {
+            "maxLength": 10000,
+            "minLength": 1,
+            "title": "Raw Text",
+            "type": "string"
+          },
+          "timezone": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Timezone"
+          }
+        },
+        "required": [
+          "raw_text",
+          "covers_start_at",
+          "covers_end_at"
+        ],
+        "title": "EntryCreate",
+        "type": "object"
+      },
+      "EntryDetail": {
+        "properties": {
+          "activities": {
+            "items": {
+              "$ref": "#/components/schemas/ActivityOut"
+            },
+            "title": "Activities",
+            "type": "array"
+          },
+          "covers_end_at": {
+            "format": "date-time",
+            "title": "Covers End At",
+            "type": "string"
+          },
+          "covers_start_at": {
+            "format": "date-time",
+            "title": "Covers Start At",
+            "type": "string"
+          },
+          "created_at": {
+            "format": "date-time",
+            "title": "Created At",
+            "type": "string"
+          },
+          "dictation_seconds": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Dictation Seconds"
+          },
+          "entry_date": {
+            "format": "date",
+            "title": "Entry Date",
+            "type": "string"
+          },
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "input_method": {
+            "$ref": "#/components/schemas/InputMethod"
+          },
+          "latest_job": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/JobBrief"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "latest_job_id": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Latest Job Id"
+          },
+          "raw_text": {
+            "title": "Raw Text",
+            "type": "string"
+          },
+          "revision": {
+            "title": "Revision",
+            "type": "integer"
+          },
+          "status": {
+            "$ref": "#/components/schemas/EntryStatus"
+          },
+          "timezone": {
+            "title": "Timezone",
+            "type": "string"
+          },
+          "title": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Title"
+          },
+          "updated_at": {
+            "format": "date-time",
+            "title": "Updated At",
+            "type": "string"
+          },
+          "version": {
+            "title": "Version",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "id",
+          "entry_date",
+          "title",
+          "raw_text",
+          "covers_start_at",
+          "covers_end_at",
+          "timezone",
+          "input_method",
+          "dictation_seconds",
+          "status",
+          "latest_job_id",
+          "revision",
+          "version",
+          "created_at",
+          "updated_at",
+          "activities",
+          "latest_job"
+        ],
+        "title": "EntryDetail",
+        "type": "object"
+      },
+      "EntryOut": {
+        "properties": {
+          "covers_end_at": {
+            "format": "date-time",
+            "title": "Covers End At",
+            "type": "string"
+          },
+          "covers_start_at": {
+            "format": "date-time",
+            "title": "Covers Start At",
+            "type": "string"
+          },
+          "created_at": {
+            "format": "date-time",
+            "title": "Created At",
+            "type": "string"
+          },
+          "dictation_seconds": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Dictation Seconds"
+          },
+          "entry_date": {
+            "format": "date",
+            "title": "Entry Date",
+            "type": "string"
+          },
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "input_method": {
+            "$ref": "#/components/schemas/InputMethod"
+          },
+          "latest_job_id": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Latest Job Id"
+          },
+          "raw_text": {
+            "title": "Raw Text",
+            "type": "string"
+          },
+          "revision": {
+            "title": "Revision",
+            "type": "integer"
+          },
+          "status": {
+            "$ref": "#/components/schemas/EntryStatus"
+          },
+          "timezone": {
+            "title": "Timezone",
+            "type": "string"
+          },
+          "title": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Title"
+          },
+          "updated_at": {
+            "format": "date-time",
+            "title": "Updated At",
+            "type": "string"
+          },
+          "version": {
+            "title": "Version",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "id",
+          "entry_date",
+          "title",
+          "raw_text",
+          "covers_start_at",
+          "covers_end_at",
+          "timezone",
+          "input_method",
+          "dictation_seconds",
+          "status",
+          "latest_job_id",
+          "revision",
+          "version",
+          "created_at",
+          "updated_at"
+        ],
+        "title": "EntryOut",
+        "type": "object"
+      },
+      "EntryPatch": {
+        "properties": {
+          "covers_end_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Covers End At"
+          },
+          "covers_start_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Covers Start At"
+          },
+          "raw_text": {
+            "anyOf": [
+              {
+                "maxLength": 10000,
+                "minLength": 1,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Raw Text"
+          },
+          "title": {
+            "anyOf": [
+              {
+                "maxLength": 120,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Title"
+          },
+          "version": {
+            "title": "Version",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "version"
+        ],
+        "title": "EntryPatch",
+        "type": "object"
+      },
+      "EntryStatus": {
+        "enum": [
+          "draft",
+          "processing",
+          "review",
+          "confirmed",
+          "failed",
+          "manual"
+        ],
+        "title": "EntryStatus",
+        "type": "string"
+      },
+      "EntrySummary": {
+        "properties": {
+          "activity_count": {
+            "title": "Activity Count",
+            "type": "integer"
+          },
+          "covered_minutes": {
+            "title": "Covered Minutes",
+            "type": "integer"
+          },
+          "covers_end_at": {
+            "format": "date-time",
+            "title": "Covers End At",
+            "type": "string"
+          },
+          "covers_start_at": {
+            "format": "date-time",
+            "title": "Covers Start At",
+            "type": "string"
+          },
+          "entry_date": {
+            "format": "date",
+            "title": "Entry Date",
+            "type": "string"
+          },
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "input_method": {
+            "$ref": "#/components/schemas/InputMethod"
+          },
+          "status": {
+            "$ref": "#/components/schemas/EntryStatus"
+          },
+          "tags": {
+            "items": {
+              "$ref": "#/components/schemas/TagDot"
+            },
+            "title": "Tags",
+            "type": "array"
+          },
+          "timezone": {
+            "title": "Timezone",
+            "type": "string"
+          },
+          "title": {
+            "title": "Title",
+            "type": "string"
+          },
+          "window_minutes": {
+            "title": "Window Minutes",
+            "type": "integer"
+          },
+          "word_count": {
+            "title": "Word Count",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "id",
+          "entry_date",
+          "title",
+          "status",
+          "covers_start_at",
+          "covers_end_at",
+          "timezone",
+          "input_method",
+          "word_count",
+          "activity_count",
+          "covered_minutes",
+          "window_minutes",
+          "tags"
+        ],
+        "title": "EntrySummary",
+        "type": "object"
+      },
       "Envelope_ActivityDetail_": {
         "properties": {
           "data": {
@@ -1862,6 +2828,23 @@
           "data"
         ],
         "title": "Envelope[ActivityOut]",
+        "type": "object"
+      },
+      "Envelope_AiStatusOut_": {
+        "properties": {
+          "data": {
+            "$ref": "#/components/schemas/AiStatusOut"
+          },
+          "meta": {
+            "additionalProperties": true,
+            "title": "Meta",
+            "type": "object"
+          }
+        },
+        "required": [
+          "data"
+        ],
+        "title": "Envelope[AiStatusOut]",
         "type": "object"
       },
       "Envelope_AuthOut_": {
@@ -1932,6 +2915,57 @@
         "title": "Envelope[CategoryOut]",
         "type": "object"
       },
+      "Envelope_CommitOut_": {
+        "properties": {
+          "data": {
+            "$ref": "#/components/schemas/CommitOut"
+          },
+          "meta": {
+            "additionalProperties": true,
+            "title": "Meta",
+            "type": "object"
+          }
+        },
+        "required": [
+          "data"
+        ],
+        "title": "Envelope[CommitOut]",
+        "type": "object"
+      },
+      "Envelope_EntryDetail_": {
+        "properties": {
+          "data": {
+            "$ref": "#/components/schemas/EntryDetail"
+          },
+          "meta": {
+            "additionalProperties": true,
+            "title": "Meta",
+            "type": "object"
+          }
+        },
+        "required": [
+          "data"
+        ],
+        "title": "Envelope[EntryDetail]",
+        "type": "object"
+      },
+      "Envelope_EntryOut_": {
+        "properties": {
+          "data": {
+            "$ref": "#/components/schemas/EntryOut"
+          },
+          "meta": {
+            "additionalProperties": true,
+            "title": "Meta",
+            "type": "object"
+          }
+        },
+        "required": [
+          "data"
+        ],
+        "title": "Envelope[EntryOut]",
+        "type": "object"
+      },
       "Envelope_ExportOut_": {
         "properties": {
           "data": {
@@ -1947,6 +2981,57 @@
           "data"
         ],
         "title": "Envelope[ExportOut]",
+        "type": "object"
+      },
+      "Envelope_IdealOverviewOut_": {
+        "properties": {
+          "data": {
+            "$ref": "#/components/schemas/IdealOverviewOut"
+          },
+          "meta": {
+            "additionalProperties": true,
+            "title": "Meta",
+            "type": "object"
+          }
+        },
+        "required": [
+          "data"
+        ],
+        "title": "Envelope[IdealOverviewOut]",
+        "type": "object"
+      },
+      "Envelope_IdealTemplateOut_": {
+        "properties": {
+          "data": {
+            "$ref": "#/components/schemas/IdealTemplateOut"
+          },
+          "meta": {
+            "additionalProperties": true,
+            "title": "Meta",
+            "type": "object"
+          }
+        },
+        "required": [
+          "data"
+        ],
+        "title": "Envelope[IdealTemplateOut]",
+        "type": "object"
+      },
+      "Envelope_JobOut_": {
+        "properties": {
+          "data": {
+            "$ref": "#/components/schemas/JobOut"
+          },
+          "meta": {
+            "additionalProperties": true,
+            "title": "Meta",
+            "type": "object"
+          }
+        },
+        "required": [
+          "data"
+        ],
+        "title": "Envelope[JobOut]",
         "type": "object"
       },
       "Envelope_KeywordRuleOut_": {
@@ -2017,6 +3102,40 @@
         "title": "Envelope[PreferencesOut]",
         "type": "object"
       },
+      "Envelope_ProcessOut_": {
+        "properties": {
+          "data": {
+            "$ref": "#/components/schemas/ProcessOut"
+          },
+          "meta": {
+            "additionalProperties": true,
+            "title": "Meta",
+            "type": "object"
+          }
+        },
+        "required": [
+          "data"
+        ],
+        "title": "Envelope[ProcessOut]",
+        "type": "object"
+      },
+      "Envelope_ProgressOut_": {
+        "properties": {
+          "data": {
+            "$ref": "#/components/schemas/ProgressOut"
+          },
+          "meta": {
+            "additionalProperties": true,
+            "title": "Meta",
+            "type": "object"
+          }
+        },
+        "required": [
+          "data"
+        ],
+        "title": "Envelope[ProgressOut]",
+        "type": "object"
+      },
       "Envelope_ProjectOut_": {
         "properties": {
           "data": {
@@ -2051,6 +3170,23 @@
         "title": "Envelope[RefreshOut]",
         "type": "object"
       },
+      "Envelope_ReviewOut_": {
+        "properties": {
+          "data": {
+            "$ref": "#/components/schemas/ReviewOut"
+          },
+          "meta": {
+            "additionalProperties": true,
+            "title": "Meta",
+            "type": "object"
+          }
+        },
+        "required": [
+          "data"
+        ],
+        "title": "Envelope[ReviewOut]",
+        "type": "object"
+      },
       "Envelope_SplitOut_": {
         "properties": {
           "data": {
@@ -2066,6 +3202,23 @@
           "data"
         ],
         "title": "Envelope[SplitOut]",
+        "type": "object"
+      },
+      "Envelope_StatsOut_": {
+        "properties": {
+          "data": {
+            "$ref": "#/components/schemas/StatsOut"
+          },
+          "meta": {
+            "additionalProperties": true,
+            "title": "Meta",
+            "type": "object"
+          }
+        },
+        "required": [
+          "data"
+        ],
+        "title": "Envelope[StatsOut]",
         "type": "object"
       },
       "Envelope_TagMergeOut_": {
@@ -2216,6 +3369,27 @@
         "title": "Envelope[list[CategoryNode]]",
         "type": "object"
       },
+      "Envelope_list_EntrySummary__": {
+        "properties": {
+          "data": {
+            "items": {
+              "$ref": "#/components/schemas/EntrySummary"
+            },
+            "title": "Data",
+            "type": "array"
+          },
+          "meta": {
+            "additionalProperties": true,
+            "title": "Meta",
+            "type": "object"
+          }
+        },
+        "required": [
+          "data"
+        ],
+        "title": "Envelope[list[EntrySummary]]",
+        "type": "object"
+      },
       "Envelope_list_EventOut__": {
         "properties": {
           "data": {
@@ -2277,6 +3451,27 @@
           "data"
         ],
         "title": "Envelope[list[ProjectOut]]",
+        "type": "object"
+      },
+      "Envelope_list_RevisionOut__": {
+        "properties": {
+          "data": {
+            "items": {
+              "$ref": "#/components/schemas/RevisionOut"
+            },
+            "title": "Data",
+            "type": "array"
+          },
+          "meta": {
+            "additionalProperties": true,
+            "title": "Meta",
+            "type": "object"
+          }
+        },
+        "required": [
+          "data"
+        ],
+        "title": "Envelope[list[RevisionOut]]",
         "type": "object"
       },
       "Envelope_list_TagOut__": {
@@ -2538,6 +3733,69 @@
         "title": "GoalKind",
         "type": "string"
       },
+      "IdealDistribution": {
+        "enum": [
+          "all_days",
+          "weekdays",
+          "weekend"
+        ],
+        "title": "IdealDistribution",
+        "type": "string"
+      },
+      "IdealOverviewOut": {
+        "properties": {
+          "current": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/IdealTemplateOut"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "versions": {
+            "items": {
+              "$ref": "#/components/schemas/IdealVersion"
+            },
+            "title": "Versions",
+            "type": "array"
+          }
+        },
+        "required": [
+          "current",
+          "versions"
+        ],
+        "title": "IdealOverviewOut",
+        "type": "object"
+      },
+      "IdealPreview": {
+        "properties": {
+          "date": {
+            "format": "date",
+            "title": "Date",
+            "type": "string"
+          },
+          "other_actual": {
+            "title": "Other Actual",
+            "type": "integer"
+          },
+          "rows": {
+            "items": {
+              "$ref": "#/components/schemas/IdealRowOut"
+            },
+            "title": "Rows",
+            "type": "array"
+          }
+        },
+        "required": [
+          "date",
+          "rows",
+          "other_actual"
+        ],
+        "title": "IdealPreview",
+        "type": "object"
+      },
       "IdealRow": {
         "properties": {
           "category_id": {
@@ -2565,6 +3823,242 @@
           "minutes"
         ],
         "title": "IdealRow",
+        "type": "object"
+      },
+      "IdealRowOut": {
+        "properties": {
+          "actual": {
+            "title": "Actual",
+            "type": "integer"
+          },
+          "category_id": {
+            "format": "uuid",
+            "title": "Category Id",
+            "type": "string"
+          },
+          "color": {
+            "title": "Color",
+            "type": "string"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "target": {
+            "title": "Target",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "category_id",
+          "name",
+          "color",
+          "target",
+          "actual"
+        ],
+        "title": "IdealRowOut",
+        "type": "object"
+      },
+      "IdealSaveIn": {
+        "properties": {
+          "allocations": {
+            "items": {
+              "$ref": "#/components/schemas/AllocationIn"
+            },
+            "maxItems": 200,
+            "title": "Allocations",
+            "type": "array"
+          },
+          "effective_from": {
+            "format": "date",
+            "title": "Effective From",
+            "type": "string"
+          }
+        },
+        "required": [
+          "effective_from",
+          "allocations"
+        ],
+        "title": "IdealSaveIn",
+        "type": "object"
+      },
+      "IdealTemplateOut": {
+        "properties": {
+          "allocations": {
+            "items": {
+              "$ref": "#/components/schemas/AllocationOut"
+            },
+            "title": "Allocations",
+            "type": "array"
+          },
+          "effective_from": {
+            "anyOf": [
+              {
+                "format": "date",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Effective From"
+          },
+          "expected_minutes": {
+            "title": "Expected Minutes",
+            "type": "integer"
+          },
+          "kind": {
+            "enum": [
+              "day",
+              "week"
+            ],
+            "title": "Kind",
+            "type": "string"
+          },
+          "total_minutes": {
+            "title": "Total Minutes",
+            "type": "integer"
+          },
+          "unallocated_minutes": {
+            "title": "Unallocated Minutes",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "kind",
+          "effective_from",
+          "allocations",
+          "total_minutes",
+          "expected_minutes",
+          "unallocated_minutes"
+        ],
+        "title": "IdealTemplateOut",
+        "type": "object"
+      },
+      "IdealVersion": {
+        "properties": {
+          "created_at": {
+            "format": "date-time",
+            "title": "Created At",
+            "type": "string"
+          },
+          "effective_from": {
+            "format": "date",
+            "title": "Effective From",
+            "type": "string"
+          },
+          "total_minutes": {
+            "title": "Total Minutes",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "effective_from",
+          "created_at",
+          "total_minutes"
+        ],
+        "title": "IdealVersion",
+        "type": "object"
+      },
+      "InputMethod": {
+        "enum": [
+          "typed",
+          "dictated"
+        ],
+        "title": "InputMethod",
+        "type": "string"
+      },
+      "JobBrief": {
+        "properties": {
+          "error_code": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Error Code"
+          },
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "is_stale": {
+            "title": "Is Stale",
+            "type": "boolean"
+          },
+          "model": {
+            "title": "Model",
+            "type": "string"
+          },
+          "provider": {
+            "title": "Provider",
+            "type": "string"
+          },
+          "status": {
+            "title": "Status",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "status",
+          "error_code",
+          "is_stale",
+          "provider",
+          "model"
+        ],
+        "title": "JobBrief",
+        "type": "object"
+      },
+      "JobOut": {
+        "properties": {
+          "attempts": {
+            "title": "Attempts",
+            "type": "integer"
+          },
+          "entry_id": {
+            "format": "uuid",
+            "title": "Entry Id",
+            "type": "string"
+          },
+          "error_code": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Error Code"
+          },
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "is_stale": {
+            "title": "Is Stale",
+            "type": "boolean"
+          },
+          "status": {
+            "title": "Status",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "status",
+          "attempts",
+          "error_code",
+          "entry_id",
+          "is_stale"
+        ],
+        "title": "JobOut",
         "type": "object"
       },
       "KeywordRuleCreate": {
@@ -2715,6 +4209,32 @@
           }
         },
         "title": "MarkDoneIn",
+        "type": "object"
+      },
+      "NewTagChoice": {
+        "properties": {
+          "draft_id": {
+            "format": "uuid",
+            "title": "Draft Id",
+            "type": "string"
+          },
+          "keep": {
+            "default": true,
+            "title": "Keep",
+            "type": "boolean"
+          },
+          "name": {
+            "maxLength": 48,
+            "minLength": 1,
+            "title": "Name",
+            "type": "string"
+          }
+        },
+        "required": [
+          "draft_id",
+          "name"
+        ],
+        "title": "NewTagChoice",
         "type": "object"
       },
       "OkOut": {
@@ -2965,6 +4485,48 @@
         "title": "PreferencesPatch",
         "type": "object"
       },
+      "ProcessIn": {
+        "properties": {
+          "regenerate": {
+            "default": false,
+            "title": "Regenerate",
+            "type": "boolean"
+          },
+          "user_hint": {
+            "anyOf": [
+              {
+                "maxLength": 500,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "User Hint"
+          }
+        },
+        "title": "ProcessIn",
+        "type": "object"
+      },
+      "ProcessOut": {
+        "properties": {
+          "job_id": {
+            "format": "uuid",
+            "title": "Job Id",
+            "type": "string"
+          },
+          "status": {
+            "title": "Status",
+            "type": "string"
+          }
+        },
+        "required": [
+          "job_id",
+          "status"
+        ],
+        "title": "ProcessOut",
+        "type": "object"
+      },
       "ProfilePatch": {
         "properties": {
           "display_name": {
@@ -3015,6 +4577,149 @@
           }
         },
         "title": "ProfilePatch",
+        "type": "object"
+      },
+      "ProgressOut": {
+        "properties": {
+          "as_of": {
+            "format": "date",
+            "title": "As Of",
+            "type": "string"
+          },
+          "from_date": {
+            "format": "date",
+            "title": "From Date",
+            "type": "string"
+          },
+          "other_actual": {
+            "title": "Other Actual",
+            "type": "integer"
+          },
+          "provisional": {
+            "title": "Provisional",
+            "type": "boolean"
+          },
+          "rows": {
+            "items": {
+              "$ref": "#/components/schemas/ProgressRow"
+            },
+            "title": "Rows",
+            "type": "array"
+          },
+          "scope": {
+            "enum": [
+              "day",
+              "week"
+            ],
+            "title": "Scope",
+            "type": "string"
+          },
+          "template_effective_from": {
+            "anyOf": [
+              {
+                "format": "date",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Template Effective From"
+          },
+          "to_date": {
+            "format": "date",
+            "title": "To Date",
+            "type": "string"
+          },
+          "total_actual": {
+            "title": "Total Actual",
+            "type": "integer"
+          },
+          "total_target": {
+            "title": "Total Target",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "scope",
+          "from_date",
+          "to_date",
+          "as_of",
+          "template_effective_from",
+          "provisional",
+          "rows",
+          "other_actual",
+          "total_target",
+          "total_actual"
+        ],
+        "title": "ProgressOut",
+        "type": "object"
+      },
+      "ProgressRow": {
+        "properties": {
+          "actual": {
+            "title": "Actual",
+            "type": "integer"
+          },
+          "category_id": {
+            "format": "uuid",
+            "title": "Category Id",
+            "type": "string"
+          },
+          "color": {
+            "title": "Color",
+            "type": "string"
+          },
+          "delta": {
+            "title": "Delta",
+            "type": "integer"
+          },
+          "distribution": {
+            "$ref": "#/components/schemas/IdealDistribution"
+          },
+          "expected_to_date": {
+            "title": "Expected To Date",
+            "type": "integer"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "path_names": {
+            "title": "Path Names",
+            "type": "string"
+          },
+          "root_kind": {
+            "$ref": "#/components/schemas/RootKind"
+          },
+          "status": {
+            "enum": [
+              "on_target",
+              "under",
+              "over"
+            ],
+            "title": "Status",
+            "type": "string"
+          },
+          "target": {
+            "title": "Target",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "category_id",
+          "name",
+          "path_names",
+          "color",
+          "root_kind",
+          "distribution",
+          "target",
+          "expected_to_date",
+          "actual",
+          "delta",
+          "status"
+        ],
+        "title": "ProgressRow",
         "type": "object"
       },
       "ProjectCreate": {
@@ -3132,6 +4837,45 @@
         "title": "ProjectPatch",
         "type": "object"
       },
+      "Question": {
+        "properties": {
+          "activity_temp_id": {
+            "title": "Activity Temp Id",
+            "type": "string"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "options": {
+            "items": {
+              "additionalProperties": {
+                "type": "string"
+              },
+              "type": "object"
+            },
+            "title": "Options",
+            "type": "array"
+          },
+          "prompt": {
+            "title": "Prompt",
+            "type": "string"
+          },
+          "type": {
+            "title": "Type",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "type",
+          "activity_temp_id",
+          "prompt",
+          "options"
+        ],
+        "title": "Question",
+        "type": "object"
+      },
       "RefreshOut": {
         "properties": {
           "access_token": {
@@ -3182,6 +4926,30 @@
         "title": "RegisterIn",
         "type": "object"
       },
+      "ReplaceCandidate": {
+        "properties": {
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "title": {
+            "title": "Title",
+            "type": "string"
+          },
+          "user_edited": {
+            "title": "User Edited",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "id",
+          "title",
+          "user_edited"
+        ],
+        "title": "ReplaceCandidate",
+        "type": "object"
+      },
       "ResetIn": {
         "properties": {
           "password": {
@@ -3201,6 +4969,707 @@
           "password"
         ],
         "title": "ResetIn",
+        "type": "object"
+      },
+      "ReviewCategory": {
+        "properties": {
+          "color": {
+            "title": "Color",
+            "type": "string"
+          },
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "path_names": {
+            "title": "Path Names",
+            "type": "string"
+          },
+          "root_kind": {
+            "title": "Root Kind",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "path_names",
+          "color",
+          "root_kind"
+        ],
+        "title": "ReviewCategory",
+        "type": "object"
+      },
+      "ReviewConflict": {
+        "properties": {
+          "draft_id": {
+            "format": "uuid",
+            "title": "Draft Id",
+            "type": "string"
+          },
+          "end_at": {
+            "format": "date-time",
+            "title": "End At",
+            "type": "string"
+          },
+          "other_id": {
+            "format": "uuid",
+            "title": "Other Id",
+            "type": "string"
+          },
+          "other_is_draft": {
+            "title": "Other Is Draft",
+            "type": "boolean"
+          },
+          "other_title": {
+            "title": "Other Title",
+            "type": "string"
+          },
+          "overlap_minutes": {
+            "title": "Overlap Minutes",
+            "type": "integer"
+          },
+          "start_at": {
+            "format": "date-time",
+            "title": "Start At",
+            "type": "string"
+          }
+        },
+        "required": [
+          "draft_id",
+          "other_id",
+          "other_title",
+          "other_is_draft",
+          "start_at",
+          "end_at",
+          "overlap_minutes"
+        ],
+        "title": "ReviewConflict",
+        "type": "object"
+      },
+      "ReviewDraft": {
+        "properties": {
+          "band": {
+            "enum": [
+              "high",
+              "medium",
+              "low"
+            ],
+            "title": "Band",
+            "type": "string"
+          },
+          "category": {
+            "$ref": "#/components/schemas/ReviewCategory"
+          },
+          "confidence": {
+            "title": "Confidence",
+            "type": "number"
+          },
+          "description": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Description"
+          },
+          "duplicate_of": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/DuplicateRef"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "duration_minutes": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Duration Minutes"
+          },
+          "end_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "End At"
+          },
+          "flags": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Flags",
+            "type": "array"
+          },
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "ideal_row_id": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Ideal Row Id"
+          },
+          "include": {
+            "title": "Include",
+            "type": "boolean"
+          },
+          "location_type": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/LocationType"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "order": {
+            "title": "Order",
+            "type": "integer"
+          },
+          "placement": {
+            "enum": [
+              "placed",
+              "unplaced"
+            ],
+            "title": "Placement",
+            "type": "string"
+          },
+          "source": {
+            "$ref": "#/components/schemas/ReviewSource"
+          },
+          "start_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Start At"
+          },
+          "tags": {
+            "items": {
+              "$ref": "#/components/schemas/ReviewTag"
+            },
+            "title": "Tags",
+            "type": "array"
+          },
+          "task": {
+            "$ref": "#/components/schemas/ReviewTask"
+          },
+          "temp_id": {
+            "title": "Temp Id",
+            "type": "string"
+          },
+          "time_certainty": {
+            "title": "Time Certainty",
+            "type": "string"
+          },
+          "title": {
+            "title": "Title",
+            "type": "string"
+          },
+          "window_end_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Window End At"
+          },
+          "window_start_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Window Start At"
+          }
+        },
+        "required": [
+          "id",
+          "temp_id",
+          "order",
+          "title",
+          "description",
+          "placement",
+          "start_at",
+          "end_at",
+          "window_start_at",
+          "window_end_at",
+          "duration_minutes",
+          "time_certainty",
+          "category",
+          "tags",
+          "task",
+          "location_type",
+          "confidence",
+          "band",
+          "flags",
+          "source",
+          "include",
+          "duplicate_of",
+          "ideal_row_id"
+        ],
+        "title": "ReviewDraft",
+        "type": "object"
+      },
+      "ReviewEntry": {
+        "properties": {
+          "covers_end_at": {
+            "format": "date-time",
+            "title": "Covers End At",
+            "type": "string"
+          },
+          "covers_start_at": {
+            "format": "date-time",
+            "title": "Covers Start At",
+            "type": "string"
+          },
+          "dictation_seconds": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Dictation Seconds"
+          },
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "input_method": {
+            "title": "Input Method",
+            "type": "string"
+          },
+          "raw_text": {
+            "title": "Raw Text",
+            "type": "string"
+          },
+          "revision": {
+            "title": "Revision",
+            "type": "integer"
+          },
+          "status": {
+            "title": "Status",
+            "type": "string"
+          },
+          "timezone": {
+            "title": "Timezone",
+            "type": "string"
+          },
+          "title": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Title"
+          }
+        },
+        "required": [
+          "id",
+          "status",
+          "title",
+          "raw_text",
+          "covers_start_at",
+          "covers_end_at",
+          "timezone",
+          "revision",
+          "input_method",
+          "dictation_seconds"
+        ],
+        "title": "ReviewEntry",
+        "type": "object"
+      },
+      "ReviewGap": {
+        "properties": {
+          "end_at": {
+            "format": "date-time",
+            "title": "End At",
+            "type": "string"
+          },
+          "minutes": {
+            "title": "Minutes",
+            "type": "integer"
+          },
+          "start_at": {
+            "format": "date-time",
+            "title": "Start At",
+            "type": "string"
+          }
+        },
+        "required": [
+          "start_at",
+          "end_at",
+          "minutes"
+        ],
+        "title": "ReviewGap",
+        "type": "object"
+      },
+      "ReviewOut": {
+        "properties": {
+          "blocking": {
+            "items": {
+              "$ref": "#/components/schemas/Blocker"
+            },
+            "title": "Blocking",
+            "type": "array"
+          },
+          "conflicts": {
+            "items": {
+              "$ref": "#/components/schemas/ReviewConflict"
+            },
+            "title": "Conflicts",
+            "type": "array"
+          },
+          "drafts": {
+            "items": {
+              "$ref": "#/components/schemas/ReviewDraft"
+            },
+            "title": "Drafts",
+            "type": "array"
+          },
+          "entry": {
+            "$ref": "#/components/schemas/ReviewEntry"
+          },
+          "gaps": {
+            "items": {
+              "$ref": "#/components/schemas/ReviewGap"
+            },
+            "title": "Gaps",
+            "type": "array"
+          },
+          "ideal": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/IdealPreview"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "job": {
+            "$ref": "#/components/schemas/JobBrief"
+          },
+          "questions": {
+            "items": {
+              "$ref": "#/components/schemas/Question"
+            },
+            "title": "Questions",
+            "type": "array"
+          },
+          "replace_candidates": {
+            "items": {
+              "$ref": "#/components/schemas/ReplaceCandidate"
+            },
+            "title": "Replace Candidates",
+            "type": "array"
+          },
+          "summary": {
+            "$ref": "#/components/schemas/ReviewSummary"
+          },
+          "warnings": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Warnings",
+            "type": "array"
+          }
+        },
+        "required": [
+          "entry",
+          "job",
+          "summary",
+          "drafts",
+          "gaps",
+          "conflicts",
+          "questions",
+          "blocking",
+          "warnings",
+          "ideal",
+          "replace_candidates"
+        ],
+        "title": "ReviewOut",
+        "type": "object"
+      },
+      "ReviewSource": {
+        "properties": {
+          "end": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "End"
+          },
+          "quote": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Quote"
+          },
+          "start": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Start"
+          }
+        },
+        "required": [
+          "quote",
+          "start",
+          "end"
+        ],
+        "title": "ReviewSource",
+        "type": "object"
+      },
+      "ReviewSummary": {
+        "properties": {
+          "activity_count": {
+            "title": "Activity Count",
+            "type": "integer"
+          },
+          "covered_minutes": {
+            "title": "Covered Minutes",
+            "type": "integer"
+          },
+          "gap_count": {
+            "title": "Gap Count",
+            "type": "integer"
+          },
+          "not_mentioned_minutes": {
+            "title": "Not Mentioned Minutes",
+            "type": "integer"
+          },
+          "tags_applied": {
+            "title": "Tags Applied",
+            "type": "integer"
+          },
+          "to_double_check": {
+            "title": "To Double Check",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "activity_count",
+          "covered_minutes",
+          "not_mentioned_minutes",
+          "gap_count",
+          "to_double_check",
+          "tags_applied"
+        ],
+        "title": "ReviewSummary",
+        "type": "object"
+      },
+      "ReviewTag": {
+        "properties": {
+          "applied": {
+            "title": "Applied",
+            "type": "boolean"
+          },
+          "color": {
+            "title": "Color",
+            "type": "string"
+          },
+          "confidence": {
+            "title": "Confidence",
+            "type": "number"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "new": {
+            "title": "New",
+            "type": "boolean"
+          },
+          "reason": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Reason"
+          },
+          "source": {
+            "title": "Source",
+            "type": "string"
+          },
+          "tag_id": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Tag Id"
+          }
+        },
+        "required": [
+          "tag_id",
+          "name",
+          "color",
+          "source",
+          "confidence",
+          "reason",
+          "applied",
+          "new"
+        ],
+        "title": "ReviewTag",
+        "type": "object"
+      },
+      "ReviewTask": {
+        "properties": {
+          "confidence": {
+            "title": "Confidence",
+            "type": "number"
+          },
+          "new_task_title": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "New Task Title"
+          },
+          "task_id": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Task Id"
+          },
+          "task_title": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Task Title"
+          }
+        },
+        "required": [
+          "task_id",
+          "task_title",
+          "new_task_title",
+          "confidence"
+        ],
+        "title": "ReviewTask",
+        "type": "object"
+      },
+      "RevisionOut": {
+        "properties": {
+          "covers_end_at": {
+            "format": "date-time",
+            "title": "Covers End At",
+            "type": "string"
+          },
+          "covers_start_at": {
+            "format": "date-time",
+            "title": "Covers Start At",
+            "type": "string"
+          },
+          "created_at": {
+            "format": "date-time",
+            "title": "Created At",
+            "type": "string"
+          },
+          "raw_text": {
+            "title": "Raw Text",
+            "type": "string"
+          },
+          "revision": {
+            "title": "Revision",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "revision",
+          "raw_text",
+          "covers_start_at",
+          "covers_end_at",
+          "created_at"
+        ],
+        "title": "RevisionOut",
         "type": "object"
       },
       "RootKind": {
@@ -3296,6 +5765,47 @@
         "title": "SplitOut",
         "type": "object"
       },
+      "StatsOut": {
+        "properties": {
+          "entries_per_day_30d": {
+            "title": "Entries Per Day 30D",
+            "type": "number"
+          },
+          "full_days_pct_30d": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Full Days Pct 30D"
+          },
+          "streak_days": {
+            "title": "Streak Days",
+            "type": "integer"
+          },
+          "yesterday_gap": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/YesterdayGap"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "required": [
+          "streak_days",
+          "entries_per_day_30d",
+          "full_days_pct_30d",
+          "yesterday_gap"
+        ],
+        "title": "StatsOut",
+        "type": "object"
+      },
       "TagCreate": {
         "properties": {
           "color": {
@@ -3349,6 +5859,24 @@
           "name"
         ],
         "title": "TagCreate",
+        "type": "object"
+      },
+      "TagDot": {
+        "properties": {
+          "color": {
+            "title": "Color",
+            "type": "string"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          }
+        },
+        "required": [
+          "name",
+          "color"
+        ],
+        "title": "TagDot",
         "type": "object"
       },
       "TagMergeOut": {
@@ -3936,6 +6464,26 @@
         "title": "TranscriptionMode",
         "type": "string"
       },
+      "Transition": {
+        "properties": {
+          "end_at": {
+            "format": "date-time",
+            "title": "End At",
+            "type": "string"
+          },
+          "start_at": {
+            "format": "date-time",
+            "title": "Start At",
+            "type": "string"
+          }
+        },
+        "required": [
+          "start_at",
+          "end_at"
+        ],
+        "title": "Transition",
+        "type": "object"
+      },
       "UnplacedItem": {
         "properties": {
           "category": {
@@ -4048,6 +6596,37 @@
           "has_password"
         ],
         "title": "UserOut",
+        "type": "object"
+      },
+      "YesterdayGap": {
+        "properties": {
+          "date": {
+            "format": "date",
+            "title": "Date",
+            "type": "string"
+          },
+          "end_at": {
+            "format": "date-time",
+            "title": "End At",
+            "type": "string"
+          },
+          "minutes": {
+            "title": "Minutes",
+            "type": "integer"
+          },
+          "start_at": {
+            "format": "date-time",
+            "title": "Start At",
+            "type": "string"
+          }
+        },
+        "required": [
+          "date",
+          "minutes",
+          "start_at",
+          "end_at"
+        ],
+        "title": "YesterdayGap",
         "type": "object"
       },
       "app__schemas__activity__MergeIn": {
@@ -5529,6 +8108,170 @@
         "summary": "Put Tags",
         "tags": [
           "activities"
+        ]
+      }
+    },
+    "/api/v1/ai-jobs/{job_id}": {
+      "get": {
+        "operationId": "get_job_api_v1_ai_jobs__job_id__get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "job_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Job Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Envelope_JobOut_"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Unauthorized"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Conflict"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Validation Error"
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Too Many Requests"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Get Job",
+        "tags": [
+          "journal"
+        ]
+      }
+    },
+    "/api/v1/ai/status": {
+      "get": {
+        "operationId": "ai_status_api_v1_ai_status_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Envelope_AiStatusOut_"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Unauthorized"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Conflict"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Validation Error"
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Too Many Requests"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Ai Status",
+        "tags": [
+          "journal"
         ]
       }
     },
@@ -7158,6 +9901,1655 @@
         "summary": "Healthz",
         "tags": [
           "health"
+        ]
+      }
+    },
+    "/api/v1/ideal/day": {
+      "get": {
+        "operationId": "get_day_api_v1_ideal_day_get",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "on",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "format": "date",
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "On"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Envelope_IdealOverviewOut_"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Unauthorized"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Conflict"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Validation Error"
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Too Many Requests"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Get Day",
+        "tags": [
+          "ideal"
+        ]
+      },
+      "put": {
+        "operationId": "put_day_api_v1_ideal_day_put",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "dry_run",
+            "required": false,
+            "schema": {
+              "default": false,
+              "title": "Dry Run",
+              "type": "boolean"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/IdealSaveIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Envelope_IdealTemplateOut_"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Unauthorized"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Conflict"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Validation Error"
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Too Many Requests"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Put Day",
+        "tags": [
+          "ideal"
+        ]
+      }
+    },
+    "/api/v1/ideal/progress": {
+      "get": {
+        "operationId": "progress_api_v1_ideal_progress_get",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "on",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "format": "date",
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "On"
+            }
+          },
+          {
+            "in": "query",
+            "name": "scope",
+            "required": false,
+            "schema": {
+              "default": "week",
+              "enum": [
+                "day",
+                "week"
+              ],
+              "title": "Scope",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Envelope_ProgressOut_"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Unauthorized"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Conflict"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Validation Error"
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Too Many Requests"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Progress",
+        "tags": [
+          "ideal"
+        ]
+      }
+    },
+    "/api/v1/ideal/week": {
+      "get": {
+        "operationId": "get_week_api_v1_ideal_week_get",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "on",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "format": "date",
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "On"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Envelope_IdealOverviewOut_"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Unauthorized"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Conflict"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Validation Error"
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Too Many Requests"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Get Week",
+        "tags": [
+          "ideal"
+        ]
+      },
+      "put": {
+        "operationId": "put_week_api_v1_ideal_week_put",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "dry_run",
+            "required": false,
+            "schema": {
+              "default": false,
+              "title": "Dry Run",
+              "type": "boolean"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/IdealSaveIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Envelope_IdealTemplateOut_"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Unauthorized"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Conflict"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Validation Error"
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Too Many Requests"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Put Week",
+        "tags": [
+          "ideal"
+        ]
+      }
+    },
+    "/api/v1/journal-entries": {
+      "get": {
+        "operationId": "list_entries_api_v1_journal_entries_get",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "from",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "format": "date",
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "From"
+            }
+          },
+          {
+            "in": "query",
+            "name": "to",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "format": "date",
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "To"
+            }
+          },
+          {
+            "in": "query",
+            "name": "status",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "$ref": "#/components/schemas/EntryStatus"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Status"
+            }
+          },
+          {
+            "in": "query",
+            "name": "q",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "maxLength": 100,
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Q"
+            }
+          },
+          {
+            "in": "query",
+            "name": "limit",
+            "required": false,
+            "schema": {
+              "default": 20,
+              "maximum": 100,
+              "minimum": 1,
+              "title": "Limit",
+              "type": "integer"
+            }
+          },
+          {
+            "in": "query",
+            "name": "cursor",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Cursor"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Envelope_list_EntrySummary__"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Unauthorized"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Conflict"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Validation Error"
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Too Many Requests"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "List Entries",
+        "tags": [
+          "journal"
+        ]
+      },
+      "post": {
+        "operationId": "create_entry_api_v1_journal_entries_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/EntryCreate"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Envelope_EntryOut_"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Unauthorized"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Conflict"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Validation Error"
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Too Many Requests"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Create Entry",
+        "tags": [
+          "journal"
+        ]
+      }
+    },
+    "/api/v1/journal-entries/stats": {
+      "get": {
+        "operationId": "stats_api_v1_journal_entries_stats_get",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "as_of_date",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "format": "date",
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "As Of Date"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Envelope_StatsOut_"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Unauthorized"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Conflict"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Validation Error"
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Too Many Requests"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Stats",
+        "tags": [
+          "journal"
+        ]
+      }
+    },
+    "/api/v1/journal-entries/{entry_id}": {
+      "delete": {
+        "operationId": "delete_entry_api_v1_journal_entries__entry_id__delete",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "entry_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Entry Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "activities",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "pattern": "^(keep|delete)$",
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Activities"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Unauthorized"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Conflict"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Validation Error"
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Too Many Requests"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Delete Entry",
+        "tags": [
+          "journal"
+        ]
+      },
+      "get": {
+        "operationId": "get_entry_api_v1_journal_entries__entry_id__get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "entry_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Entry Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Envelope_EntryDetail_"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Unauthorized"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Conflict"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Validation Error"
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Too Many Requests"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Get Entry",
+        "tags": [
+          "journal"
+        ]
+      },
+      "patch": {
+        "operationId": "patch_entry_api_v1_journal_entries__entry_id__patch",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "entry_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Entry Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/EntryPatch"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Envelope_EntryOut_"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Unauthorized"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Conflict"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Validation Error"
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Too Many Requests"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Patch Entry",
+        "tags": [
+          "journal"
+        ]
+      }
+    },
+    "/api/v1/journal-entries/{entry_id}/process": {
+      "post": {
+        "operationId": "process_api_v1_journal_entries__entry_id__process_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "entry_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Entry Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "header",
+            "name": "Idempotency-Key",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Idempotency-Key"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "anyOf": [
+                  {
+                    "$ref": "#/components/schemas/ProcessIn"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "title": "Body"
+              }
+            }
+          }
+        },
+        "responses": {
+          "202": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Envelope_ProcessOut_"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Unauthorized"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Conflict"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Validation Error"
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Too Many Requests"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Process",
+        "tags": [
+          "journal"
+        ]
+      }
+    },
+    "/api/v1/journal-entries/{entry_id}/review": {
+      "get": {
+        "operationId": "review_api_v1_journal_entries__entry_id__review_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "entry_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Entry Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "job_id",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "format": "uuid",
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Job Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Envelope_ReviewOut_"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Unauthorized"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Conflict"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Validation Error"
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Too Many Requests"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Review",
+        "tags": [
+          "review"
+        ]
+      }
+    },
+    "/api/v1/journal-entries/{entry_id}/review/answers": {
+      "post": {
+        "operationId": "answer_api_v1_journal_entries__entry_id__review_answers_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "entry_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Entry Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AnswerIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Envelope_ReviewOut_"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Unauthorized"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Conflict"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Validation Error"
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Too Many Requests"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Answer",
+        "tags": [
+          "review"
+        ]
+      }
+    },
+    "/api/v1/journal-entries/{entry_id}/review/commit": {
+      "post": {
+        "operationId": "commit_api_v1_journal_entries__entry_id__review_commit_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "entry_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Entry Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "header",
+            "name": "Idempotency-Key",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Idempotency-Key"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CommitIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Envelope_CommitOut_"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Unauthorized"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Conflict"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Validation Error"
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Too Many Requests"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Commit",
+        "tags": [
+          "review"
+        ]
+      }
+    },
+    "/api/v1/journal-entries/{entry_id}/revisions": {
+      "get": {
+        "operationId": "revisions_api_v1_journal_entries__entry_id__revisions_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "entry_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Entry Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Envelope_list_RevisionOut__"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Unauthorized"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Conflict"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Validation Error"
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Too Many Requests"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Revisions",
+        "tags": [
+          "journal"
         ]
       }
     },

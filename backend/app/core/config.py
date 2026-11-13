@@ -32,6 +32,17 @@ class Settings(BaseSettings):
     sentry_dsn: str = ""
     export_dir: str = "./var/exports"
 
+    # AI (PRD section 6). With no key the offline FakeProvider is used so the full flow works without one.
+    anthropic_api_key: str = ""
+    llm_provider: str = "auto"  # auto | anthropic | fake
+    llm_model_extract: str = "claude-sonnet-5-5"
+    llm_timeout_seconds: int = 45
+    llm_max_tokens: int = 4096
+    llm_enabled: bool = True  # kill switch (PRD Phase 5)
+    ai_daily_job_limit: int = 30
+    ai_regenerations_per_day: int = 5
+    embedded_worker: bool = True  # run the job worker inside the API process; set false when running a separate worker
+
     login_max_failures: int = 5
     login_window_seconds: int = 900
     api_rate_limit_per_minute: int = 300

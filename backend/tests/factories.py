@@ -59,3 +59,25 @@ def utc(y, m, d, hh=0, mm=0) -> datetime:
 
 
 __all__ = ["PASSWORD", "Person", "signup", "load_taxonomy", "log", "at", "utc", "timedelta"]
+
+
+async def create_entry(client, person, text: str, *, day: str = "2025-06-02", start: str = "09:00", end: str = "18:00", tz: str = "Asia/Kolkata", method: str = "typed"):
+    offset = "+05:30" if tz == "Asia/Kolkata" else "+00:00"
+    return await client.post("/api/v1/journal-entries", headers=person.headers, json={
+        "raw_text": text, "covers_start_at": at(day, start, offset), "covers_end_at": at(day, end, offset), "timezone": tz, "input_method": method})
+
+
+def idem(key: str | None = None) -> dict:
+    return {"Idempotency-Key": key or uuid.uuid4().hex}
+
+
+async def submit(client, db, person, entry_id: str, provider, *, regenerate: bool = False, hint: str | None = None) -> str:
+    """POST /process, then run the queued job exactly as the worker would, using the given provider."""
+    from app.workers.tasks_ai import run_job
+
+    body = {"regenerate": regenerate, **({"user_hint": hint} if hint else {})}
+    r = await client.post(f"/api/v1/journal-entries/{entry_id}/process", headers={**person.headers, **idem()}, json=body)
+    assert r.status_code == 202, r.text
+    job_id = r.json()["data"]["job_id"]
+    await run_job(db, uuid.UUID(job_id), provider)
+    return job_id
