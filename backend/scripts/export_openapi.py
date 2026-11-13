@@ -1,7 +1,8 @@
 """Write the OpenAPI document used to generate the frontend's TypeScript types (`make gen-api`).
 
-Enum schemas carry an auto-generated docstring whose text differs between Python versions; it is noise,
-so it is dropped to keep the snapshot identical on every interpreter.
+Two strings come from the Python standard library and differ between versions, so the snapshot is
+normalised to stay identical on every interpreter: enum docstrings (3.12 adds one, 3.13 does not) and
+the HTTP 422 reason phrase ("Unprocessable Entity" in 3.12, "Unprocessable Content" in 3.13).
 """
 
 import json
@@ -15,6 +16,10 @@ def normalise(spec: dict) -> dict:
     for schema in spec.get("components", {}).get("schemas", {}).values():
         if "enum" in schema:
             schema.pop("description", None)
+    for methods in spec.get("paths", {}).values():
+        for op in methods.values():
+            if isinstance(op, dict) and "422" in op.get("responses", {}):
+                op["responses"]["422"]["description"] = "Validation Error"
     return spec
 
 
