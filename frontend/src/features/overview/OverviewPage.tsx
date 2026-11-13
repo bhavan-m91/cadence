@@ -17,7 +17,7 @@ export function OverviewPage() {
   const [sp, setSp] = useSearchParams()
   const { data: prefs } = usePreferences()
   const today = todayIn(tz)
-  const scope = sp.get('scope') === 'day' ? 'day' : 'week'
+  const scope = sp.get('scope') === 'week' ? 'week' : 'day' // the day is the default everywhere
   const date = sp.get('date') ?? today
   const weekStart = prefs?.week_start ?? 1
   const dates = scope === 'week' ? weekDates(date, weekStart) : [date]
@@ -31,7 +31,7 @@ export function OverviewPage() {
   return (
     <>
       <PageHeader title={`${greeting(tz)}, ${user.display_name.split(' ')[0]}`} subtitle={scope === 'week' ? `Week of ${rangeLabel(dates[0], dates[6])}` : `${weekdayLong(date)}, ${dayAndMonth(date)}`}>
-        <Segmented label="Scope" value={scope} onChange={(v) => set('scope', v === 'day' ? 'day' : null)} options={[{ value: 'day', label: 'Day' }, { value: 'week', label: 'Week' }]} />
+        <Segmented label="Scope" value={scope} onChange={(v) => set('scope', v === 'week' ? 'week' : null)} options={[{ value: 'day', label: 'Day' }, { value: 'week', label: 'Week' }]} />
         <div className="flex items-center gap-1.5">
           <IconButton icon="chevronLeft" label="Previous" onClick={() => set('date', addDays(date, -step))} />
           <Button onClick={() => set('date', null)} disabled={dates.includes(today)}>Today</Button>

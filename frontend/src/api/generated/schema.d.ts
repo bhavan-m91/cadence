@@ -3986,6 +3986,8 @@ export interface components {
             personal_in_office_hours: number;
             /** Work */
             work: number;
+            /** Work Outside Hours */
+            work_outside_hours: number;
             /** Work Outside Office */
             work_outside_office: number;
         };

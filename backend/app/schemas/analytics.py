@@ -62,7 +62,8 @@ class CertaintyOut(BaseModel):
 class WorkPersonal(BaseModel):
     work: int
     personal: int
-    work_outside_office: int
+    work_outside_office: int  # by place: location is set and is not the office
+    work_outside_hours: int  # by time of day: outside office hours, or on a weekend
     personal_in_office_hours: int
 
 

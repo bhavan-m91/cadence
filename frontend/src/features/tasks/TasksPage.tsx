@@ -5,7 +5,7 @@ import { errorMessage } from '@/api/errors'
 import { useCreateProject, useCreateTask, useDeleteTask, useProjects, useTask, useTasks, useUpdateProject, useUpdateTask } from '@/api/hooks/useTasks'
 import type { Task } from '@/api/types'
 import { ProjectSelect } from '@/components/domain/Pickers'
-import { PageHeader } from '@/components/layout/PageHeader'
+import { PageHeader, Segmented } from '@/components/layout/PageHeader'
 import { Button, IconButton } from '@/components/ui/Button'
 import { Dialog } from '@/components/ui/Dialog'
 import { EmptyState, ErrorState, Skeleton } from '@/components/ui/Feedback'
@@ -33,6 +33,14 @@ export function TasksPage() {
   const { data: tasks, isLoading, error, refetch } = useTasks({ status: status || undefined, project_id: project || undefined, q: q || undefined })
   const { data: projects } = useProjects()
   const pname = new Map((projects ?? []).map((p) => [p.id, p]))
+  const updateTask = useUpdateTask()
+  const toggle = (t: Task) => updateTask.mutate({ id: t.id, version: t.version, status: t.status === 'done' ? 'open' : 'done', clear: [] } as any, { onError: (e) => toast.error(errorMessage(e)) })
+  const stats = {
+    open: (tasks ?? []).filter((t) => t.status === 'open').length,
+    overdue: (tasks ?? []).filter((t) => t.status === 'open' && t.overdue).length,
+    soon: (tasks ?? []).filter((t) => t.status === 'open' && !t.overdue && t.days_left != null && t.days_left <= 7).length,
+    logged: (tasks ?? []).filter((t) => t.status === 'open').reduce((a, t) => a + t.logged_minutes, 0),
+  }
 
   return (
     <>
@@ -40,32 +48,55 @@ export function TasksPage() {
         <Button icon="folder" onClick={() => setProjectsOpen(true)}>Projects</Button>
         <Button variant="primary" icon="plus" onClick={() => setNewOpen(true)}>New task</Button>
       </PageHeader>
-      <div className="grid gap-4 p-4 md:px-7 md:py-5 lg:grid-cols-[minmax(0,1fr)_minmax(0,420px)]">
-        <section className={clsx('min-w-0', taskId && 'max-lg:hidden')}>
-          <div className="mb-3 flex flex-wrap gap-2">
-            <div className="relative min-w-40 flex-1"><Icon name="search" size={15} className="pointer-events-none absolute left-3 top-[11px] text-faint" /><Input dense aria-label="Search tasks" placeholder="Search tasks" className="pl-9" value={q} onChange={(e) => setQ(e.target.value)} /></div>
-            <Select dense aria-label="Status" className="!w-auto" value={status} onChange={(e) => setStatus(e.target.value)}><option value="open">Open</option><option value="done">Done</option><option value="dropped">Dropped</option><option value="">All</option></Select>
-            <Select dense aria-label="Project" className="!w-auto" value={project} onChange={(e) => setProject(e.target.value)}><option value="">All projects</option>{(projects ?? []).map((p) => <option key={p.id} value={p.id}>{p.name}</option>)}</Select>
+      <div className={clsx('grid items-start gap-4 p-4 md:px-7 md:py-[22px] md:pb-10', taskId && 'lg:grid-cols-[minmax(0,1fr)_minmax(0,440px)]')}>
+        <section className={clsx('flex min-w-0 flex-col gap-4', taskId && 'max-lg:hidden')}>
+          <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
+            {[
+              ['Open', `${stats.open}`, 'tasks still to finish', undefined],
+              ['Overdue', `${stats.overdue}`, stats.overdue ? 'need attention' : 'nothing late', stats.overdue ? 'text-bad' : undefined],
+              ['Due this week', `${stats.soon}`, 'in the next 7 days', undefined],
+              ['Logged on open tasks', hm(stats.logged), 'across all days', undefined],
+            ].map(([l, v, h, c]) => (
+              <div key={l} className="card flex flex-col gap-1.5 p-4"><div className="text-[11px] font-semibold uppercase tracking-wide text-muted">{l}</div><div className={clsx('num text-[26px] font-semibold leading-none', c)}>{v}</div><div className="text-xs text-muted">{h}</div></div>
+            ))}
+          </div>
+          <div className="flex flex-wrap items-center gap-2.5">
+            <div className="relative min-w-52 flex-1"><Icon name="search" size={16} className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-faint" /><Input aria-label="Search tasks" placeholder="Search tasks" className="h-10 pl-10" value={q} onChange={(e) => setQ(e.target.value)} /></div>
+            <Segmented label="Status" value={status} onChange={setStatus} options={[{ value: 'open', label: 'Open' }, { value: 'done', label: 'Done' }, { value: 'dropped', label: 'Dropped' }, { value: '', label: 'All' }]} />
+            <Select aria-label="Project" className="h-10 !w-52" value={project} onChange={(e) => setProject(e.target.value)}><option value="">All projects</option>{(projects ?? []).map((p) => <option key={p.id} value={p.id}>{p.name}</option>)}</Select>
           </div>
           <div className="card overflow-hidden">
-            {isLoading && <div className="flex flex-col gap-2 p-4"><Skeleton className="h-12" /><Skeleton className="h-12" /><Skeleton className="h-12" /></div>}
+            {isLoading && <div className="flex flex-col gap-2 p-4"><Skeleton className="h-16" /><Skeleton className="h-16" /><Skeleton className="h-16" /></div>}
             {error && <ErrorState error={error} onRetry={() => refetch()} />}
             {tasks && tasks.length === 0 && <EmptyState icon="tasks" title={q || project || status !== 'open' ? 'No tasks match' : 'No tasks yet'} action={<Button variant="primary" icon="plus" onClick={() => setNewOpen(true)}>New task</Button>}>Tasks appear as you log work, or add one now. A task can exist with zero time.</EmptyState>}
             {tasks && tasks.length > 0 && (
               <ul className="m-0 list-none p-0">
-                {tasks.map((t) => (
-                  <li key={t.id} className="border-b border-line2 last:border-0">
-                    <button type="button" onClick={() => nav(`/tasks/${t.id}`)} aria-current={t.id === taskId ? 'true' : undefined} className={clsx('flex w-full items-center gap-3 px-4 py-3 text-left hover:bg-line2/60', t.id === taskId && 'bg-tint')}>
-                      <span className={clsx('flex size-5 flex-none items-center justify-center rounded-full border', t.status === 'done' ? 'border-good bg-good text-white' : t.status === 'dropped' ? 'border-ghostline text-faint' : 'border-ghostline')} aria-hidden>{t.status === 'done' && <Icon name="check" size={12} strokeWidth={3} />}{t.status === 'dropped' && <Icon name="x" size={11} />}</span>
-                      <span className="min-w-0 flex-1">
-                        <span className={clsx('block truncate text-[13.5px] font-semibold', t.status !== 'open' && 'text-muted line-through')}>{t.title}</span>
-                        <span className="block truncate text-[11.5px] text-faint">{t.project_id ? pname.get(t.project_id)?.name : 'No project'} · {hm(t.logged_minutes)} logged{t.estimate_minutes ? ` of ${hm(t.estimate_minutes)}` : ''}</span>
-                      </span>
-                      {t.priority !== null && <span className={clsx('rounded px-1.5 py-0.5 text-[10.5px] font-bold', t.priority === 0 ? 'bg-bad/15 text-bad' : 'bg-line2 text-muted')}>{PRIORITIES[t.priority]}</span>}
-                      <DueBadge t={t} />
-                    </button>
-                  </li>
-                ))}
+                {tasks.map((t) => {
+                  const proj = t.project_id ? pname.get(t.project_id) : undefined
+                  const pct = t.estimate_minutes ? Math.min(100, (t.logged_minutes / t.estimate_minutes) * 100) : null
+                  return (
+                    <li key={t.id} className={clsx('group flex items-center gap-3.5 border-b border-line2 px-5 py-3.5 last:border-0 hover:bg-line2/60', t.id === taskId && 'bg-tint')}>
+                      <button type="button" aria-label={t.status === 'done' ? `Reopen ${t.title}` : `Mark ${t.title} done`} onClick={() => toggle(t)}
+                        className={clsx('flex size-[22px] flex-none items-center justify-center rounded-full border-2 transition', t.status === 'done' ? 'border-good bg-good text-white' : t.status === 'dropped' ? 'border-ghostline text-faint' : 'border-ghostline text-transparent hover:border-good hover:text-good')}>
+                        {t.status === 'dropped' ? <Icon name="x" size={12} strokeWidth={2.4} /> : <Icon name="check" size={13} strokeWidth={3} />}
+                      </button>
+                      <button type="button" onClick={() => nav(`/tasks/${t.id}`)} aria-current={t.id === taskId ? 'true' : undefined} className="grid min-w-0 flex-1 grid-cols-[minmax(0,1fr)_auto] items-center gap-x-4 gap-y-1.5 text-left">
+                        <span className="min-w-0">
+                          <span className={clsx('block truncate text-sm font-semibold', t.status !== 'open' && 'text-muted line-through')}>{t.title}</span>
+                          <span className="mt-1 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-muted">
+                            <span className="inline-flex items-center gap-1.5"><i className="size-2 rounded-[3px]" style={{ background: proj?.color ?? 'var(--ghostline)' }} />{proj?.name ?? 'No project'}</span>
+                            <span className="num font-medium">{hm(t.logged_minutes)}{t.estimate_minutes ? ` of ${hm(t.estimate_minutes)}` : ''} logged</span>
+                          </span>
+                        </span>
+                        <span className="flex items-center gap-2">
+                          {t.priority !== null && <span className={clsx('rounded-md px-2 py-0.5 text-[11px] font-bold', t.priority === 0 ? 'bg-bad/15 text-bad' : 'bg-line2 text-muted')}>{PRIORITIES[t.priority]}</span>}
+                          <DueBadge t={t} />
+                        </span>
+                        {pct !== null && <span className="col-span-2 h-1.5 overflow-hidden rounded-full bg-line2" role="img" aria-label={`${Math.round(pct)}% of the estimate`}><i className="block h-full rounded-full" style={{ width: `${pct}%`, background: t.logged_minutes > (t.estimate_minutes ?? 0) ? 'var(--warn)' : 'var(--accent)' }} /></span>}
+                      </button>
+                    </li>
+                  )
+                })}
               </ul>
             )}
           </div>

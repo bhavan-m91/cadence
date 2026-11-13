@@ -1,9 +1,10 @@
 import clsx from 'clsx'
-import { useMemo, useState } from 'react'
+import { useMemo, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useBreakdown, useTrends } from '@/api/hooks/useAnalytics'
+import { usePreferences } from '@/api/hooks/useSettings'
 import type { Banner, DayTimeline, Overview, TrendMetric } from '@/api/types'
-import { ChartTable, Columns, DayClock, Heatmap, Legend, LineChart, MeterList, SegmentedBar, Treemap, type ClockArc, type HeatCell } from '@/components/charts/charts'
+import { ChartTable, Columns, DayClock, Heatmap, Legend, LineChart, MeterList, SegmentedBar, Treemap, type ClockArc, type ClockGap, type HeatCell } from '@/components/charts/charts'
 import { Segmented } from '@/components/layout/PageHeader'
 import { Button } from '@/components/ui/Button'
 import { ErrorState, Skeleton } from '@/components/ui/Feedback'
@@ -90,15 +91,25 @@ export function IdealCard({ o, scope, onOpen }: { o: Overview; scope: 'day' | 'w
   )
 }
 
+const clockLabel = (minute: number) => { const h = Math.floor(minute / 60) % 24, m = minute % 60; return `${h % 12 === 0 ? 12 : h % 12}${m ? `:${String(m).padStart(2, '0')}` : ''}${h < 12 ? 'am' : 'pm'}` }
+
 export function WorkPersonalCard({ o }: { o: Overview }) {
+  const { data: prefs } = usePreferences()
   const w = o.charts.work_vs_personal, cert = o.charts.certainty
+  const hours = prefs ? `${clockLabel(prefs.office_start_minute)} to ${clockLabel(prefs.office_end_minute)}, Monday to Friday` : 'your office hours'
+  const rows: [string, string, number][] = [
+    ['Work outside office hours', 'Work you logged in personal time: evenings, nights and weekends', w.work_outside_hours],
+    ['Personal during office hours', 'Personal time that fell inside your working day', w.personal_in_office_hours],
+    ['Work away from the office', 'Work with a location other than office, such as home or remote', w.work_outside_office],
+  ]
   return (
-    <Card title="Work vs personal" sub="Waking time only; sleep is not counted.">
+    <Card title="Work vs personal" sub={`Waking time only. Office hours are ${hours}.`}>
       <SegmentedBar parts={[{ key: 'work', label: 'Work', value: w.work, color: 'var(--sky)' }, { key: 'personal', label: 'Personal', value: w.personal, color: 'var(--teal)' }]} />
-      <dl className="m-0 mt-4 grid gap-2 border-t border-line2 pt-3 text-[12.5px]">
-        <div className="flex justify-between gap-3"><dt className="text-muted">Work outside the office</dt><dd className="num m-0 font-semibold">{hm(w.work_outside_office)}</dd></div>
-        <div className="flex justify-between gap-3"><dt className="text-muted">Personal during office hours</dt><dd className="num m-0 font-semibold">{hm(w.personal_in_office_hours)}</dd></div>
-        <div className="flex justify-between gap-3"><dt className="text-muted">Stated times</dt><dd className="num m-0 font-semibold">{hm(cert.recorded)}</dd></div>
+      <dl className="m-0 mt-4 grid gap-2.5 border-t border-line2 pt-3 text-[12.5px]">
+        {rows.map(([label, hint, v]) => (
+          <div key={label} className="flex items-start justify-between gap-3"><dt><span className="text-muted">{label}</span><span className="block text-[11px] text-faint">{hint}</span></dt><dd className={clsx('num m-0 font-semibold', v > 0 && label === 'Work outside office hours' && 'text-warn')}>{hm(v)}</dd></div>
+        ))}
+        <div className="flex justify-between gap-3 border-t border-line2 pt-2.5"><dt className="text-muted">Stated times</dt><dd className="num m-0 font-semibold">{hm(cert.recorded)}</dd></div>
         <div className="flex justify-between gap-3"><dt className="text-muted">Estimated times</dt><dd className="num m-0 font-semibold">{hm(cert.estimated)}</dd></div>
       </dl>
     </Card>
@@ -137,6 +148,7 @@ export function FocusCard({ o, dates }: { o: Overview; dates: string[] }) {
 const TREND: Record<TrendMetric, { label: string; pct: boolean }> = { adherence: { label: 'Adherence', pct: true }, coverage: { label: 'Coverage', pct: true }, focus: { label: 'Focus', pct: false }, sleep: { label: 'Sleep', pct: false } }
 
 export function TrendCard() {
+  const nav = useNavigate()
   const [metric, setMetric] = useState<TrendMetric>('adherence')
   const q = useTrends(metric, 'week', 8)
   const cfg = TREND[metric], fmt = cfg.pct ? (n: number) => `${Math.round(n * 100)}%` : hm
@@ -146,7 +158,8 @@ export function TrendCard() {
       <Segmented label="Trend metric" value={metric} onChange={setMetric} options={(Object.keys(TREND) as TrendMetric[]).map((m) => ({ value: m, label: TREND[m].label }))} />}>
       {q.error ? <ErrorState compact error={q.error} onRetry={() => q.refetch()} /> : !q.data ? <Skeleton className="h-52" /> : (
         <div className={clsx('transition-opacity', q.isPlaceholderData && 'opacity-60')}>
-          <LineChart name={`${cfg.label} by week`} points={pts} format={fmt} yMax={cfg.pct ? 1 : undefined} yTicks={cfg.pct ? [0, 0.5, 1] : undefined} />
+          <LineChart name={`${cfg.label} by week`} points={pts} format={fmt} yMax={cfg.pct ? 1 : undefined} yTicks={cfg.pct ? [0, 0.5, 1] : undefined} onPick={(i) => nav(`/overview?date=${q.data!.points[i].period_start}`)}
+            gap={(v, t) => (cfg.pct ? `${v - t >= 0 ? '+' : '−'}${Math.abs(Math.round((v - t) * 100))} pts` : `${v - t >= 0 ? '+' : '−'}${hm(Math.abs(Math.round(v - t)))}`)} />
           <ChartTable caption={`${cfg.label} by week`} head={['Week', cfg.label, 'Target']} rows={pts.map((p) => [p.x, p.value == null ? '–' : fmt(p.value), p.target == null ? '–' : fmt(p.target)])} />
         </div>
       )}
@@ -155,6 +168,7 @@ export function TrendCard() {
 }
 
 export function HeatmapCard({ weekStart }: { weekStart: number }) {
+  const nav = useNavigate()
   const q = useTrends('focus', 'day', 182)
   const { cells, weeks, max } = useMemo(() => {
     const pts = q.data?.points ?? []
@@ -174,7 +188,7 @@ export function HeatmapCard({ weekStart }: { weekStart: number }) {
   return (
     <Card title="Focus, last 26 weeks" sub="Each square is a day. Darker means more focus time.">
       {q.error ? <ErrorState compact error={q.error} onRetry={() => q.refetch()} /> : !q.data ? <Skeleton className="h-28" /> : (
-        <><Heatmap cells={cells} weeks={weeks} max={max} name="Focus minutes per day over 26 weeks" /><ChartTable caption="Focus minutes per week" head={['Week of', 'Focus']} rows={weekly.map(([d, v]) => [dayAndMonth(d), hm(v)])} /></>
+        <><Heatmap cells={cells} weeks={weeks} max={max} name="Focus minutes per day over 26 weeks" onPick={(d) => nav(`/overview?scope=day&date=${d}`)} /><ChartTable caption="Focus minutes per week" head={['Week of', 'Focus']} rows={weekly.map(([d, v]) => [dayAndMonth(d), hm(v)])} /></>
       )}
     </Card>
   )
@@ -183,12 +197,12 @@ export function HeatmapCard({ weekStart }: { weekStart: number }) {
 export function TreemapCard({ from, to }: { from: string; to: string }) {
   const nav = useNavigate()
   const q = useBreakdown(from, to, 'category')
-  const tiles = (q.data?.items ?? []).filter((i) => i.minutes > 0 && i.root_kind !== 'sleep').map((i) => ({ key: i.id, label: i.name, value: i.minutes, color: i.color, share: q.data!.waking_minutes ? i.minutes / q.data!.waking_minutes : 0 }))
+  const tiles = (q.data?.items ?? []).filter((i) => i.minutes > 0 && i.root_kind !== 'sleep').map((i) => ({ key: i.id, label: i.name, path: i.path_names ?? i.name, value: i.minutes, color: i.color, share: q.data!.waking_minutes ? i.minutes / q.data!.waking_minutes : 0 }))
   return (
     <Card title="Where the time went" sub="Area is time. Click a tile to see those activities on the Calendar.">
       {q.error ? <ErrorState compact error={q.error} onRetry={() => q.refetch()} /> : !q.data ? <Skeleton className="h-56" /> : tiles.length === 0 ? <p className="m-0 text-[13px] text-muted">Nothing logged in this period.</p> : (
         <div className={clsx('transition-opacity', q.isPlaceholderData && 'opacity-60')}>
-          <Treemap tiles={tiles} onOpen={(t) => nav(`/calendar?date=${from}&category=${t.key}`)} />
+          <Treemap tiles={tiles} onOpen={(t) => nav(`/calendar?date=${from}&view=week&category=${t.key}`)} />
           <ChartTable caption="Time by category" head={['Category', 'Time', 'Share of waking time']} rows={tiles.sort((a, b) => b.value - a.value).map((t) => [t.label, hm(t.value), pct(t.share)])} />
         </div>
       )}
@@ -250,31 +264,34 @@ export function DeadlinesCard({ o }: { o: Overview }) {
   )
 }
 
-/** Day scope: the ring, then the hour-by-hour log with a Fill button on every gap. */
+/** Day scope: the ring, then the hour-by-hour log with a Fill button on every gap. The ring and the log are linked both ways. */
 export function DayRhythm({ day, tz, fmt }: { day: DayTimeline; tz: string; fmt: TimeFormat }) {
   const nav = useNavigate()
+  const [hot, setHot] = useState<string | null>(null)
+  const log = useRef<HTMLOListElement>(null)
   const start = Date.parse(day.day_start_at), mins = (iso: string) => Math.round((Date.parse(iso) - start) / 60000)
-  const arcs: ClockArc[] = day.blocks.map((b) => ({ key: b.id + b.start_at, label: `${b.title} · ${hm(b.minutes)}`, startMin: mins(b.start_at), endMin: mins(b.end_at), color: b.category.color }))
-  const gaps = day.gaps.map((g) => ({ startMin: mins(g.start_at), endMin: mins(g.end_at) }))
-  const rows = [...day.blocks.map((b) => ({ t: Date.parse(b.start_at), kind: 'block' as const, b })), ...day.gaps.map((g) => ({ t: Date.parse(g.start_at), kind: 'gap' as const, g })), ...day.planned.map((b) => ({ t: Date.parse(b.start_at), kind: 'plan' as const, b }))].sort((a, b) => a.t - b.t)
+  const arcs: ClockArc[] = day.blocks.map((b) => ({ key: `b-${b.id}-${b.start_at}`, title: b.title, category: b.category.name, range: formatRange(b.start_at, b.end_at, tz, fmt), minutes: b.minutes, startMin: mins(b.start_at), endMin: mins(b.end_at), color: b.category.color }))
+  const gaps: ClockGap[] = day.gaps.map((g) => ({ key: `g-${g.start_at}`, range: formatRange(g.start_at, g.end_at, tz, fmt), minutes: g.minutes, startMin: mins(g.start_at), endMin: mins(g.end_at) }))
+  const rows = [...day.blocks.map((b) => ({ t: Date.parse(b.start_at), kind: 'block' as const, key: `b-${b.id}-${b.start_at}`, b })), ...day.gaps.map((g) => ({ t: Date.parse(g.start_at), kind: 'gap' as const, key: `g-${g.start_at}`, g })), ...day.planned.map((b) => ({ t: Date.parse(b.start_at), kind: 'plan' as const, key: `p-${b.id}-${b.start_at}`, b }))].sort((a, b) => a.t - b.t)
   const legend = Array.from(new Map(day.blocks.map((b) => [b.category.id, b.category])).values()).slice(0, 8).map((c) => ({ label: c.name, color: c.color }))
+  const pick = (key: string) => { const el = document.getElementById(`log-${key}`); el?.scrollIntoView({ behavior: 'smooth', block: 'center' }); setHot(key) }
   return (
     <div className="grid items-start gap-4 lg:grid-cols-[minmax(0,320px)_minmax(0,1fr)]">
-      <Card title="24 hours" sub="Midnight is at the top. Hatched is time nobody logged.">
-        <DayClock arcs={arcs} gaps={gaps} centre={hm(day.coverage.logged)} sub={`of ${hm(day.coverage.elapsed || 1440)}`} />
+      <Card title="24 hours" sub="Midnight is at the top. Hover an arc to see it; click to find it in the log.">
+        <DayClock arcs={arcs} gaps={gaps} active={hot} onActive={setHot} onPick={pick} centre={hm(day.coverage.logged)} sub={`of ${hm(day.coverage.elapsed || 1440)}`} />
         <div className="mt-3"><Legend items={[...legend, ...(day.gaps.length ? [{ label: 'Unlogged', color: 'var(--bad)', hatch: true }] : [])]} /></div>
       </Card>
       <Card title="Hour by hour">
-        <ol className="m-0 flex list-none flex-col p-0">
+        <ol ref={log} className="m-0 flex list-none flex-col p-0" onPointerLeave={() => setHot(null)}>
           {rows.length === 0 && <li className="py-2 text-[13px] text-muted">Nothing logged yet today.</li>}
           {rows.map((r) => r.kind === 'gap' ? (
-            <li key={`g${r.t}`} className="flex items-center gap-3 border-b border-line2 py-2 last:border-0">
+            <li key={r.key} id={`log-${r.key}`} onPointerEnter={() => setHot(r.key)} className={clsx('flex items-center gap-3 rounded-lg border-b border-line2 px-1 py-2 last:border-0', hot === r.key && 'bg-bad/[.06]')}>
               <span className="num w-[108px] flex-none text-[11.5px] text-muted">{formatRange(r.g.start_at, r.g.end_at, tz, fmt)}</span><i className="hatch-bad h-7 w-[3px] flex-none rounded" />
               <span className="min-w-0 flex-1 text-[12.5px] font-semibold text-bad">Not logged · {hm(r.g.minutes)}</span>
               <Button size="sm" onClick={() => nav(`/calendar?date=${day.date}&view=day&log=1`)}>Fill</Button>
             </li>
           ) : (
-            <li key={r.b.id + r.b.start_at} className="border-b border-line2 last:border-0"><button type="button" onClick={() => nav(`/activities/${r.b.id}`)} className="flex w-full items-center gap-3 py-2 text-left hover:bg-line2/60">
+            <li key={r.key} id={`log-${r.key}`} onPointerEnter={() => setHot(r.key)} className={clsx('rounded-lg border-b border-line2 last:border-0', hot === r.key && 'bg-tint')}><button type="button" onClick={() => nav(`/activities/${r.b.id}`)} onFocus={() => setHot(r.key)} className="flex w-full items-center gap-3 px-1 py-2 text-left">
               <span className="num w-[108px] flex-none text-[11.5px] text-muted">{formatRange(r.b.start_at, r.b.end_at, tz, fmt)}</span><i className="h-7 w-[3px] flex-none rounded" style={{ background: r.b.category.color }} />
               <span className={clsx('min-w-0 flex-1', r.kind === 'plan' && 'opacity-60')}><span className="block truncate text-[13px] font-semibold">{r.b.title}</span><span className="block truncate text-[11px] text-faint">{r.kind === 'plan' ? 'Planned · ' : ''}{r.b.category.name}</span></span>
               <span className="num text-xs font-semibold text-muted">{hm(r.b.minutes)}</span>
@@ -285,4 +302,3 @@ export function DayRhythm({ day, tz, fmt }: { day: DayTimeline; tz: string; fmt:
     </div>
   )
 }
-

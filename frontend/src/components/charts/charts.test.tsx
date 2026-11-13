@@ -1,7 +1,7 @@
 import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { describe, expect, it } from 'vitest'
-import { ChartTable, Columns, Heatmap, LineChart, MeterList, SegmentedBar } from './charts'
+import { ChartTable, Columns, DayClock, Heatmap, LineChart, MeterList, SegmentedBar } from './charts'
 
 describe('charts', () => {
   it('names every column with its value and marks the ones below target without relying on colour', () => {
@@ -44,5 +44,21 @@ describe('charts', () => {
     render(<ChartTable caption="Sleep by night" head={['Night', 'Slept']} rows={[['3 Jun', '8h']]} />)
     expect(screen.getByText('View as table')).toBeInTheDocument()
     expect(screen.getByRole('table', { name: 'Sleep by night', hidden: true })).toBeInTheDocument()
+  })
+
+  it('turns the 24h ring into the hovered entry: the centre swaps, and the same happens on keyboard focus', async () => {
+    let active: string | null = null
+    const arcs = [{ key: 'a', title: 'Acme agent architecture', category: 'Deep work', range: '9am – 12pm', minutes: 180, startMin: 540, endMin: 720, color: '#3e86d4' }]
+    const gaps = [{ key: 'g', range: '12pm – 1pm', minutes: 60, startMin: 720, endMin: 780 }]
+    const { rerender } = render(<DayClock arcs={arcs} gaps={gaps} centre="3h" sub="of 24h" active={active} onActive={(k) => { active = k }} />)
+    expect(screen.getByText('of 24h')).toBeInTheDocument()
+    await userEvent.tab()
+    expect(active).toBe('a')
+    rerender(<DayClock arcs={arcs} gaps={gaps} centre="3h" sub="of 24h" active="a" />)
+    expect(screen.getByText('Deep work')).toBeInTheDocument()
+    expect(screen.getByText(/Acme agent architecture · 9am – 12pm/)).toBeInTheDocument()
+    rerender(<DayClock arcs={arcs} gaps={gaps} centre="3h" sub="of 24h" active="g" />)
+    expect(screen.getByText('Unlogged')).toBeInTheDocument()
+    expect(screen.getByText('12pm – 1pm')).toBeInTheDocument()
   })
 })

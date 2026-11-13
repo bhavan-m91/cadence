@@ -58,13 +58,13 @@ const STATUS = { on_target: ['On track', 'bg-good/15 text-good'], under: ['Behin
 export function MeterList({ items, onOpen }: { items: MeterItem[]; onOpen?: (key: string) => void }) {
   const max = Math.max(1, ...items.map((i) => Math.max(i.actual, i.target)))
   return (
-    <ul className="m-0 flex list-none flex-col gap-2.5 p-0">
+    <ul className="group/meters m-0 flex list-none flex-col gap-2.5 p-0">
       {items.map((i) => {
         const mark = i.expected ?? i.target
         const label = `${i.label}: ${hm(i.actual)} of ${hm(i.target)}${i.expected !== undefined ? `, expected ${hm(i.expected)} by now` : ''}`
         const st = i.status ? STATUS[i.status] : null
         return (
-          <li key={i.key}>
+          <li key={i.key} className="transition-opacity group-hover/meters:opacity-35 hover:!opacity-100 focus-within:!opacity-100">
             <Tooltip content={<><b>{i.label}</b><br />Actual {hm(i.actual)}<br />Ideal {hm(i.target)}{i.expected !== undefined && <><br />By now {hm(i.expected)}</>}<br />{i.actual - mark >= 0 ? '+' : '−'}{hm(Math.abs(i.actual - mark))}</>}>
               <button type="button" disabled={!onOpen} onClick={() => onOpen?.(i.key)} aria-label={label} className="grid w-full grid-cols-[minmax(0,136px)_minmax(0,1fr)_auto] items-center gap-x-3 gap-y-1 rounded-lg py-0.5 text-left enabled:hover:bg-line2/60 max-sm:grid-cols-[minmax(0,1fr)_auto]">
                 <span className="flex min-w-0 items-center gap-2 text-[12.5px] font-medium"><i className="size-2.5 flex-none rounded-[3px]" style={{ background: i.color }} /><span className="truncate">{i.label}</span></span>
@@ -90,7 +90,7 @@ export function Columns({ items, target, targetLabel, max, height = 150, format 
 }) {
   const top = Math.max(1, max ?? 0, target ?? 0, ...items.map((i) => i.value)) * 1.08
   return (
-    <div className="relative" style={{ paddingTop: 18 }}>
+    <div className="group/cols relative" style={{ paddingTop: 18 }}>
       <div className="relative flex items-end gap-1.5 sm:gap-3" style={{ height }}>
         <i aria-hidden className="absolute inset-x-0 bottom-0 h-px bg-line" />
         {target ? (
@@ -102,7 +102,7 @@ export function Columns({ items, target, targetLabel, max, height = 150, format 
           const label = `${i.label}${i.sub ? ` ${i.sub}` : ''}: ${format(i.value)}${i.flag ? ', below target' : ''}`
           return (
             <Tooltip key={i.key} content={<><b>{i.label}{i.sub ? ` ${i.sub}` : ''}</b><br />{format(i.value)}{target ? <><br />Target {format(target)}</> : null}{i.flag && <><br />Below target</>}</>}>
-              <button type="button" aria-label={label} onClick={() => onOpen?.(i.key)} disabled={!onOpen} className="group relative flex h-full flex-1 flex-col items-center justify-end">
+              <button type="button" aria-label={label} onClick={() => onOpen?.(i.key)} disabled={!onOpen} className="group relative flex h-full flex-1 flex-col items-center justify-end rounded-lg transition hover:bg-line2/70 focus-visible:bg-line2/70 group-hover/cols:opacity-35 group-focus-within/cols:opacity-35 hover:!opacity-100 focus-visible:!opacity-100">
                 {valueLabels && i.value > 0 && <span className="num mb-1 text-[10.5px] font-semibold text-muted">{format(i.value)}</span>}
                 <i className={clsx('block w-full max-w-6 rounded-t-[4px] transition group-hover:brightness-110', i.muted && 'opacity-40')} style={{ height: `${Math.max(i.value > 0 ? 2 : 0, (i.value / top) * (height - 22))}px`, background: i.color }} />
               </button>
@@ -125,7 +125,7 @@ export function Columns({ items, target, targetLabel, max, height = 150, format 
 export interface LinePoint { x: string; label: string; value: number | null; target?: number | null }
 
 /** A 2px line with >=8px markers ringed in the surface colour, a crosshair that snaps to the nearest X, and the same readout on keyboard focus. */
-export function LineChart({ points, format, yMax, yTicks, height = 190, name }: { points: LinePoint[]; format: (n: number) => string; yMax?: number; yTicks?: number[]; height?: number; name: string }) {
+export function LineChart({ points, format, yMax, yTicks, height = 190, name, onPick, gap }: { points: LinePoint[]; format: (n: number) => string; yMax?: number; yTicks?: number[]; height?: number; name: string; onPick?: (i: number) => void; gap?: (value: number, target: number) => string }) {
   const [active, setActive] = useState<number | null>(null)
   const box = useRef<HTMLDivElement>(null)
   const [W, setW] = useState(640) // measured, so text and markers keep their real pixel size on a phone and on a wide screen
@@ -169,13 +169,13 @@ export function LineChart({ points, format, yMax, yTicks, height = 190, name }: 
         {points.map((p, i) => p.value != null && (
           <g key={p.x}>
             <circle cx={px(i)} cy={py(p.value)} r={active === i ? 5.5 : 4} fill="var(--accent)" stroke="var(--card)" strokeWidth="2" />
-            <circle cx={px(i)} cy={py(p.value)} r="16" fill="transparent" tabIndex={0} role="img" aria-label={`${p.label}: ${format(p.value)}`} onPointerEnter={() => setActive(i)} onFocus={() => setActive(i)} onBlur={() => setActive(null)} className="outline-none focus-visible:stroke-accent" />
+            <circle cx={px(i)} cy={py(p.value)} r="16" fill="transparent" tabIndex={0} role="img" aria-label={`${p.label}: ${format(p.value)}`} onPointerEnter={() => setActive(i)} onFocus={() => setActive(i)} onBlur={() => setActive(null)} onClick={() => onPick?.(i)} className={clsx('outline-none focus-visible:stroke-accent', onPick && 'cursor-pointer')} />
           </g>
         ))}
       </svg>
       {a && a.value != null && (
         <div role="status" className="pointer-events-none absolute z-10 -translate-x-1/2 -translate-y-full rounded-lg bg-[var(--tipbg)] px-3 py-2 text-xs text-[var(--tipink)] shadow-lg" style={{ left: px(active!), top: py(a.value), marginTop: -10 }}>
-          <b className="num block text-sm font-semibold">{format(a.value)}</b><span className="opacity-80">{a.label}</span>{a.target != null && <span className="mt-0.5 block opacity-80">Target {format(a.target)}</span>}
+          <b className="num block text-sm font-semibold">{format(a.value)}</b><span className="opacity-80">{a.label}</span>{a.target != null && <span className="mt-0.5 block opacity-80">Target {format(a.target)}{gap && a.value != null ? ` · ${gap(a.value, a.target)}` : ''}</span>}
         </div>
       )}
     </div>
@@ -185,7 +185,7 @@ export function LineChart({ points, format, yMax, yTicks, height = 190, name }: 
 export interface HeatCell { date: string; value: number; label: string }
 
 /** Weeks as columns, Monday to Sunday as rows. One hue, light to dark; cells are the hit targets (one shared tooltip). */
-export function Heatmap({ cells, weeks, max, name }: { cells: (HeatCell | null)[]; weeks: number; max: number; name: string }) {
+export function Heatmap({ cells, weeks, max, name, onPick }: { cells: (HeatCell | null)[]; weeks: number; max: number; name: string; onPick?: (date: string) => void }) {
   const [hover, setHover] = useState<{ c: HeatCell; x: number; y: number } | null>(null)
   const level = (v: number) => (v <= 0 ? 0 : v / max > 0.75 ? 4 : v / max > 0.5 ? 3 : v / max > 0.25 ? 2 : 1)
   const colors = ['var(--h0)', 'var(--h1)', 'var(--h2)', 'var(--h3)', 'var(--h4)']
@@ -199,10 +199,10 @@ export function Heatmap({ cells, weeks, max, name }: { cells: (HeatCell | null)[
           <div className="grid gap-[3px]" role="img" aria-label={name} style={{ gridTemplateColumns: `repeat(${weeks}, minmax(0, 1fr))`, gridTemplateRows: 'repeat(7, auto)', gridAutoFlow: 'column' }}>
             {cells.map((c, i) => c ? (
               <i key={c.date} onPointerEnter={(e) => setHover({ c, x: e.currentTarget.offsetLeft + e.currentTarget.offsetWidth / 2, y: e.currentTarget.offsetTop })}
-                className="block aspect-square rounded-[3px] transition hover:ring-2 hover:ring-ink/40" style={{ background: colors[level(c.value)] }} />
+                onClick={() => onPick?.(c.date)} className={clsx('block aspect-square rounded-[3px] transition hover:ring-2 hover:ring-ink', onPick && 'cursor-pointer')} style={{ background: colors[level(c.value)] }} />
             ) : <i key={`e${i}`} className="block aspect-square" />)}
           </div>
-          {hover && <div className="pointer-events-none absolute z-10 -translate-x-1/2 -translate-y-full whitespace-nowrap rounded-lg bg-[var(--tipbg)] px-2.5 py-1.5 text-xs text-[var(--tipink)] shadow-lg" style={{ left: hover.x, top: hover.y - 6 }}><b className="num">{hover.c.label}</b><br /><span className="opacity-80">{hover.c.date}</span></div>}
+          {hover && <div className="pointer-events-none absolute z-10 -translate-x-1/2 -translate-y-full whitespace-nowrap rounded-lg bg-[var(--tipbg)] px-2.5 py-1.5 text-xs text-[var(--tipink)] shadow-lg" style={{ left: hover.x, top: hover.y - 6 }}><b className="num">{hover.c.label}</b><br /><span className="opacity-80">{hover.c.date}</span>{onPick && <><br /><span className="opacity-70">Click to open that day</span></>}</div>}
         </div>
       </div>
       <div className="mt-2.5 flex items-center justify-end gap-1.5 text-[10.5px] text-faint" aria-hidden>Less{colors.map((c) => <i key={c} className="size-3 rounded-[3px]" style={{ background: c }} />)}More</div>
@@ -210,7 +210,7 @@ export function Heatmap({ cells, weeks, max, name }: { cells: (HeatCell | null)[
   )
 }
 
-export interface TreeTile { key: string; label: string; value: number; color: string; share: number; to?: string }
+export interface TreeTile { key: string; label: string; path?: string; value: number; color: string; share: number; to?: string }
 
 /** Where the time went: area is minutes. Tiles keep a 2px surface gap; a label only appears where it fits. */
 export function Treemap({ tiles, onOpen, aspect = 2.4 }: { tiles: TreeTile[]; onOpen?: (t: TreeTile) => void; aspect?: number }) {
@@ -222,10 +222,10 @@ export function Treemap({ tiles, onOpen, aspect = 2.4 }: { tiles: TreeTile[]; on
         const t = byKey.get(r.key)!
         const roomy = r.w > 0.16 && r.h > 0.26, mid = r.w > 0.09 && r.h > 0.16
         return (
-          <Tooltip key={r.key} content={<><b>{t.label}</b><br />{hm(t.value)} · {Math.round(t.share * 100)}% of waking time</>}>
+          <Tooltip key={r.key} content={<><b>{t.path ?? t.label}</b><br />Hours {hm(t.value)}<br />Share of waking time {Math.round(t.share * 100)}%</>}>
             <button type="button" aria-label={`${t.label}: ${hm(t.value)}`} onClick={() => onOpen?.(t)} disabled={!onOpen}
               className="group absolute p-[1px] text-left" style={{ left: `${r.x * 100}%`, top: `${r.y * 100}%`, width: `${r.w * 100}%`, height: `${r.h * 100}%` }}>
-              <span className="flex h-full w-full flex-col justify-between overflow-hidden rounded-md p-1.5 text-white transition group-hover:brightness-110" style={{ background: t.color }}>
+              <span className="flex h-full w-full flex-col justify-between overflow-hidden rounded-md p-1.5 text-white ring-ink transition group-hover:ring-2 group-focus-visible:ring-2" style={{ background: t.color }}>
                 {mid && <span className="truncate text-[11.5px] font-semibold leading-tight [text-shadow:0_1px_1px_rgb(0_0_0/.25)]">{t.label}</span>}
                 {roomy && <span className="num text-[11px] font-medium opacity-90">{hm(t.value)}</span>}
               </span>
@@ -237,25 +237,50 @@ export function Treemap({ tiles, onOpen, aspect = 2.4 }: { tiles: TreeTile[]; on
   )
 }
 
-export interface ClockArc { key: string; label: string; startMin: number; endMin: number; color: string }
+export interface ClockArc { key: string; title: string; category: string; range: string; minutes: number; startMin: number; endMin: number; color: string }
+export interface ClockGap { key: string; range: string; minutes: number; startMin: number; endMin: number }
 
-/** 24 hours as a ring: angle is time of day (midnight at the top). Logged time takes its category colour, unlogged time is hatched. */
-export function DayClock({ arcs, gaps, centre, sub, size = 250 }: { arcs: ClockArc[]; gaps: { startMin: number; endMin: number }[]; centre: string; sub: string; size?: number }) {
-  const SW = 22, c = size / 2, R = c - SW / 2 - 26 // leave room outside the ring for the hour labels
+/** 24 hours as a ring: angle is time of day (midnight at the top). Hover or focus an arc and it widens, the rest fade, and the centre becomes
+ *  that entry, so no tooltip covers the ring (Hover & Tooltip Spec, pattern 7). Click scrolls the log to it. */
+export function DayClock({ arcs, gaps, centre, sub, active, onActive, onPick, size = 250 }: {
+  arcs: ClockArc[]; gaps: ClockGap[]; centre: string; sub: string; active?: string | null; onActive?: (key: string | null) => void; onPick?: (key: string) => void; size?: number
+}) {
+  const SW = 22, WIDE = 30, c = size / 2, R = c - WIDE / 2 - 26 // leave room outside the ring for the hour labels
   const pt = (min: number, r = R) => { const a = (min / 1440) * 2 * Math.PI - Math.PI / 2; return [c + r * Math.cos(a), c + r * Math.sin(a)] as const }
-  const arc = (s: number, e: number) => {
-    const [x1, y1] = pt(s), [x2, y2] = pt(Math.max(s + 0.5, e))
-    return `M${x1.toFixed(2)},${y1.toFixed(2)} A${R},${R} 0 ${e - s > 720 ? 1 : 0} 1 ${x2.toFixed(2)},${y2.toFixed(2)}`
+  const arc = (s0: number, e: number) => {
+    const [x1, y1] = pt(s0), [x2, y2] = pt(Math.max(s0 + 0.5, e))
+    return `M${x1.toFixed(2)},${y1.toFixed(2)} A${R},${R} 0 ${e - s0 > 720 ? 1 : 0} 1 ${x2.toFixed(2)},${y2.toFixed(2)}`
   }
+  const hot = arcs.find((a) => a.key === active), hotGap = gaps.find((g) => g.key === active)
+  const dim = active ? 0.3 : 1
+  const hit = (key: string, label: string, d: string, extra: string) => (
+    <path key={`h${key}`} d={d} fill="none" stroke="transparent" strokeWidth={WIDE + 14} tabIndex={0} role="button" aria-label={label} className={clsx('cursor-pointer outline-none', extra)}
+      onPointerEnter={() => onActive?.(key)} onPointerLeave={() => onActive?.(null)} onFocus={() => onActive?.(key)} onBlur={() => onActive?.(null)} onClick={() => onPick?.(key)}
+      onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); onPick?.(key) } }} />
+  )
   return (
-    <svg viewBox={`0 0 ${size} ${size}`} className="mx-auto block w-full max-w-[260px]" role="img" aria-label={`${centre} logged ${sub}`}>
+    <svg viewBox={`0 0 ${size} ${size}`} className="mx-auto block w-full max-w-[280px]" role="group" aria-label={`24 hours: ${centre} logged ${sub}`}>
       <defs><pattern id="clock-hatch" width="6" height="6" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><rect width="6" height="6" fill="var(--line2)" /><rect width="2.5" height="6" fill="color-mix(in srgb, var(--bad) 40%, transparent)" /></pattern></defs>
       <circle cx={c} cy={c} r={R} fill="none" stroke="var(--line2)" strokeWidth={SW} />
-      {gaps.map((g) => <path key={`g${g.startMin}`} d={arc(g.startMin, g.endMin)} fill="none" stroke="url(#clock-hatch)" strokeWidth={SW} />)}
-      {arcs.map((a) => <path key={a.key} d={arc(a.startMin + 0.4, a.endMin - 0.4)} fill="none" stroke={a.color} strokeWidth={SW}><title>{a.label}</title></path>)}
-      {[0, 6, 12, 18].map((h) => { const [x, y] = pt(h * 60, R + SW / 2 + 12); return <text key={h} x={x} y={y + 3.5} textAnchor="middle" fontSize="10" fill="var(--faint)">{h === 0 ? '12a' : h === 12 ? '12p' : h > 12 ? `${h - 12}p` : `${h}a`}</text> })}
-      <text x={c} y={c - 2} textAnchor="middle" fontSize="26" fontWeight="600" className="num" fill="var(--ink)">{centre}</text>
-      <text x={c} y={c + 18} textAnchor="middle" fontSize="11" fill="var(--muted)">{sub}</text>
+      {gaps.map((g) => <path key={g.key} d={arc(g.startMin, g.endMin)} fill="none" stroke="url(#clock-hatch)" strokeWidth={active === g.key ? WIDE : SW} opacity={active && active !== g.key ? dim : 1} className="transition-all duration-150" />)}
+      {arcs.map((a) => <path key={a.key} d={arc(a.startMin + 0.4, a.endMin - 0.4)} fill="none" stroke={a.color} strokeWidth={active === a.key ? WIDE : SW} opacity={active && active !== a.key ? dim : 1} className="transition-all duration-150" />)}
+      {[0, 6, 12, 18].map((h) => { const [x, y] = pt(h * 60, R + WIDE / 2 + 12); return <text key={h} x={x} y={y + 3.5} textAnchor="middle" fontSize="10" fill="var(--faint)">{h === 0 ? '12a' : h === 12 ? '12p' : h > 12 ? `${h - 12}p` : `${h}a`}</text> })}
+      {arcs.map((a) => hit(a.key, `${a.title}, ${a.range}, ${hm(a.minutes)}`, arc(a.startMin, a.endMin), 'focus-visible:[stroke:var(--accent)] focus-visible:[stroke-opacity:.25]'))}
+      {gaps.map((g) => hit(g.key, `Not logged, ${g.range}, ${hm(g.minutes)}`, arc(g.startMin, g.endMin), 'focus-visible:[stroke:var(--bad)] focus-visible:[stroke-opacity:.2]'))}
+      <g aria-live="polite" pointerEvents="none">
+        {hot ? <>
+          <text x={c} y={c - 20} textAnchor="middle" fontSize="11" fontWeight="600" fill="var(--muted)">{hot.category}</text>
+          <text x={c} y={c + 6} textAnchor="middle" fontSize="26" fontWeight="600" className="num" fill="var(--ink)">{hm(hot.minutes)}</text>
+          <foreignObject x={c - 62} y={c + 14} width="124" height="40"><div className="line-clamp-2 text-center text-[10.5px] leading-tight text-muted">{hot.title} · {hot.range}</div></foreignObject>
+        </> : hotGap ? <>
+          <text x={c} y={c - 20} textAnchor="middle" fontSize="11" fontWeight="600" fill="var(--bad)">Unlogged</text>
+          <text x={c} y={c + 6} textAnchor="middle" fontSize="26" fontWeight="600" className="num" fill="var(--bad)">{hm(hotGap.minutes)}</text>
+          <text x={c} y={c + 26} textAnchor="middle" fontSize="10.5" fill="var(--muted)">{hotGap.range}</text>
+        </> : <>
+          <text x={c} y={c - 2} textAnchor="middle" fontSize="26" fontWeight="600" className="num" fill="var(--ink)">{centre}</text>
+          <text x={c} y={c + 18} textAnchor="middle" fontSize="11" fill="var(--muted)">{sub}</text>
+        </>}
+      </g>
     </svg>
   )
 }

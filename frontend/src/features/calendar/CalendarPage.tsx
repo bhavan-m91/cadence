@@ -49,7 +49,7 @@ export function CalendarPage() {
   const today = todayIn(tz)
 
   const date = sp.get('date') ?? today
-  const view = mobile || sp.get('view') === 'day' ? 'day' : 'week'
+  const view = mobile || sp.get('view') !== 'week' ? 'day' : 'week' // the day is the default everywhere
   const ideal = sp.get('ideal') !== '0'
   const tagFilter = sp.get('tag') ?? ''
   const categoryFilter = sp.get('category') ?? ''
@@ -157,7 +157,7 @@ export function CalendarPage() {
   return (
     <>
       <PageHeader title="Calendar" subtitle={view === 'week' ? `${monthYear(dates[0])} · ${rangeLabel(dates[0], dates[6])}` : `${weekdayShort(date)} ${rangeLabel(date, date)} ${monthYear(date).split(' ').pop()}`}>
-        {!mobile && <Segmented label="View" value={view} onChange={(v) => setParam('view', v === 'day' ? 'day' : null)} options={[{ value: 'week', label: 'Week' }, { value: 'day', label: 'Day' }]} />}
+        {!mobile && <Segmented label="View" value={view} onChange={(v) => setParam('view', v === 'week' ? 'week' : null)} options={[{ value: 'day', label: 'Day' }, { value: 'week', label: 'Week' }]} />}
         <div className="flex items-center gap-1.5">
           <IconButton icon="chevronLeft" label={view === 'week' ? 'Previous week' : 'Previous day'} onClick={() => setParam('date', addDays(date, -step))} />
           <Button onClick={() => setParam('date', null)} disabled={dates.includes(today)}>Today</Button>

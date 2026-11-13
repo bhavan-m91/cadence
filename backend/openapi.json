@@ -8064,6 +8064,10 @@
             "title": "Work",
             "type": "integer"
           },
+          "work_outside_hours": {
+            "title": "Work Outside Hours",
+            "type": "integer"
+          },
           "work_outside_office": {
             "title": "Work Outside Office",
             "type": "integer"
@@ -8073,6 +8077,7 @@
           "work",
           "personal",
           "work_outside_office",
+          "work_outside_hours",
           "personal_in_office_hours"
         ],
         "title": "WorkPersonal",

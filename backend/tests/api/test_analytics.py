@@ -256,3 +256,26 @@ async def test_ac068_trends_over_26_weeks_and_7000_activities_stay_under_400ms_p
             assert r.status_code == 200
     times.sort()
     assert times[int(len(times) * 0.95) - 1] < 0.4, f"p95 {times[int(len(times) * 0.95) - 1]:.3f}s over {len(times)} calls"
+
+
+async def test_work_done_outside_office_hours_is_counted_by_time_of_day_not_only_by_place(client):
+    p = await signup(client)  # default office hours: 9:00-18:00, weekdays
+    await log(client, p, "Late build", MON, "00:00", "02:00")  # 12am-2am, the case that looked unmarked
+    await log(client, p, "Day build", MON, "10:00", "12:00")
+    await log(client, p, "Straddles the end", MON, "17:00", "19:00")  # one hour inside, one outside
+    await log(client, p, "Weekend work", "2025-06-07", "10:00", "11:00")  # a Saturday has no office hours
+    mon = (await day(client, p))["work_vs_personal"]
+    assert mon["work"] == 120 + 120 + 120 and mon["work_outside_hours"] == 120 + 0 + 60
+    sat = (await day(client, p, "2025-06-07"))["work_vs_personal"]
+    assert sat["work"] == 60 and sat["work_outside_hours"] == 60
+    week = (await get(client, p, f"/analytics/week/{MON}")).json()["data"]["work_vs_personal"]
+    assert week["work_outside_hours"] == 240 and week["work_outside_office"] == 0  # no location was set, so the place-based figure stays 0
+
+
+async def test_personal_time_inside_office_hours_follows_the_setting(client):
+    p = await signup(client)
+    await log(client, p, "Gym at lunch", MON, "12:00", "13:00", category="Health")
+    assert (await day(client, p))["work_vs_personal"]["personal_in_office_hours"] == 60
+    r = await client.patch(f"{API}/users/me/preferences", headers=p.headers, json={"office_start_minute": 840, "office_end_minute": 1140})  # 2pm-7pm
+    assert r.status_code == 200, r.text
+    assert (await day(client, p))["work_vs_personal"]["personal_in_office_hours"] == 0

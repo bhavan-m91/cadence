@@ -78,6 +78,7 @@ class Agg:
     work: int = 0
     personal: int = 0
     work_outside: int = 0
+    work_outside_hours: int = 0
     personal_office: int = 0
 
 
@@ -163,17 +164,26 @@ class AnalyticsService:
                 continue
             if c.counts_as_focus:
                 a.focus[r.local_date] += m
+            in_office = self._office_overlap(r, prefs.office_start_minute, prefs.office_end_minute) if r.is_placed and r.start_at and r.end_at else None
             if c.root_kind == RootKind.work:
                 a.work += m
                 if r.location and r.location != "office":
                     a.work_outside += m
+                if in_office is not None:  # time of day, not place: work at 12am-2am happened in personal time
+                    a.work_outside_hours += m - in_office
             elif c.root_kind == RootKind.personal:
                 a.personal += m
-                if r.is_placed and r.start_at and r.end_at and r.local_date.isoweekday() <= 5:
-                    d0 = day_bounds(r.local_date, self.tz)[0]
-                    lo, hi = d0 + timedelta(minutes=prefs.office_start_minute), d0 + timedelta(minutes=prefs.office_end_minute)
-                    a.personal_office += max(0, int((min(r.end_at, hi) - max(r.start_at, lo)).total_seconds() // 60))
+                if in_office:
+                    a.personal_office += in_office
         return a
+
+    def _office_overlap(self, r: SliceRow, start_min: int, end_min: int) -> int:
+        """Minutes of this slice inside office hours. Office hours apply on weekdays only: a Saturday has none."""
+        if r.local_date.isoweekday() > 5 or r.start_at is None or r.end_at is None:
+            return 0
+        d0 = day_bounds(r.local_date, self.tz)[0]
+        lo, hi = d0 + timedelta(minutes=start_min), d0 + timedelta(minutes=end_min)
+        return max(0, int((min(r.end_at, hi) - max(r.start_at, lo)).total_seconds() // 60))
 
     def _coverage(self, dates: list[date], a: Agg, tolerance: int) -> tuple[CoverageOut, list[DayColumn]]:
         cols: list[DayColumn] = []
@@ -287,7 +297,7 @@ class AnalyticsService:
         focus = FocusBlock(days=[FocusDay(date=d, minutes=a.focus.get(d, 0)) for d in dates], minutes=sum(a.focus.get(d, 0) for d in dates), target=focus_alloc)
 
         p = Period(scope, dates, coverage, CertaintyOut(recorded=a.recorded, estimated=a.estimated), by_category, by_tag, by_task, by_project,
-                   WorkPersonal(work=a.work, personal=a.personal, work_outside_office=a.work_outside, personal_in_office_hours=a.personal_office),
+                   WorkPersonal(work=a.work, personal=a.personal, work_outside_office=a.work_outside, work_outside_hours=a.work_outside_hours, personal_in_office_hours=a.personal_office),
                    cols, sleep_block, focus, ideal, ideal is None)
         if with_prev:
             n = len(dates)

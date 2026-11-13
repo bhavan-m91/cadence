@@ -1,5 +1,5 @@
 import clsx from 'clsx'
-import { forwardRef, useId, type InputHTMLAttributes, type ReactNode, type SelectHTMLAttributes, type TextareaHTMLAttributes } from 'react'
+import { forwardRef, useId, type InputHTMLAttributes, type ReactNode, type TextareaHTMLAttributes } from 'react'
 
 interface FieldProps {
   label: ReactNode
@@ -35,9 +35,7 @@ export const Input = forwardRef<HTMLInputElement, InputHTMLAttributes<HTMLInputE
   return <input ref={ref} aria-invalid={invalid || undefined} className={clsx(control, dense ? 'h-9' : 'h-11', invalid && 'border-bad', className)} {...rest} />
 })
 
-export const Select = forwardRef<HTMLSelectElement, SelectHTMLAttributes<HTMLSelectElement> & { dense?: boolean }>(function Select({ className, dense, children, ...rest }, ref) {
-  return <select ref={ref} className={clsx(control, dense ? 'h-9' : 'h-11', 'pr-8', className)} {...rest}>{children}</select>
-})
+export { Select } from './Select'
 
 export const Textarea = forwardRef<HTMLTextAreaElement, TextareaHTMLAttributes<HTMLTextAreaElement>>(function Textarea({ className, ...rest }, ref) {
   return <textarea ref={ref} className={clsx(control, 'min-h-[84px] py-2.5 leading-relaxed', className)} {...rest} />
