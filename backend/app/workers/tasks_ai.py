@@ -87,14 +87,16 @@ async def run_job(session: AsyncSession, job_id: uuid.UUID, provider=None) -> No
     try:
         inp = await build_input(session, user, entry, job)
         result = await run_extraction(inp, provider or get_llm_provider(), max_tokens=s.llm_max_tokens, timeout_s=s.llm_timeout_seconds)
-    except ProviderTransientError:
+    except ProviderTransientError as e:
+        log.warning("extraction_provider_transient", job_id=str(job.id), attempt=job.attempts, reason=str(e))  # provider text only, never the journal
         if job.attempts < MAX_ATTEMPTS:
             job.status, job.queued_at = AiJobStatus.queued, datetime.now(UTC) + timedelta(seconds=RETRY_DELAYS[min(job.attempts, 3) - 1])
             await session.commit()
         else:
             await _fail(session, job, entry, "PROVIDER_UNAVAILABLE")
         return
-    except ProviderPermanentError:
+    except ProviderPermanentError as e:
+        log.error("extraction_provider_rejected", job_id=str(job.id), reason=str(e))  # e.g. "HTTP 400: tool_choice ... not supported": what to fix on the server
         await _fail(session, job, entry, "PROVIDER_ERROR")
         return
     except (ExtractionFailed, ProviderOutputError) as e:

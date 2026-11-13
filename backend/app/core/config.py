@@ -37,7 +37,7 @@ class Settings(BaseSettings):
     llm_provider: str = "auto"  # auto | anthropic | fake
     llm_model_extract: str = "claude-sonnet-5-5"
     llm_timeout_seconds: int = 45
-    llm_max_tokens: int = 4096
+    llm_max_tokens: int = 8192  # thinking tokens count against this too
     llm_enabled: bool = True  # kill switch (PRD Phase 5)
     # Speech-to-text fallback (FR-016): used where the browser has no working Web Speech API (Firefox, Brave, app shells)
     openai_api_key: str = ""

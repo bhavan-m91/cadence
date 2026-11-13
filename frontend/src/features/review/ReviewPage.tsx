@@ -24,8 +24,11 @@ import { DraftCard, DraftEditDialog, GapRow, initialEdit, type DraftEdit, type D
 type Edits = NonNullable<NonNullable<CommitBody['activities']>[number]['edits']>
 
 const JOB_FAIL: Record<string, string> = {
-  LLM_TIMEOUT: 'The AI took too long to answer.', LLM_UNAVAILABLE: 'The AI service could not be reached.', LLM_INVALID_OUTPUT: 'The AI returned something Cadence could not read.',
-  TIMED_OUT: 'Reading took too long and was stopped.', LLM_AUTH: 'The server’s AI key was rejected.', LLM_RATE_LIMITED: 'The AI service is busy right now.',
+  PROVIDER_ERROR: 'The AI service refused the request. That is a server setup problem (the model or key), not your text.',
+  PROVIDER_UNAVAILABLE: 'The AI service is busy or unreachable right now.',
+  INVALID_MODEL_OUTPUT: 'The AI answered in a form Cadence could not read.',
+  TIMED_OUT: 'Reading took too long and was stopped.',
+  INTERNAL: 'Something broke on the server while reading it.',
 }
 
 function findCategory(nodes: CategoryNode[] | undefined, id: string): CategoryNode | undefined {

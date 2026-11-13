@@ -216,3 +216,27 @@ async def test_the_offline_provider_produces_a_usable_extraction_from_the_prd_te
     meet = next(x for x in res.drafts if "meeting" in x.title.lower())
     assert meet.placement == "unplaced" and meet.duration == 45                         # "In the afternoon ... 45 minutes"
     assert all(x.source_quote and x.source_quote in TEXT for x in res.drafts)           # verbatim quotes
+
+
+async def test_the_anthropic_adapter_never_forces_a_tool_and_retries_once_when_the_model_answers_in_text(monkeypatch):
+    """Current models answer 400 to a forced tool_choice; the adapter steers with `auto` plus an instruction and retries a text-only reply once."""
+    from types import SimpleNamespace as NS
+
+    from app.ai.providers.anthropic_provider import AnthropicProvider
+    from app.ai.providers.base import StructuredRequest
+
+    calls = []
+    text_only = NS(content=[NS(type="text", text="Here you go")], stop_reason="end_turn")
+    with_tool = NS(content=[NS(type="tool_use", name="record_activities", input={"schema_version": "1", "activities": []})], stop_reason="tool_use",
+                   usage=NS(input_tokens=10, output_tokens=5), model="m", model_dump=lambda mode="json": {})
+    replies = [text_only, with_tool]
+
+    async def create(**kw):
+        calls.append(kw)
+        return replies.pop(0)
+
+    p = AnthropicProvider("k", "claude-sonnet-5-5")
+    monkeypatch.setattr(p._client.messages, "create", create)
+    out = await p.generate_structured(StructuredRequest(system="sys", user="u", json_schema={"type": "object"}))
+    assert out.data["schema_version"] == "1" and len(calls) == 2
+    assert all(c["tool_choice"] == {"type": "auto"} and "record_activities" in c["system"] for c in calls)
