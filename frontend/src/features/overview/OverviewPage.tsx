@@ -1,7 +1,9 @@
 import { useNavigate, useSearchParams } from 'react-router-dom'
 import { useOverview } from '@/api/hooks/useAnalytics'
 import { usePreferences } from '@/api/hooks/useSettings'
+import { LensNotice, LensToggle } from '@/components/layout/LensToggle'
 import { PageHeader, Segmented } from '@/components/layout/PageHeader'
+import { useLensStore } from '@/stores/lensStore'
 import { Button, IconButton } from '@/components/ui/Button'
 import { EmptyState, ErrorState, Skeleton } from '@/components/ui/Feedback'
 import { addDays, dayAndMonth, greeting, rangeLabel, todayIn, weekdayLong, weekDates } from '@/lib/time'
@@ -23,7 +25,8 @@ export function OverviewPage() {
   const dates = scope === 'week' ? weekDates(date, weekStart) : [date]
   const fmt = prefs?.time_format ?? '12h'
   const { data: o, error, isLoading, isPlaceholderData, refetch } = useOverview(scope, date)
-  const { data: days } = useTimeline({ from: dates[0], to: dates[dates.length - 1], ideal: false })
+  const lens = useLensStore((s) => s.lens)
+  const { data: days } = useTimeline({ from: dates[0], to: dates[dates.length - 1], ideal: false, lens })
   const set = (k: string, v: string | null) => { const n = new URLSearchParams(sp); if (v) n.set(k, v); else n.delete(k); setSp(n, { replace: true }) }
   const step = scope === 'week' ? 7 : 1
   const empty = !!o && o.kpis.logged_minutes === 0
@@ -31,6 +34,7 @@ export function OverviewPage() {
   return (
     <>
       <PageHeader title={`${greeting(tz)}, ${user.display_name.split(' ')[0]}`} subtitle={scope === 'week' ? `Week of ${rangeLabel(dates[0], dates[6])}` : `${weekdayLong(date)}, ${dayAndMonth(date)}`}>
+        <LensToggle />
         <Segmented label="Scope" value={scope} onChange={(v) => set('scope', v === 'week' ? 'week' : null)} options={[{ value: 'day', label: 'Day' }, { value: 'week', label: 'Week' }]} />
         <div className="flex items-center gap-1.5">
           <IconButton icon="chevronLeft" label="Previous" onClick={() => set('date', addDays(date, -step))} />
@@ -39,6 +43,7 @@ export function OverviewPage() {
         </div>
         <Button variant="primary" icon="plus" className="max-md:hidden" onClick={() => nav('/calendar?log=1')}>Log time</Button>
       </PageHeader>
+      <LensNotice />
 
       <div className={`flex flex-col gap-4 p-4 transition-opacity md:px-7 md:py-5 ${isPlaceholderData ? 'opacity-60' : ''}`}>
         {error && <ErrorState error={error} onRetry={() => refetch()} />}

@@ -11,6 +11,7 @@ from app.schemas.common import Envelope, ok
 from app.services.analytics_service import AnalyticsService
 
 router = APIRouter(prefix="/analytics", tags=["analytics"])
+Lens = Literal["all", "work", "personal"]
 
 
 def etag(request: Request, user, svc: AnalyticsService, live: bool) -> str:
@@ -29,24 +30,24 @@ def cached(request: Request, response: Response, tag: str) -> Response | None:
 
 
 @router.get("/day/{day}", response_model=Envelope[DayAnalytics])
-async def day(day: date, request: Request, response: Response, user: CurrentUser, session: DB):
-    svc = AnalyticsService(session, user)
+async def day(day: date, request: Request, response: Response, user: CurrentUser, session: DB, lens: Lens = "all"):
+    svc = AnalyticsService(session, user, lens)
     if (hit := cached(request, response, etag(request, user, svc, svc.touches_today(day, day)))):
         return hit
     return ok(await svc.day(day))
 
 
 @router.get("/week/{week_start}", response_model=Envelope[WeekAnalytics])
-async def week(week_start: date, request: Request, response: Response, user: CurrentUser, session: DB):
-    svc = AnalyticsService(session, user)
+async def week(week_start: date, request: Request, response: Response, user: CurrentUser, session: DB, lens: Lens = "all"):
+    svc = AnalyticsService(session, user, lens)
     if (hit := cached(request, response, etag(request, user, svc, True))):
         return hit
     return ok(await svc.week(week_start))
 
 
 @router.get("/overview", response_model=Envelope[OverviewOut])
-async def overview(request: Request, response: Response, user: CurrentUser, session: DB, scope: Literal["day", "week"] = "week", anchor: date | None = None):
-    svc = AnalyticsService(session, user)
+async def overview(request: Request, response: Response, user: CurrentUser, session: DB, scope: Literal["day", "week"] = "week", anchor: date | None = None, lens: Lens = "all"):
+    svc = AnalyticsService(session, user, lens)
     if (hit := cached(request, response, etag(request, user, svc, True))):
         return hit
     return ok(await svc.overview(scope, anchor))
@@ -54,8 +55,8 @@ async def overview(request: Request, response: Response, user: CurrentUser, sess
 
 @router.get("/breakdown", response_model=Envelope[BreakdownOut])
 async def breakdown(request: Request, response: Response, user: CurrentUser, session: DB, filters: Filters,
-                    from_: Annotated[date, Query(alias="from")], to: date, by: Literal["category", "tag", "task", "project"] = "category"):
-    svc = AnalyticsService(session, user)
+                    from_: Annotated[date, Query(alias="from")], to: date, by: Literal["category", "tag", "task", "project"] = "category", lens: Lens = "all"):
+    svc = AnalyticsService(session, user, lens)
     if (hit := cached(request, response, etag(request, user, svc, svc.touches_today(from_, to)))):
         return hit
     return ok(await svc.breakdown(from_, to, by, filters))
@@ -63,8 +64,8 @@ async def breakdown(request: Request, response: Response, user: CurrentUser, ses
 
 @router.get("/trends", response_model=Envelope[TrendsOut])
 async def trends(request: Request, response: Response, user: CurrentUser, session: DB,
-                 metric: Literal["adherence", "coverage", "sleep", "focus"], granularity: Literal["day", "week"] = "week", periods: int = 8):
-    svc = AnalyticsService(session, user)
+                 metric: Literal["adherence", "coverage", "sleep", "focus"], granularity: Literal["day", "week"] = "week", periods: int = 8, lens: Lens = "all"):
+    svc = AnalyticsService(session, user, lens)
     if (hit := cached(request, response, etag(request, user, svc, True))):
         return hit
     return ok(await svc.trends(metric, granularity, periods))

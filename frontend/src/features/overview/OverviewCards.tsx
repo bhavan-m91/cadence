@@ -3,6 +3,7 @@ import { useMemo, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useBreakdown, useTrends } from '@/api/hooks/useAnalytics'
 import { usePreferences } from '@/api/hooks/useSettings'
+import { useLensStore } from '@/stores/lensStore'
 import type { Banner, DayTimeline, Overview, TrendMetric } from '@/api/types'
 import { ChartTable, Columns, DayClock, Heatmap, Legend, LineChart, MeterList, SegmentedBar, Treemap, type ClockArc, type ClockGap, type HeatCell } from '@/components/charts/charts'
 import { Segmented } from '@/components/layout/PageHeader'
@@ -51,6 +52,7 @@ function Kpi({ label, value, hint, delta, meter }: { label: string; value: React
 }
 
 export function KpiRow({ o, scope }: { o: Overview; scope: 'day' | 'week' }) {
+  const lens = useLensStore((st) => st.lens)
   const k = o.kpis, prevWord = scope === 'week' ? 'last week' : 'yesterday'
   const nav = useNavigate()
   const cov = k.vs_prev.coverage_pct, foc = k.vs_prev.focus, slp = k.vs_prev.sleep_avg, adh = k.vs_prev.adherence
@@ -64,7 +66,7 @@ export function KpiRow({ o, scope }: { o: Overview; scope: 'day' | 'week' }) {
         meter={k.adherence.value != null ? { pct: k.adherence.value * 100, color: 'var(--accent)' } : undefined} delta={adh != null && `${sign(adh)}${Math.abs(Math.round(adh * 100))} pts vs ${prevWord}`} />
       <Kpi label="Focus" value={hm(k.focus.minutes ?? 0)} hint={target ? `of ${hm(target)} ${scope === 'week' ? 'weekly ' : ''}target` : 'No focus target yet'}
         meter={target ? { pct: ((k.focus.minutes ?? 0) / target) * 100, color: 'var(--accent)' } : undefined} delta={foc != null && `${sign(foc)}${hm(Math.abs(foc))} vs ${prevWord}`} />
-      <Kpi label="Sleep" value={k.sleep.avg_minutes != null ? hm(k.sleep.avg_minutes) : '–'} hint={k.sleep.avg_minutes == null ? 'No nights logged' : `${k.sleep.target ? `Target ${hm(k.sleep.target)} · ` : ''}${k.sleep.drift_minutes != null ? `bedtime drift ±${k.sleep.drift_minutes}m` : 'avg per night'}`}
+      <Kpi label="Sleep" value={k.sleep.avg_minutes != null ? hm(k.sleep.avg_minutes) : '–'} hint={lens === 'work' ? 'Not part of the work view' : k.sleep.avg_minutes == null ? 'No nights logged' : `${k.sleep.target ? `Target ${hm(k.sleep.target)} · ` : ''}${k.sleep.drift_minutes != null ? `bedtime drift ±${k.sleep.drift_minutes}m` : 'avg per night'}`}
         delta={slp != null && `${sign(slp)}${hm(Math.abs(slp))} vs ${prevWord}`} />
     </div>
   )
@@ -266,6 +268,7 @@ export function DeadlinesCard({ o }: { o: Overview }) {
 
 /** Day scope: the ring, then the hour-by-hour log with a Fill button on every gap. The ring and the log are linked both ways. */
 export function DayRhythm({ day, tz, fmt }: { day: DayTimeline; tz: string; fmt: TimeFormat }) {
+  const lens = useLensStore((st) => st.lens)
   const nav = useNavigate()
   const [hot, setHot] = useState<string | null>(null)
   const log = useRef<HTMLOListElement>(null)
@@ -278,7 +281,8 @@ export function DayRhythm({ day, tz, fmt }: { day: DayTimeline; tz: string; fmt:
   return (
     <div className="grid items-start gap-4 lg:grid-cols-[minmax(0,320px)_minmax(0,1fr)]">
       <Card title="24 hours" sub="Midnight is at the top. Hover an arc to see it; click to find it in the log.">
-        <DayClock arcs={arcs} gaps={gaps} active={hot} onActive={setHot} onPick={pick} centre={hm(day.coverage.logged)} sub={`of ${hm(day.coverage.elapsed || 1440)}`} />
+        <DayClock arcs={arcs} gaps={gaps} active={hot} onActive={setHot} onPick={pick}
+          centre={hm(lens === 'all' ? day.coverage.logged : day.blocks.reduce((t, b) => t + b.minutes, 0))} sub={lens === 'all' ? `of ${hm(day.coverage.elapsed || 1440)}` : `${lens} of ${hm(day.coverage.elapsed || 1440)}`} />
         <div className="mt-3"><Legend items={[...legend, ...(day.gaps.length ? [{ label: 'Unlogged', color: 'var(--bad)', hatch: true }] : [])]} /></div>
       </Card>
       <Card title="Hour by hour">

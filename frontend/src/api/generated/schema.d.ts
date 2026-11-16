@@ -4059,6 +4059,7 @@ export interface operations {
                 kind?: components["schemas"]["ActivityKind"] | null;
                 certainty?: components["schemas"]["TimeCertainty"] | null;
                 needs_review?: boolean | null;
+                lens?: string;
             };
             header?: never;
             path?: never;
@@ -5088,6 +5089,7 @@ export interface operations {
                 from: string;
                 to: string;
                 by?: "category" | "tag" | "task" | "project";
+                lens?: string;
                 q?: string | null;
                 category_id?: string | null;
                 tag_ids?: string[] | null;
@@ -5163,7 +5165,9 @@ export interface operations {
     };
     day_api_v1_analytics_day__day__get: {
         parameters: {
-            query?: never;
+            query?: {
+                lens?: "all" | "work" | "personal";
+            };
             header?: never;
             path: {
                 day: string;
@@ -5233,6 +5237,7 @@ export interface operations {
             query?: {
                 scope?: "day" | "week";
                 anchor?: string | null;
+                lens?: "all" | "work" | "personal";
             };
             header?: never;
             path?: never;
@@ -5302,6 +5307,7 @@ export interface operations {
                 metric: "adherence" | "coverage" | "sleep" | "focus";
                 granularity?: "day" | "week";
                 periods?: number;
+                lens?: "all" | "work" | "personal";
             };
             header?: never;
             path?: never;
@@ -5367,7 +5373,9 @@ export interface operations {
     };
     week_api_v1_analytics_week__week_start__get: {
         parameters: {
-            query?: never;
+            query?: {
+                lens?: "all" | "work" | "personal";
+            };
             header?: never;
             path: {
                 week_start: string;
@@ -9159,6 +9167,7 @@ export interface operations {
                 kind?: components["schemas"]["ActivityKind"] | null;
                 certainty?: components["schemas"]["TimeCertainty"] | null;
                 needs_review?: boolean | null;
+                lens?: string;
             };
             header?: never;
             path?: never;

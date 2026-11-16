@@ -18,7 +18,9 @@ import { Dialog } from '@/components/ui/Dialog'
 import { EmptyState, ErrorState, Skeleton } from '@/components/ui/Feedback'
 import { Field, Input, Select, Textarea } from '@/components/ui/Field'
 import { PALETTE } from '@/lib/colors'
-import { dayOfMonth, hm, weekdayShort } from '@/lib/time'
+import { addDays, dayOfMonth, hm, todayIn, weekdayShort, weekStartOf } from '@/lib/time'
+import { usePreferences } from '@/api/hooks/useSettings'
+import { useAuthStore } from '@/stores/authStore'
 import { toast } from '@/stores/toastStore'
 import { ColorPicker, MergeDialog } from './shared'
 
@@ -100,14 +102,27 @@ function TagRow({ tag, scale, selected, onSelect }: { tag: Tag; scale: number; s
   )
 }
 
+type TagRange = '7d' | 'week' | 'last' | '30d'
+const RANGE_LABEL: Record<TagRange, string> = { '7d': 'Last 7 days', week: 'This week', last: 'Last week', '30d': 'Last 30 days' }
+
+function useTagRange(range: TagRange) {
+  const tz = useAuthStore((s) => s.user!.timezone)
+  const weekStart = usePreferences().data?.week_start ?? 1
+  const today = todayIn(tz)
+  const ws = weekStartOf(today, weekStart)
+  return range === 'week' ? { from: ws, to: addDays(ws, 6) } : range === 'last' ? { from: addDays(ws, -7), to: addDays(ws, -1) } : range === '30d' ? { from: addDays(today, -29), to: today } : { from: addDays(today, -6), to: today }
+}
+
 function TagsTab({ selected, onSelect, search, newOpen, setNewOpen }: { selected: string | null; onSelect: (id: string | null) => void; search: string; newOpen: boolean; setNewOpen: (v: boolean) => void }) {
   const [archived, setArchived] = useState(false)
-  const { data: tags, isLoading, error, refetch } = useTags({ archived })
+  const [range, setRange] = useState<TagRange>('7d') // a rolling week, so a Monday morning never shows an empty page
+  const span = useTagRange(range)
+  const { data: tags, isLoading, error, refetch } = useTags({ archived, ...span })
   // Land on a tag on wide screens so the detail panel is never an empty box (the design always shows one).
   useEffect(() => {
-    if (!selected && tags?.length && typeof window !== 'undefined' && window.matchMedia('(min-width: 1024px)').matches) onSelect(tags[0].id)
+    if (!selected && tags?.length && typeof window !== 'undefined' && window.matchMedia('(min-width: 1024px)').matches) onSelect([...tags].sort((x, y) => y.minutes_in_range - x.minutes_in_range)[0].id) // open on the busiest tag
   }, [selected, tags]) // eslint-disable-line react-hooks/exhaustive-deps
-  const shown = (tags ?? []).filter((t) => t.name.toLowerCase().includes(search.trim().toLowerCase().replace(/^#/, '')))
+  const shown = (tags ?? []).filter((t) => t.name.toLowerCase().includes(search.trim().toLowerCase().replace(/^#/, ''))).sort((x, y) => y.minutes_in_range - x.minutes_in_range || x.name.localeCompare(y.name))
   const scale = Math.max(60, ...shown.map((t) => Math.max(t.minutes_in_range, t.goal_kind !== 'tracked' ? t.goal_weekly_minutes ?? 0 : 0)))
   const groups = Array.from(shown.reduce((m, t) => m.set(groupOf(t.name), [...(m.get(groupOf(t.name)) ?? []), t]), new Map<string, Tag[]>()))
     .sort(([a], [b]) => (a === 'General' ? -1 : b === 'General' ? 1 : a.localeCompare(b)))
@@ -116,7 +131,10 @@ function TagsTab({ selected, onSelect, search, newOpen, setNewOpen }: { selected
       <StyleGuide />
       <div className="grid items-start gap-4 lg:grid-cols-[minmax(0,1.15fr)_minmax(0,1fr)]">
         <section className={clsx('card min-w-0 p-4 md:p-[18px]', selected && 'max-lg:hidden')} aria-labelledby="all-tags">
-          <div className="mb-3 flex flex-wrap items-baseline justify-between gap-2.5"><h2 id="all-tags" className="m-0 text-[13.5px] font-semibold">All tags</h2><span className="text-[11.5px] font-medium text-faint">Bar = hours this week · line = weekly limit</span></div>
+          <div className="mb-3 flex flex-wrap items-center justify-between gap-2.5">
+            <div><h2 id="all-tags" className="m-0 text-[13.5px] font-semibold">All tags</h2><span className="text-[11.5px] font-medium text-faint">Bar = hours in {RANGE_LABEL[range].toLowerCase()} · line = weekly limit</span></div>
+            <Select dense aria-label="Range" className="!w-40" value={range} onChange={(e) => setRange(e.target.value as TagRange)}>{(Object.keys(RANGE_LABEL) as TagRange[]).map((r) => <option key={r} value={r}>{RANGE_LABEL[r]}</option>)}</Select>
+          </div>
           {isLoading && <div className="flex flex-col gap-2"><Skeleton className="h-10" /><Skeleton className="h-10" /><Skeleton className="h-10" /></div>}
           {error && <ErrorState error={error} onRetry={() => refetch()} />}
           {tags && tags.length === 0 && <EmptyState icon="tag" title={archived ? 'No archived tags' : 'No tags yet'} action={!archived ? <Button variant="primary" icon="plus" onClick={() => setNewOpen(true)}>Create a tag</Button> : undefined}>Tags describe what an activity was about (#product-b, #p0, #social-media). One activity can have many.</EmptyState>}
@@ -126,14 +144,14 @@ function TagsTab({ selected, onSelect, search, newOpen, setNewOpen }: { selected
               <div className="flex items-center gap-2.5 border-b border-line2 px-2 pb-2 pt-2.5">
                 <CategoryChip name={name} color="var(--sky)" />
                 <span className="text-[11.5px] text-faint">{list.length} {list.length === 1 ? 'tag' : 'tags'}</span>
-                <span className="num ml-auto text-[11.5px] text-muted"><b className="font-semibold text-ink">{hm(list.reduce((a, t) => a + t.minutes_in_range, 0))}</b> this week</span>
+                <span className="num ml-auto text-[11.5px] text-muted"><b className="font-semibold text-ink">{hm(list.reduce((a, t) => a + t.minutes_in_range, 0))}</b> tagged</span>
               </div>
               {list.map((t) => <TagRow key={t.id} tag={t} scale={scale} selected={t.id === selected} onSelect={() => onSelect(t.id)} />)}
             </div>
           ))}
           <label className="mt-2 flex items-center gap-2 border-t border-line2 pt-3 text-[12.5px] font-medium text-muted"><input type="checkbox" className="size-4 accent-[var(--accent)]" checked={archived} onChange={(e) => setArchived(e.target.checked)} />Show archived</label>
         </section>
-        {selected ? <TagPanel key={selected} id={selected} onClose={() => onSelect(null)} />
+        {selected ? <TagPanel key={selected} id={selected} span={span} rangeLabel={RANGE_LABEL[range]} onClose={() => onSelect(null)} />
           : <section className="card hidden p-8 text-center text-[13px] text-muted lg:block">Pick a tag to see its limit, keywords and the days it was used.</section>}
       </div>
       <NewTagDialog open={newOpen} onOpenChange={setNewOpen} onCreated={(id) => onSelect(id)} />
@@ -173,9 +191,9 @@ function Sect({ label, children }: { label: string; children: React.ReactNode })
   return <div className="mt-3.5 border-t border-line2 pt-3.5"><div className="mb-2 text-[11.5px] font-semibold text-muted">{label}</div>{children}</div>
 }
 
-function TagPanel({ id, onClose }: { id: string; onClose: () => void }) {
+function TagPanel({ id, span, rangeLabel, onClose }: { id: string; span: { from: string; to: string }; rangeLabel: string; onClose: () => void }) {
   const nav = useNavigate()
-  const { data: tag, isLoading, error, refetch } = useTag(id)
+  const { data: tag, isLoading, error, refetch } = useTag(id, span)
   const { data: allTags } = useTags()
   const { data: rules } = useRules({ target_type: 'tag', target_id: id })
   const update = useUpdateTag(), del = useDeleteTag(), merge = useMergeTag(), aliases = usePutAliases(), addRule = useCreateRule(), delRule = useDeleteRule()
@@ -232,7 +250,7 @@ function TagPanel({ id, onClose }: { id: string; onClose: () => void }) {
               <span>hours a week</span><span className="num text-faint">≈ {hm(Math.round(goalMin / 7))} a day</span>
             </div>
             <div className="mt-3">
-              <div className="mb-1.5 flex justify-between text-xs text-muted"><span>This week so far</span><b className="num font-semibold text-ink">{hm(tag.minutes_in_range)} of {hm(goalMin)}</b></div>
+              <div className="mb-1.5 flex justify-between text-xs text-muted"><span>{rangeLabel}</span><b className="num font-semibold text-ink">{hm(tag.minutes_in_range)} of {hm(goalMin)}</b></div>
               <div className="relative h-3 overflow-hidden rounded-md bg-line2" role="img" aria-label={`${hm(tag.minutes_in_range)} of ${hm(goalMin)}`}><i className="absolute inset-y-0 left-0 rounded-md" style={{ width: `${pct}%`, background: over ? 'var(--bad)' : tag.goal_status === 'met' ? 'var(--good)' : 'var(--accent)' }} /></div>
               <div className={clsx('mt-1.5 text-xs font-medium', over ? 'text-bad' : 'text-muted')}>{status}</div>
             </div>
@@ -259,9 +277,9 @@ function TagPanel({ id, onClose }: { id: string; onClose: () => void }) {
         </div>
       </Sect>
 
-      <Sect label="Per day this week">
+      <Sect label={`Per day · ${rangeLabel.toLowerCase()}`}>
         <Columns items={tag.by_day.map((d) => ({ key: d.date, label: weekdayShort(d.date), sub: String(dayOfMonth(d.date)), value: d.minutes, color: tag.color, muted: d.minutes === 0 }))} height={118} />
-        <p className="mb-0 mt-2 text-xs text-muted">{hm(tag.total_minutes)} total this week</p>
+        <p className="mb-0 mt-2 text-xs text-muted">{hm(tag.total_minutes)} in {rangeLabel.toLowerCase()}</p>
       </Sect>
 
       <Sect label="Recent activities">

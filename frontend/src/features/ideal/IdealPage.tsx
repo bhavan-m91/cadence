@@ -6,7 +6,9 @@ import { useIdeal, useIdealProgress, useSaveIdeal } from '@/api/hooks/useIdeal'
 import { useCategories, useTags, type FlatCategory, flattenCategories } from '@/api/hooks/useTaxonomy'
 import type { CategoryNode, IdealProgressRow } from '@/api/types'
 import { TagChip } from '@/components/domain/Chips'
+import { LensNotice, LensToggle } from '@/components/layout/LensToggle'
 import { PageHeader } from '@/components/layout/PageHeader'
+import { inLens, useLensStore } from '@/stores/lensStore'
 import { Button } from '@/components/ui/Button'
 import { Dialog } from '@/components/ui/Dialog'
 import { ErrorState, Skeleton } from '@/components/ui/Feedback'
@@ -114,7 +116,9 @@ export function IdealPage() {
   const allocated = useMemo(() => new Set([...Object.keys(m.day), ...Object.keys(m.week)].filter((k) => (m.day[k] ?? 0) > 0 || (m.week[k] ?? 0) > 0)), [m])
   const rows = useMemo(() => selectableRows(tree, new Set([...Object.keys(base.day), ...Object.keys(base.week)])), [tree, base])
   const roots = useMemo(() => new Map((tree ?? []).map((r) => [r.root_kind, r])), [tree])
-  const grouped = ROOTS.map((k) => ({ kind: k, root: roots.get(k), rows: rows.filter((r) => r.root_kind === k) })).filter((g) => g.root && g.rows.length)
+  const lens = useLensStore((s) => s.lens)
+  // The lens only hides rows; totals still add up every row, since a template must cover the whole 24h and 168h.
+  const grouped = ROOTS.map((k) => ({ kind: k, root: roots.get(k), rows: rows.filter((r) => r.root_kind === k) })).filter((g) => g.root && g.rows.length && inLens(lens, g.kind))
 
   const dayTotal = sum(m.day), weekTotal = sum(m.week)
   const dayDirty = !eq(m.day, base.day), weekDirty = !eq(m.week, base.week) || !eq(m.dist as any, base.dist as any)
@@ -181,9 +185,11 @@ export function IdealPage() {
   return (
     <>
       <PageHeader title="Ideal Day & Week" subtitle="How you'd like your time to split · the daily view compares to the day, the weekly view to the week">
+        <LensToggle />
         <Button icon="x" onClick={() => setM(base)} disabled={!dirty}>Reset</Button>
         <Button variant="primary" icon="check" disabled={!canSave} title={canSave ? 'Save a new version' : dirty ? 'Each template must add up exactly (24h day, 168h week)' : 'Nothing to save'} onClick={() => { setSaveError(undefined); setSaveOpen(true) }}>Save</Button>
       </PageHeader>
+      <LensNotice />
 
       <div className="flex flex-col gap-4 p-4 md:px-7 md:py-[22px] md:pb-10">
         {loading && <Skeleton className="h-96" />}
@@ -258,7 +264,7 @@ export function IdealPage() {
               </div>
 
               <ul className="m-0 flex list-none flex-col gap-2.5 p-0 md:hidden">
-                {rows.map((r) => (
+                {rows.filter((r) => inLens(lens, r.root_kind)).map((r) => (
                   <li key={r.id} className="rounded-xl border border-line p-3">
                     <div className="flex items-center gap-2 text-[13px] font-semibold"><i className="size-2.5 rounded-[3px]" style={{ background: r.color }} />{r.name}<span className="ml-auto num text-xs font-medium text-muted">≈ {hm(Math.round((m.week[r.id] ?? 0) / ({ all_days: 7, weekdays: 5, weekend: 2 } as const)[m.dist[r.id] ?? 'all_days']))}/day</span></div>
                     <div className="mt-2 flex items-center justify-between gap-2"><Stepper value={m.week[r.id] ?? 0} onChange={(v) => setWeek(r.id, v)} label={r.name} max={WEEK} />

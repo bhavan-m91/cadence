@@ -11,7 +11,9 @@ import { ErrorState, Skeleton } from '@/components/ui/Feedback'
 import { Icon } from '@/components/ui/Icon'
 import { Select } from '@/components/ui/Field'
 import { Tooltip } from '@/components/ui/Tooltip'
+import { LensNotice, LensToggle } from '@/components/layout/LensToggle'
 import { PageHeader, Segmented } from '@/components/layout/PageHeader'
+import { useLensStore } from '@/stores/lensStore'
 import { ActivityDetailPanel } from '@/features/activity/ActivityDetailPanel'
 import { ActivityFormDialog, type FormDefaults } from '@/features/activity/ActivityFormDialog'
 import { addDays, dayOfMonth, formatClock, formatRange, hm, isoToLocal, monthYear, rangeLabel, snap, todayIn, weekdayShort, weekDates } from '@/lib/time'
@@ -54,7 +56,8 @@ export function CalendarPage() {
   const tagFilter = sp.get('tag') ?? ''
   const categoryFilter = sp.get('category') ?? ''
   const dates = view === 'week' ? weekDates(date, weekStart) : [date]
-  const params = { from: dates[0], to: dates[dates.length - 1], ideal, ...(tagFilter && { tag_ids: [tagFilter] }), ...(categoryFilter && { category_id: categoryFilter }) }
+  const lens = useLensStore((s) => s.lens)
+  const params = { from: dates[0], to: dates[dates.length - 1], ideal, lens, ...(tagFilter && { tag_ids: [tagFilter] }), ...(categoryFilter && { category_id: categoryFilter }) }
   const { data: days, error, isLoading, refetch } = useTimeline(params)
   const { data: tree } = useCategories()
   const { data: tags } = useTags()
@@ -150,13 +153,14 @@ export function CalendarPage() {
   }
 
   const anyLogged = !!days?.some((d) => d.coverage.logged > 0)
-  const firstIncomplete = anyLogged ? days?.find((d) => d.date < today && !d.coverage.complete && d.coverage.unlogged > 0) : undefined
+  const firstIncomplete = anyLogged ? days?.find((d) => d.date < today && !d.coverage.complete && d.coverage.unlogged > 0 && d.coverage.logged > 0) : undefined
   const tagOptions = tags ?? []
   const catOptions = flattenCategories(tree)
 
   return (
     <>
       <PageHeader title="Calendar" subtitle={view === 'week' ? `${monthYear(dates[0])} · ${rangeLabel(dates[0], dates[6])}` : `${weekdayShort(date)} ${rangeLabel(date, date)} ${monthYear(date).split(' ').pop()}`}>
+        <LensToggle />
         {!mobile && <Segmented label="View" value={view} onChange={(v) => setParam('view', v === 'week' ? 'week' : null)} options={[{ value: 'day', label: 'Day' }, { value: 'week', label: 'Week' }]} />}
         <div className="flex items-center gap-1.5">
           <IconButton icon="chevronLeft" label={view === 'week' ? 'Previous week' : 'Previous day'} onClick={() => setParam('date', addDays(date, -step))} />
@@ -165,6 +169,7 @@ export function CalendarPage() {
         </div>
         <Button variant="primary" icon="plus" onClick={() => openLog()} className="max-md:hidden">Log time</Button>
       </PageHeader>
+      <LensNotice />
 
       <div className="flex flex-wrap items-center gap-2 border-b border-line bg-card px-4 py-2 md:px-7">
         <label className="flex items-center gap-2 text-[12.5px] font-medium text-muted"><input type="checkbox" className="size-4 accent-[var(--accent)]" checked={ideal} onChange={(e) => setParam('ideal', e.target.checked ? null : '0')} />Ideal overlay</label>

@@ -59,6 +59,7 @@ from app.services.tag_service import goal_status
 from app.services.timeline_service import TimelineService
 
 ROOT_ORDER = {"work": 0, "personal": 1, "sleep": 2}
+LENS_ROOTS: dict[str, set[RootKind] | None] = {"all": None, "work": {RootKind.work}, "personal": {RootKind.personal, RootKind.sleep}}
 NEUTRAL = "#5E6582"
 MAX_TREND_PERIODS = {"day": 366, "week": 52}
 
@@ -102,8 +103,10 @@ class Period:
 
 
 class AnalyticsService:
-    def __init__(self, session: AsyncSession, user: User):
+    def __init__(self, session: AsyncSession, user: User, lens: str | None = None):
         self.session, self.user = session, user
+        # The Work / Personal lens narrows every total to one side of life. Coverage stays whole-day: a gap is a gap whichever side you look at.
+        self.roots: set[RootKind] | None = LENS_ROOTS.get(lens or "all")
         self.tz: ZoneInfo = get_zone(user.timezone)
         self.q = AnalyticsQueries(session, user.id)
         self.ideal = IdealRepository(session, user.id)
@@ -141,15 +144,24 @@ class AnalyticsService:
         start, end = day_bounds(d, self.tz)
         return int((min(max(self.now, start), end) - start).total_seconds() // 60)
 
+    def in_lens(self, c) -> bool:
+        return self.roots is None or (c is not None and c.root_kind in self.roots)
+
+    @property
+    def sleep_in_lens(self) -> bool:
+        return self.roots is None or RootKind.sleep in self.roots
+
     # ------------------------------------------------------------------ aggregation
     async def _aggregate(self, rows: list[SliceRow], tag_map: dict[uuid.UUID, list[uuid.UUID]]) -> Agg:
         cats, prefs = await self.cats(), await self.prefs()
         a = Agg()
         for r in rows:
             m, c = r.minutes, cats.get(r.category_id)
+            (a.placed if r.is_placed else a.unplaced)[r.local_date] += m
+            if not self.in_lens(c):
+                continue
             a.by_cat[r.category_id] += m
             a.by_day_cat[r.local_date][r.category_id] += m
-            (a.placed if r.is_placed else a.unplaced)[r.local_date] += m
             if r.task_id:
                 a.by_task[r.task_id] += m
             if r.project_id:
@@ -218,6 +230,9 @@ class AnalyticsService:
             return None
         eff, allocs = tpl
         cats = await self.cats()
+        allocs = [al for al in allocs if self.in_lens(cats.get(al.category_id))]
+        if not allocs:
+            return None
         allocated = {a.category_id for a in allocs}
         day = kind == IdealKind.day
         completed = [d for d in dates if d < self.today]
@@ -284,16 +299,17 @@ class AnalyticsService:
 
         # sleep: nights by wake date. A day reads the 7 nights ending that day, a week reads its own 7.
         n_dates = date_range(lo - timedelta(days=6), hi) if scope == "day" else dates
-        nights = sleep.attribute(await self.q.sleep_activities(n_dates[0], n_dates[-1], self.tz), self.tz)
+        nights = sleep.attribute(await self.q.sleep_activities(n_dates[0], n_dates[-1], self.tz), self.tz) if self.sleep_in_lens else {}
         stats = sleep.summarize(nights, n_dates, self.tz, prefs.short_night_minutes)
         sleep_target = sum(al.minutes for al in (day_tpl[1] if day_tpl else []) if al.category_id in cats and cats[al.category_id].root_kind == RootKind.sleep) or None
+        sleep_target = sleep_target if self.sleep_in_lens else None
         for c in cols:
             c.sleep = nights[c.date].minutes if c.date in nights else 0
         sleep_block = SleepBlock(
             nights=[SleepNight(date=d, minutes=nights[d].minutes, bed_at=nights[d].bed_at, wake_at=nights[d].wake_at, short=nights[d].minutes < prefs.short_night_minutes)
                     for d in n_dates if d in nights], target=sleep_target, **stats)
 
-        focus_alloc = sum(al.minutes for al in (tpl[1] if tpl else []) if al.category_id in cats and cats[al.category_id].counts_as_focus) or None
+        focus_alloc = sum(al.minutes for al in (tpl[1] if tpl else []) if al.category_id in cats and cats[al.category_id].counts_as_focus and self.in_lens(cats[al.category_id])) or None
         focus = FocusBlock(days=[FocusDay(date=d, minutes=a.focus.get(d, 0)) for d in dates], minutes=sum(a.focus.get(d, 0) for d in dates), target=focus_alloc)
 
         p = Period(scope, dates, coverage, CertaintyOut(recorded=a.recorded, estimated=a.estimated), by_category, by_tag, by_task, by_project,
@@ -358,7 +374,8 @@ class AnalyticsService:
 
         rhythm = None
         if scope == "day":
-            rhythm = (await TimelineService(self.session, self.user).build(anchor, anchor, None, True)).days[0]
+            lens_filter = ActivityFilters(root_kinds=[k.value for k in self.roots]) if self.roots else None  # the ring and log follow the lens too
+            rhythm = (await TimelineService(self.session, self.user).build(anchor, anchor, lens_filter, True)).days[0]
 
         charts = {
             "actual_vs_ideal": p.ideal.model_dump(mode="json") if p.ideal else None,
@@ -466,10 +483,10 @@ class AnalyticsService:
         kind = IdealKind.day if granularity == "day" else IdealKind.week
         versions = await self._templates(kind)
         day_versions = versions if kind == IdealKind.day else await self._templates(IdealKind.day)
-        nights = sleep.attribute(await self.q.sleep_activities(lo, hi, self.tz), self.tz) if metric == "sleep" else {}
+        nights = sleep.attribute(await self.q.sleep_activities(lo, hi, self.tz), self.tz) if metric == "sleep" and self.sleep_in_lens else {}
 
         def focus_target(v) -> float | None:
-            return sum(al.minutes for al in v[1] if al.category_id in cats and cats[al.category_id].counts_as_focus) if v else None
+            return sum(al.minutes for al in v[1] if al.category_id in cats and cats[al.category_id].counts_as_focus and self.in_lens(cats[al.category_id])) if v else None
 
         points: list[TrendPoint] = []
         for dates in spans:
@@ -490,7 +507,7 @@ class AnalyticsService:
                 got = [nights[d].minutes for d in dates if d in nights]
                 value = round(sum(got) / len(got)) if got else None
                 dv = self._in_force(day_versions, start)
-                target = float(sum(al.minutes for al in dv[1] if cats[al.category_id].root_kind == RootKind.sleep)) if dv else None
+                target = float(sum(al.minutes for al in dv[1] if cats[al.category_id].root_kind == RootKind.sleep)) if dv and self.sleep_in_lens else None
             else:
                 cmp = await self._compare(kind, dates, a.by_day_cat, self._in_force(versions, start))
                 value = cmp.adherence.value if cmp else None

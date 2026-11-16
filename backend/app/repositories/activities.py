@@ -4,7 +4,7 @@ from datetime import date, datetime
 
 from sqlalchemy import and_, delete, exists, func, or_, select
 
-from app.models import Activity, ActivityDaySlice, ActivityEvent, ActivityTag, Tag
+from app.models import Activity, ActivityDaySlice, ActivityEvent, ActivityTag, Category, Tag
 from app.models.enums import (
     ActivityEventType,
     ActivityKind,
@@ -30,6 +30,7 @@ class ActivityFilters:
     kind: ActivityKind | None = None
     certainty: TimeCertainty | None = None
     needs_review: bool | None = None
+    root_kinds: list[str] | None = None  # the Work / Personal lens
 
 
 def sort_key():
@@ -81,6 +82,8 @@ class ActivitiesRepository(UserScopedRepository):
             stmt = stmt.where(Activity.time_certainty == f.certainty)
         if f.needs_review is not None:
             stmt = stmt.where(Activity.needs_review == f.needs_review)
+        if f.root_kinds:
+            stmt = stmt.where(Activity.category_id.in_(select(Category.id).where(Category.user_id == self.user_id, Category.root_kind.in_(f.root_kinds))))
         return stmt
 
     async def search(self, f: ActivityFilters, limit: int, cursor: tuple[datetime, uuid.UUID] | None) -> list[Activity]:

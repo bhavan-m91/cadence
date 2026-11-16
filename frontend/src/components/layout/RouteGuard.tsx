@@ -20,7 +20,13 @@ export function RouteGuard() {
 export function PublicOnly() {
   const status = useAuthStore((s) => s.status)
   const user = useAuthStore((s) => s.user)
+  const loc = useLocation()
   if (status === 'loading') return <Splash />
-  if (status === 'authed' && user) return <Navigate to={user.onboarding_completed ? '/overview' : '/onboarding'} replace />
+  if (status === 'authed' && user) {
+    // Signing in lands where you were going (the ?next= link), not always on Overview.
+    const next = new URLSearchParams(loc.search).get('next')
+    const safe = next && next.startsWith('/') && !next.startsWith('//') ? next : '/overview'
+    return <Navigate to={user.onboarding_completed ? safe : '/onboarding'} replace />
+  }
   return <Outlet />
 }

@@ -58,6 +58,7 @@ async def activity_filters(
     tag_ids: Annotated[list[uuid.UUID] | None, Query()] = None, tag_mode: Annotated[str, Query(pattern="^(any|all)$")] = "any",
     task_id: uuid.UUID | None = None, project_id: uuid.UUID | None = None, status: ActivityStatus | None = None,
     kind: ActivityKind | None = None, certainty: TimeCertainty | None = None, needs_review: bool | None = None,
+    lens: Annotated[str, Query(pattern="^(all|work|personal)$")] = "all",
 ) -> ActivityFilters:
     if from_ and to and (to - from_).days > 366:
         raise ValidationFailed("Range is limited to 366 days", path="to", rule="range_too_long")
@@ -69,7 +70,8 @@ async def activity_filters(
             raise ValidationFailed("Unknown category", path="category_id", rule="not_found")
         category_ids = [c.id for c in await repo.subtree(cat)]
     return ActivityFilters(from_date=from_, to_date=to, q=q, category_ids=category_ids, tag_ids=tag_ids or [], tag_mode=tag_mode,
-                           task_id=task_id, project_id=project_id, status=status, kind=kind, certainty=certainty, needs_review=needs_review)
+                           task_id=task_id, project_id=project_id, status=status, kind=kind, certainty=certainty, needs_review=needs_review,
+                           root_kinds={"work": ["work"], "personal": ["personal", "sleep"]}.get(lens))
 
 
 Filters = Annotated[ActivityFilters, Depends(activity_filters)]

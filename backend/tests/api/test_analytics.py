@@ -279,3 +279,35 @@ async def test_personal_time_inside_office_hours_follows_the_setting(client):
     r = await client.patch(f"{API}/users/me/preferences", headers=p.headers, json={"office_start_minute": 840, "office_end_minute": 1140})  # 2pm-7pm
     assert r.status_code == 200, r.text
     assert (await day(client, p))["work_vs_personal"]["personal_in_office_hours"] == 0
+
+
+async def test_the_work_and_personal_lens_narrows_every_total_but_not_coverage(client):
+    p = await signup(client)
+    await client.put(f"{API}/ideal/day", headers=p.headers, json=day_body(p, "2025-01-01"))
+    await log(client, p, "Build", MON, "09:00", "12:00")  # work
+    await log(client, p, "Lunch", MON, "12:00", "13:00", category="Meals & chores")  # personal
+    await log(client, p, "Night", MON, "00:00", "07:00", category="Sleep")  # sleep counts as personal life
+    work = (await get(client, p, f"/analytics/day/{MON}?lens=work")).json()["data"]
+    pers = (await get(client, p, f"/analytics/day/{MON}?lens=personal")).json()["data"]
+    every = (await day(client, p))
+    assert {c["name"] for c in work["by_category"]} == {"Deep work"}
+    assert {c["name"] for c in pers["by_category"]} == {"Meals & chores", "Sleep"}
+    assert work["coverage"] == pers["coverage"] == every["coverage"]  # a gap is a gap whichever side you look at
+    assert {r["root_kind"] for r in work["ideal"]["rows"]} == {"work"} and {r["root_kind"] for r in pers["ideal"]["rows"]} <= {"personal", "sleep"}
+    assert work["sleep"]["nights"] == [] and work["sleep"]["target"] is None
+    assert work["work_vs_personal"]["personal"] == 0 and pers["work_vs_personal"]["work"] == 0
+    o = (await get(client, p, f"/analytics/overview?scope=day&anchor={MON}&lens=work")).json()["data"]
+    assert o["kpis"]["focus"]["minutes"] == 180 and all(c["root_kind"] == "work" for c in o["charts"]["categories"])
+
+
+async def test_the_lens_filters_calendar_blocks_and_the_breakdown(client):
+    p = await signup(client)
+    await log(client, p, "Build", MON, "09:00", "12:00")
+    await log(client, p, "Lunch", MON, "12:00", "13:00", category="Meals & chores")
+    tl = (await get(client, p, f"/timeline?from={MON}&to={MON}&lens=work")).json()["data"]["days"][0]
+    assert [b["title"] for b in tl["blocks"]] == ["Build"] and tl["coverage"]["logged"] == 240
+    acts = (await get(client, p, f"/activities?from={MON}&to={MON}&lens=personal")).json()["data"]
+    assert [a["title"] for a in acts] == ["Lunch"]
+    b = (await get(client, p, f"/analytics/breakdown?from={MON}&to={MON}&lens=work")).json()["data"]
+    assert b["total_minutes"] == 180
+    assert (await get(client, p, f"/timeline?from={MON}&to={MON}&lens=nope")).status_code == 422

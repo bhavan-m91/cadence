@@ -7,6 +7,7 @@ import { toast } from '@/stores/toastStore'
 export interface ActivityFilter {
   from?: string; to?: string; q?: string; category_id?: string; tag_ids?: string[]; tag_mode?: 'any' | 'all'
   task_id?: string; project_id?: string; kind?: 'actual' | 'planned'; certainty?: string; needs_review?: boolean
+  lens?: 'all' | 'work' | 'personal'
 }
 
 export function useTimeline(params: ActivityFilter & { from: string; to: string; ideal?: boolean }) {
