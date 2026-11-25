@@ -2,6 +2,10 @@
 
 A personal time tracker and life-analytics app. Log what happened in a day, see it on a 24-hour calendar, and (in later phases) compare it with your Ideal Day and Week.
 
+
+
+
+
 This repository implements the **Cadence PRD V1.0**. **Phases 0 to 4B are built** (foundation, core data and manual logging, the AI journal, Ideal Day & Week, analytics and the Overview dashboards). Deploy and hardening are next. See [Status](#status).
 
 | | |
